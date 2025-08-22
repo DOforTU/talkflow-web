@@ -1,0 +1,86 @@
+/* Smart Header Component Styles */
+.smart-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--bg-primary);
+    backdrop-filter: blur(12px);
+    transition: transform 0.3s ease-in-out;
+}
+
+.smart-header.hidden {
+    transform: translateY(-100%);
+}
+
+.smart-header.visible {
+    transform: translateY(0);
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.header-logo {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+}
+
+.header-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-1);
+}
+
+.header-menu {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-link {
+    color: var(--text-2);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.header-link:hover {
+    color: var(--text-1);
+}
+
+.header-link.active {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        padding: 0.75rem 1rem;
+    }
+
+    .header-menu {
+        gap: 1rem;
+    }
+
+    .header-link {
+        font-size: var(--font-size-sm);
+    }
+}

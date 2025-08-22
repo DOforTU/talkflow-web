@@ -1,0 +1,32 @@
+.language-selector {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+}
+
+.lang-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+}
+
+.lang-btn:hover {
+    color: var(--text-primary);
+}
+
+.lang-btn.active {
+    color: var(--primary);
+}
+
+.lang-divider {
+    background-color: var(--text-muted);
+    width: 1px;
+    height: 0.875rem;
+}

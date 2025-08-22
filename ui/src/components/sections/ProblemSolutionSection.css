@@ -1,0 +1,133 @@
+/* Problem Solution Section Styles */
+
+.problem-solution-container {
+    max-width: 1200px;
+    padding: 5rem 2rem;
+    margin: 0 auto;
+}
+
+.problem-solution-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.problem-solution-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-1);
+    margin-bottom: 1.5rem;
+}
+
+.problem-solution-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-2);
+    max-width: 48rem;
+    margin: 0 auto;
+}
+
+.problem-solution-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.problem-side,
+.solution-side {
+    display: flex;
+    flex-direction: column;
+}
+
+.side-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.side-title.problem {
+    color: var(--error);
+}
+
+.side-title.solution {
+    color: var(--success);
+}
+
+.side-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.side-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.side-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.side-icon.problem {
+    background: rgba(244, 67, 54, 0.1);
+    color: var(--error);
+}
+
+.side-icon.solution {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success);
+}
+
+.side-content h4 {
+    font-weight: 600;
+    color: var(--text-1);
+    margin-bottom: 0.5rem;
+}
+
+.side-content p {
+    color: var(--text-2);
+    margin-bottom: 0;
+}
+
+@media (min-width: 1024px) {
+    .problem-solution-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .problem-solution-title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .problem-solution-section {
+        padding: 3rem 1rem;
+    }
+
+    .problem-solution-header {
+        margin-bottom: 3rem;
+    }
+
+    .problem-solution-title {
+        font-size: 1.75rem;
+    }
+
+    .problem-solution-subtitle {
+        font-size: 1.125rem;
+    }
+
+    .problem-solution-content {
+        gap: 3rem;
+    }
+
+    .transition-card {
+        padding: 1.5rem;
+    }
+}

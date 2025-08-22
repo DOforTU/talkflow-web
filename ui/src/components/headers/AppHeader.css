@@ -1,0 +1,63 @@
+/* Mobile Header */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    max-width: 768px;
+    margin: 0 auto;
+    background-color: var(--bg-primary);
+    padding: 1rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+
+.header-profile {
+    display: flex;
+    align-items: center;
+}
+
+.profile-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--text-primary);
+}
+
+.profile-info h3 {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.profile-info p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.header-notification {
+    width: 40px;
+    height: 40px;
+    border: none;
+    display: flex;
+    background-color: var(--bg-primary);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.header-notification svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-secondary);
+    transition: stroke 0.2s ease;
+}
+
+.header-notification:hover svg {
+    stroke: var(--primary);
+}
