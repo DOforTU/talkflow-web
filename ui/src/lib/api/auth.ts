@@ -1,9 +1,17 @@
+import { CurrentUserDTO } from "../types/users.interface";
 import apiClient from "./client";
 
 export function loginWithGoogle() {
     window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google`;
 }
 
+// ===== Get My Info =====
+export async function getCurrentUser(): Promise<CurrentUserDTO> {
+    const response = await apiClient.get("/api/auth/me");
+    return response.data.data;
+}
+
+// ===== Local Login =====
 export async function loginWithLocal(email: string, password: string) {
     return await apiClient.post("/api/auth/login", {
         email,
@@ -28,6 +36,7 @@ export async function completeSignup(email: string, code: string) {
     });
 }
 
+// ===== Logout =====
 export async function logout() {
     return await apiClient.post("/api/auth/logout");
 }
@@ -36,6 +45,7 @@ export async function refreshToken() {
     return await apiClient.post("/api/auth/refresh");
 }
 
+// ===== Onboarding =====
 export async function completeOnboarding(onboardingData: { firstName: string; lastName: string; language: string }) {
-    return await apiClient.post("/api/auth/complete-onboarding", onboardingData);
+    return await apiClient.post("/api/auth/onboarding", onboardingData);
 }

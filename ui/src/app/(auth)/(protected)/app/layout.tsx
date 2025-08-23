@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import AppHeader from "@/components/headers/AppHeader";
 import BottomNav from "@/components/navigation/BottomNav";
 import PageTransition from "@/components/transitions/PageTransition";
-import { AuthProvider, useAuth } from "@/context/Auth";
+import { useAuth } from "@/context/Auth";
 
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
     const router = useRouter();
@@ -52,9 +52,5 @@ export default function AppLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    return (
-        <AuthProvider>
-            <AppLayoutContent>{children}</AppLayoutContent>
-        </AuthProvider>
-    );
+    return <AppLayoutContent>{children}</AppLayoutContent>;
 }

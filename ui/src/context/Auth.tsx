@@ -8,7 +8,7 @@ import {
     logout as logoutApi,
     loginWithLocal as loginLocalApi,
 } from "@/lib/api/auth";
-import { getCurrentUser } from "@/lib/api/users";
+import { getCurrentUser } from "@/lib/api/auth";
 import { mapCommon } from "@/lib/utils/mapCommon";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
