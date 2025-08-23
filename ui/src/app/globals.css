@@ -2,9 +2,9 @@
 
 :root {
     /* Primary Colors */
-    --primary: #ff8a65;
-    --primary-dark: #ff7043;
-    --primary-light: #ffab91;
+    --primary: #8a7acd;
+    --primary-dark: #6a5acd;
+    --primary-light: #a997e2;
     --primary-text: #f8f8f8;
     --background: #fcfcfc;
 
@@ -34,9 +34,9 @@
     --dark-text-muted: #808080;
 
     /* Voice UI Colors */
-    --voice-active: #ff6b35;
+    --voice-active: #8a7acd;
     --voice-listening: #4caf50;
-    --voice-processing: #ff9800;
+    --voice-processing: #a997e2;
     --voice-error: #f44336;
 
     /* Typography */
