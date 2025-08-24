@@ -6,6 +6,7 @@ import AppHeader from "@/components/headers/AppHeader";
 import BottomNav from "@/components/navigation/BottomNav";
 import PageTransition from "@/components/transitions/PageTransition";
 import { useAuth } from "@/context/Auth";
+import SmartHeader from "@/components/headers/SmartHeader";
 
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
     const router = useRouter();
@@ -40,7 +41,11 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
 
     return (
         <>
-            {!isOnboardingPage && <AppHeader />}
+            {!isOnboardingPage && (
+                <SmartHeader>
+                    <AppHeader />
+                </SmartHeader>
+            )}
             <PageTransition>{children}</PageTransition>
             {!isOnboardingPage && <BottomNav />}
         </>

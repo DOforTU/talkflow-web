@@ -13,6 +13,17 @@
     height: 60px;
 }
 
+.header-title {
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100px;
+}
+
 .header-profile {
     display: flex;
     align-items: center;
@@ -23,7 +34,8 @@
     height: 36px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--text-1);
+    padding: 2px;
+    border: 2px solid var(--primary);
 }
 
 .profile-info h3 {
