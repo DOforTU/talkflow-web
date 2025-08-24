@@ -1,92 +1,136 @@
 "use client";
 
-import { useLanguage } from "@/context/Language";
-import { finalCTASectionTexts } from "@/text/FinalCTASection";
 import "./FinalCTASection.css";
 
 export default function FinalCTASection() {
-    const { currentLanguage } = useLanguage();
-    const texts = finalCTASectionTexts[currentLanguage];
     return (
         <section className="final-cta-section">
             <div className="final-cta-container">
-                <div className="final-cta-header">
-                    <h2 className="final-cta-title">
-                        {texts.title.line1}
-                        <br />
-                        {texts.title.line2}
-                    </h2>
-                    <p className="final-cta-subtitle">{texts.subtitle}</p>
+                {/* Animated Background Elements */}
+                <div className="floating-shapes">
+                    <div className="shape shape-1"></div>
+                    <div className="shape shape-2"></div>
+                    <div className="shape shape-3"></div>
+                    <div className="shape shape-4"></div>
                 </div>
 
-                {/* Key benefits reminder */}
-                <div className="final-cta-benefits">
-                    <div className="benefit-card">
-                        <div className="benefit-icon">
-                            <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="final-cta-content">
+                    <div className="final-cta-header">
+                        <h2 className="final-cta-title">
+                            Ready to Create Your
+                            <span className="title-accent"> Silhouette</span>?
+                        </h2>
+                        <p className="final-cta-subtitle">
+                            Join thousands who are already living more organized, productive lives
+                        </p>
+                    </div>
+
+                    {/* Feature Highlights */}
+                    <div className="feature-highlights">
+                        <div className="highlight-item">
+                            <div className="highlight-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                                    />
+                                </svg>
+                            </div>
+                            <span>Voice & Text Planning</span>
+                        </div>
+                        <div className="highlight-item">
+                            <div className="highlight-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                    />
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                </svg>
+                            </div>
+                            <span>Smart Route Planning</span>
+                        </div>
+                        <div className="highlight-item">
+                            <div className="highlight-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                                    />
+                                </svg>
+                            </div>
+                            <span>Expense Tracking</span>
+                        </div>
+                        <div className="highlight-item">
+                            <div className="highlight-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                                    />
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                </svg>
+                            </div>
+                            <span>Moment Sharing</span>
+                        </div>
+                    </div>
+
+                    {/* Main CTA */}
+                    <div className="final-cta-main">
+                        <button className="cta-button">
+                            <span className="button-text">Start Your Journey</span>
+                        </button>
+                        <p className="cta-subtext">Free to start • No credit card required</p>
+                    </div>
+
+                    {/* Social Proof */}
+                    <div className="social-proof">
+                        <div className="proof-item">
+                            <div className="proof-number">10K+</div>
+                            <div className="proof-label">Active Users</div>
+                        </div>
+                        <div className="proof-item">
+                            <div className="proof-number">4.9★</div>
+                            <div className="proof-label">App Rating</div>
+                        </div>
+                        <div className="proof-item">
+                            <div className="proof-number">99%</div>
+                            <div className="proof-label">Satisfaction</div>
+                        </div>
+                    </div>
+
+                    {/* Final Message */}
+                    <div className="final-message">
+                        <div className="message-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth={2}
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
                                 />
                             </svg>
                         </div>
-                        <h3 className="benefit-title">{texts.benefits.timeSaver.title}</h3>
-                        <p className="benefit-text">{texts.benefits.timeSaver.text}</p>
+                        <p>&quot;Your perfect day is just one silhouette away&quot;</p>
                     </div>
-
-                    <div className="benefit-card">
-                        <div className="benefit-icon">
-                            <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-                                />
-                            </svg>
-                        </div>
-                        <h3 className="benefit-title">{texts.benefits.voiceFreedom.title}</h3>
-                        <p className="benefit-text">{texts.benefits.voiceFreedom.text}</p>
-                    </div>
-
-                    <div className="benefit-card">
-                        <div className="benefit-icon">
-                            <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                                />
-                            </svg>
-                        </div>
-                        <h3 className="benefit-title">{texts.benefits.aiLearning.title}</h3>
-                        <p className="benefit-text">{texts.benefits.aiLearning.text}</p>
-                    </div>
-                </div>
-
-                {/* Main CTA buttons */}
-                <div className="final-cta-buttons">
-                    <a href="/signup" className="final-cta-primary">
-                        {texts.buttons.primary}
-                    </a>
-                    <a href="/demo" className="final-cta-secondary">
-                        {texts.buttons.secondary}
-                    </a>
-                </div>
-
-                {/* Trust indicators */}
-                <div className="final-cta-trust">
-                    {texts.trustIndicators.map((indicator, index) => (
-                        <div key={index} className="trust-item">
-                            <svg className="trust-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            {indicator}
-                        </div>
-                    ))}
                 </div>
             </div>
         </section>

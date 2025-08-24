@@ -9,14 +9,7 @@ export default function Footer() {
                     {/* Brand */}
                     <div className="footer-brand">
                         <div className="footer-brand-header">
-                            <Image
-                                width={32}
-                                height={32}
-                                src="/app_logo.png"
-                                alt="SayPlan Logo"
-                                className="footer-logo"
-                            />
-                            <span className="footer-brand-title">SayPlan</span>
+                            <span className="footer-brand-title">Silhouette</span>
                         </div>
                         <p className="footer-brand-description">
                             The smart planner that adapts to you, not the other way around. Voice or text, we make

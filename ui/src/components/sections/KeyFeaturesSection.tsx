@@ -41,13 +41,11 @@ export default function KeyFeaturesSection() {
                         </div>
                         <div className="feature-content">
                             <h3 className="feature-title">{texts.features.planning.title}</h3>
-                            <p className="feature-description">
-                                {texts.features.planning.description}
-                            </p>
-                            <div className="feature-highlights">
+                            <p className="feature-description">{texts.features.planning.description}</p>
+                            <div className="key-feature-highlights">
                                 {texts.features.planning.items.map((item, index) => (
-                                    <div key={index} className="highlight-item">
-                                        <div className="highlight-dot"></div>
+                                    <div key={index} className="key-highlight-item">
+                                        <div className="key-highlight-dot"></div>
                                         <span>{item}</span>
                                     </div>
                                 ))}
@@ -59,14 +57,12 @@ export default function KeyFeaturesSection() {
                     <div className="feature-item">
                         <div className="feature-content">
                             <h3 className="feature-title">{texts.features.routes.title}</h3>
-                            <p className="feature-description">
-                                {texts.features.routes.description}
-                            </p>
-                            <div className="feature-highlights">
+                            <p className="feature-description">{texts.features.routes.description}</p>
+                            <div className="key-feature-highlights">
                                 {texts.features.routes.items.map((item, index) => (
-                                    <div key={index} className="highlight-item">
-                                        <div className="highlight-dot"></div>
-                                        <span>{item}</span>
+                                    <div key={index} className="key-highlight-item">
+                                        <div className="key-highlight-dot"></div>
+                                        <span className="key-highlight-text">{item}</span>
                                     </div>
                                 ))}
                             </div>
@@ -117,13 +113,11 @@ export default function KeyFeaturesSection() {
                         </div>
                         <div className="feature-content">
                             <h3 className="feature-title">{texts.features.expenses.title}</h3>
-                            <p className="feature-description">
-                                {texts.features.expenses.description}
-                            </p>
-                            <div className="feature-highlights">
+                            <p className="feature-description">{texts.features.expenses.description}</p>
+                            <div className="key-feature-highlights">
                                 {texts.features.expenses.items.map((item, index) => (
-                                    <div key={index} className="highlight-item">
-                                        <div className="highlight-dot"></div>
+                                    <div key={index} className="key-highlight-item">
+                                        <div className="key-highlight-dot"></div>
                                         <span>{item}</span>
                                     </div>
                                 ))}
@@ -135,13 +129,11 @@ export default function KeyFeaturesSection() {
                     <div className="feature-item">
                         <div className="feature-content">
                             <h3 className="feature-title">{texts.features.sharing.title}</h3>
-                            <p className="feature-description">
-                                {texts.features.sharing.description}
-                            </p>
-                            <div className="feature-highlights">
+                            <p className="feature-description">{texts.features.sharing.description}</p>
+                            <div className="key-feature-highlights">
                                 {texts.features.sharing.items.map((item, index) => (
-                                    <div key={index} className="highlight-item">
-                                        <div className="highlight-dot"></div>
+                                    <div key={index} className="key-highlight-item">
+                                        <div className="key-highlight-dot"></div>
                                         <span>{item}</span>
                                     </div>
                                 ))}
