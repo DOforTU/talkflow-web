@@ -17,10 +17,10 @@ export interface HeroSectionTexts {
 
 export const heroSectionTexts: Record<"ENG" | "KOR", HeroSectionTexts> = {
     ENG: {
-        titleLine1: "Just Say It,",
-        titleLine2: "It's Planned",
+        titleLine1: "Plan Silhouette,",
+        titleLine2: "Leave Silhouette.",
         subtitle:
-            "The smart planner that adapts to you. Speak naturally or type freely — our AI understands both and creates perfect schedules with location optimization.",
+            "The smart planner that adapts to you. Speak naturally or type freely — Silhouette understands both and creates perfect schedules with location optimization.",
         tryFreeButton: "Try Free Now",
         aboutButton: "Pricing Plan",
         voiceInputLabel: "Voice Input",
@@ -34,10 +34,10 @@ export const heroSectionTexts: Record<"ENG" | "KOR", HeroSectionTexts> = {
         locationValue: "Cafe in Gangnam",
     },
     KOR: {
-        titleLine1: "말하기만 하면",
-        titleLine2: "계획 완성",
+        titleLine1: "계획하고 남겨보세요.",
+        titleLine2: "당신의 실루엣을",
         subtitle:
-            "당신에게 맞춰 적응하는 스마트 플래너입니다. 자연스럽게 말하거나 자유롭게 타이핑하세요. AI가 모두 이해하고 위치 최적화와 함께 완벽한 일정을 만들어드립니다.",
+            "당신에게 맞춰 적응하는 스마트 플래너입니다. 자연스럽게 말하거나 자유롭게 타이핑하세요. 실루엣이 모두 이해하고 위치 최적화와 함께 완벽한 일정을 만들어드립니다.",
         tryFreeButton: "무료로 시작하기",
         aboutButton: "가격 보기",
         voiceInputLabel: "음성 입력",

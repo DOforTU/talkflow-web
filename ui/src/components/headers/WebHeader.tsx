@@ -34,8 +34,7 @@ export default function WebHeader() {
             <nav className="web-header-nav">
                 {/* Brand */}
                 <Link href="/" className="web-header-brand" onClick={closeMenu}>
-                    <Image width={141} height={50} src="/web_logo.png" alt="SayPlan Logo" className="web-header-logo" />
-                    {/* <span className="web-header-title">SayPlan</span> */}
+                    <p className="web-header-logo">Silhouette</p>
                 </Link>
 
                 {/* Desktop Menu */}

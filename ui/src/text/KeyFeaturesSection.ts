@@ -2,101 +2,112 @@ export interface KeyFeaturesSectionTexts {
     title: string;
     subtitle: string;
     features: {
-        hybrid: {
+        planning: {
             title: string;
             description: string;
             items: string[];
-            learnMore: string;
         };
-        ai: {
+        routes: {
             title: string;
             description: string;
             items: string[];
-            learnMore: string;
         };
-        location: {
+        expenses: {
             title: string;
             description: string;
             items: string[];
-            learnMore: string;
+        };
+        sharing: {
+            title: string;
+            description: string;
+            items: string[];
         };
     };
-    ctaButton: string;
 }
 
 export const keyFeaturesSectionTexts: Record<"ENG" | "KOR", KeyFeaturesSectionTexts> = {
     ENG: {
-        title: "Why SayPlan Changes Everything",
-        subtitle: "Three powerful features that make planning effortless, intelligent, and perfectly adapted to your lifestyle.",
+        title: "Plan Your Silhouette.",
+        subtitle: "You can make your day more productive and enjoyable.",
         features: {
-            hybrid: {
-                title: "Hybrid Voice & Text",
-                description: "The first planner that truly adapts to how you want to communicate. Speak when you're on the go, type when you need precision.",
+            planning: {
+                title: "Plan Your Silhouette",
+                description: "Create your perfect schedule with both text and voice input. Plan your day naturally with our intelligent scheduling system.",
                 items: [
-                    "Natural speech recognition with 95%+ accuracy",
-                    "Seamless fallback to text input when needed",
-                    "Context-aware parsing for both input methods"
-                ],
-                learnMore: "Learn More →"
+                    "Voice-powered scheduling",
+                    "Text input supported",
+                    "Smart time management"
+                ]
             },
-            ai: {
-                title: "AI-Powered Intelligence",
-                description: "Advanced AI that understands context, learns your patterns, and transforms natural language into perfect schedules.",
+            routes: {
+                title: "Visual Route Planning",
+                description: "Set locations for your schedule items and visualize your daily route at a glance. Never miss an appointment or waste time on inefficient routes.",
                 items: [
-                    "Automatic time, date, and location extraction",
-                    "Smart conflict detection and resolution",
-                    "Context memory for personalized suggestions"
-                ],
-                learnMore: "Learn More →"
+                    "Location-based scheduling",
+                    "Route optimization",
+                    "Travel time estimates"
+                ]
             },
-            location: {
-                title: "Smart Location & Routes",
-                description: "Integrated Google Maps intelligence that optimizes your daily routes and saves you time with smart travel planning.",
+            expenses: {
+                title: "Expense Tracking",
+                description: "Add costs to your schedule items and manage your spending seamlessly. Track expenses in real-time and maintain your budget effortlessly.",
                 items: [
-                    "Automatic address recognition and mapping",
-                    "Daily route optimization for efficiency",
-                    "Real-time travel time calculations"
-                ],
-                learnMore: "Learn More →"
+                    "Schedule-integrated expenses",
+                    "Budget management tools",
+                    "Spending analytics"
+                ]
+            },
+            sharing: {
+                title: "Leave Your Silhouette",
+                description: "Share your daily moments with photos or 15-second videos. Get spontaneous sharing opportunities through random notifications - up to 2 shares per day.",
+                items: [
+                    "Photo & video sharing",
+                    "Random notification prompts",
+                    "Limited daily shares"
+                ]
             }
-        },
-        ctaButton: "Explore All Features"
+        }
     },
     KOR: {
-        title: "SayPlan이 모든 것을 바꾸는 이유",
-        subtitle: "계획을 손쉽고 지능적으로 만들어주며 당신의 라이프스타일에 완벽하게 적응하는 세 가지 강력한 기능.",
+        title: "당신의 실루엣을 계획하세요.",
+        subtitle: "더 생산적이고 즐거운 하루를 만들어보세요.",
         features: {
-            hybrid: {
-                title: "하이브리드 음성 & 텍스트",
-                description: "소통 방식에 진정으로 적응하는 최초의 플래너. 이동 중에는 음성으로, 정확성이 필요할 때는 타이핑으로.",
+            planning: {
+                title: "실루엣 계획하기",
+                description: "텍스트와 음성 입력 모두로 완벽한 일정을 만들어보세요. 지능적인 스케줄링 시스템으로 자연스럽게 하루를 계획하세요.",
                 items: [
-                    "95% 이상의 정확도를 가진 자연 음성 인식",
-                    "필요시 텍스트 입력으로 원활한 전환",
-                    "두 입력 방식 모두를 위한 상황 인식 파싱"
-                ],
-                learnMore: "더 알아보기 →"
+                    "음성 기반 일정 관리",
+                    "텍스트 입력 지원",
+                    "스마트 시간 관리"
+                ]
             },
-            ai: {
-                title: "AI 기반 지능",
-                description: "맥락을 이해하고 패턴을 학습하여 자연어를 완벽한 일정으로 변환하는 고급 AI.",
+            routes: {
+                title: "시각적 경로 계획",
+                description: "일정 항목에 위치를 설정하고 일일 동선을 한눈에 시각화하세요. 약속을 놓치지 않고 비효율적인 경로로 시간을 낭비하지 마세요.",
                 items: [
-                    "시간, 날짜, 위치 자동 추출",
-                    "스마트 충돌 감지 및 해결",
-                    "개인화된 제안을 위한 상황 기억"
-                ],
-                learnMore: "더 알아보기 →"
+                    "위치 기반 스케줄링",
+                    "경로 최적화",
+                    "이동 시간 예측"
+                ]
             },
-            location: {
-                title: "스마트 위치 & 경로",
-                description: "일상 경로를 최적화하고 스마트 여행 계획으로 시간을 절약해주는 통합 Google Maps 지능.",
+            expenses: {
+                title: "지출 추적",
+                description: "일정 항목에 비용을 추가하고 지출을 원활하게 관리하세요. 실시간으로 지출을 추적하고 예산을 쉽게 유지하세요.",
                 items: [
-                    "자동 주소 인식 및 매핑",
-                    "효율성을 위한 일일 경로 최적화",
-                    "실시간 이동 시간 계산"
-                ],
-                learnMore: "더 알아보기 →"
+                    "일정 연동 지출 관리",
+                    "예산 관리 도구",
+                    "지출 분석"
+                ]
+            },
+            sharing: {
+                title: "실루엣 남기기",
+                description: "사진이나 15초 동영상으로 일상의 순간들을 공유하세요. 랜덤 알림을 통한 자연스러운 공유 기회 - 하루 최대 2회.",
+                items: [
+                    "사진 및 동영상 공유",
+                    "랜덤 알림 프롬프트",
+                    "일일 공유 제한"
+                ]
             }
-        },
-        ctaButton: "모든 기능 살펴보기"
+        }
     }
 };

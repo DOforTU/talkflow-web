@@ -1,18 +1,32 @@
 /* Hero Section Styles */
+.hero-section {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--background);
+    height: 100vh;
+}
 
 .hero-container {
     max-width: 1200px;
-    padding: 8rem 2rem;
+    padding-top: 70px;
     margin: 0 auto;
     text-align: center;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .hero-title {
-    font-size: 3rem;
-    font-weight: 700;
     color: var(--text-1);
     margin-bottom: 1.5rem;
     line-height: 1.1;
+}
+
+.hero-title span {
+    font-size: 4rem;
+    font-weight: 700;
 }
 
 .hero-title-accent {
@@ -23,7 +37,7 @@
 }
 
 .hero-subtitle {
-    font-size: 1.25rem;
+    font-size: 1.4rem !important;
     color: var(--text-2);
     margin-bottom: 2rem;
     max-width: 42rem;
@@ -172,16 +186,22 @@
 }
 
 @media (max-width: 768px) {
-    .hero-container {
-        padding: 8rem 2rem;
+    .hero-section {
+        position: relative;
+        height: auto;
     }
 
-    .hero-title {
+    .hero-container {
+        padding: 8rem 2rem;
+        height: auto;
+    }
+
+    .hero-title span {
         font-size: 2.5rem;
     }
 
     .hero-subtitle {
-        font-size: 1.125rem;
+        font-size: 1rem !important;
     }
 
     .demo-input-methods {

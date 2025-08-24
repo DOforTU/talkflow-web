@@ -1,4 +1,10 @@
 /* Pricing Teaser Section Styles */
+.pricing-teaser-section {
+    position: relative;
+    z-index: 10;
+    background-color: var(--background);
+}
+
 .pricing-teaser-container {
     max-width: 1200px;
     padding: 5rem 2rem;

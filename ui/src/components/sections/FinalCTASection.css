@@ -3,6 +3,8 @@
     padding: 5rem 2rem;
     background: linear-gradient(135deg, var(--primary) 0%, #ec4899 50%, var(--secondary) 100%);
     color: var(--text-light);
+    position: relative;
+    z-index: 10;
 }
 
 .final-cta-container {
