@@ -2,20 +2,23 @@
 
 :root {
     /* Primary Colors */
-    --primary: #8a7acd;
-    --primary-dark: #6a5acd;
-    --primary-light: #a997e2;
-    --primary-text: #f8f8f8;
-    --background: #fcfcfc;
+    /* --primary: #059669; */
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #3b82f6;
+    --primary-text: #f2f2f2;
+    --background: #fdfdfd;
 
     /* Secondary Colors */
-    --secondary: #4a90e2;
+    /* --secondary: #0ea5e9; */
+    --secondary: #10b981;
     --accent: #f5f5f5;
     --success: #4caf50;
     --warning: #ffc107;
     --error: #f44336;
     --border: #d3d3d3;
-    --border-light: #e3e3e3;
+    --border-weak: #e3e3e3;
+    --border-strong: #c3c3c3;
 
     /* Text Colors */
     --text-primary: #333333;
@@ -58,7 +61,6 @@
 
     /* Theme Variables - Force Light Theme as Default */
     --bg-primary: var(--background);
-    --bg-light: #f9f9f9;
     --bg-secondary: var(--accent);
     --text-1: var(--text-primary);
     --text-2: var(--text-secondary);

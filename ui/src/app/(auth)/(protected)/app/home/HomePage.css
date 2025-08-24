@@ -4,7 +4,7 @@
     min-height: 100vh;
     max-width: 768px;
     margin: 0 auto;
-    background-color: var(--bg-light);
+    background-color: var(--bg-secondary);
     display: flex;
     flex-direction: column;
 }
@@ -126,6 +126,7 @@
 /* Today's Schedule Section */
 .today-schedule {
     padding: 1rem;
+    background-color: var(--bg-primary);
 }
 
 .today-schedule-title {

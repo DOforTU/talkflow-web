@@ -23,19 +23,19 @@
     height: 36px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--text-primary);
+    border: 2px solid var(--text-1);
 }
 
 .profile-info h3 {
     font-size: var(--font-size-base);
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-1);
     margin: 0;
 }
 
 .profile-info p {
     font-size: var(--font-size-sm);
-    color: var(--text-secondary);
+    color: var(--text-2);
     margin: 0;
 }
 
@@ -54,7 +54,7 @@
 .header-notification svg {
     width: 20px;
     height: 20px;
-    stroke: var(--text-secondary);
+    stroke: var(--text-2);
     transition: stroke 0.2s ease;
 }
 
