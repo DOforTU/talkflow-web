@@ -50,8 +50,8 @@ export default function MainPage() {
                 <div className="main-container">
                     <div className="main-intro">
                         <Image
-                            width={240}
-                            height={440}
+                            width={262}
+                            height={568}
                             src="/temp_ui.png"
                             alt="Mobile UI Example"
                             className="example-ui"

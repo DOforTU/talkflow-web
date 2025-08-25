@@ -42,10 +42,8 @@
 
 /* Example UI Styles */
 .example-ui {
-    width: 240px;
-    height: 440px;
-    border-radius: 32px;
-    border: 2px solid var(--text-1);
+    width: 262px;
+    height: 568px;
     box-shadow: var(--card-shadow);
     margin: 0 auto;
     object-fit: cover;
