@@ -180,7 +180,7 @@
     height: 56px;
     border-radius: 50%;
     border: none;
-    background-color: var(--primary);
+    background-color: var(--primary-light);
     box-shadow: var(--card-shadow-strong);
     color: white;
     display: flex;
@@ -192,7 +192,7 @@
 }
 
 .voice-record-btn:hover {
-    background-color: var(--primary-dark);
+    background-color: var(--primary);
 }
 
 .voice-record-btn svg {
