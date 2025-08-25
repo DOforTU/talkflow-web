@@ -13,8 +13,8 @@ export default function SimpleFooter() {
                     {/* Brand */}
                     <div className="simple-footer-brand">
                         <Image
-                            width={113}
-                            height={40}
+                            width={90}
+                            height={30}
                             src="/web_logo.png"
                             alt="SayPlan Logo"
                             className="simple-footer-logo"

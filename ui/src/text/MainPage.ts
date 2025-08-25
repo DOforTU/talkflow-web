@@ -1,5 +1,4 @@
 export interface MainPageTexts {
-    title: string;
     description: string;
     learnMoreButton: string;
     signInButton: string;
@@ -7,17 +6,15 @@ export interface MainPageTexts {
 
 export const mainPageTexts: Record<"ENG" | "KOR", MainPageTexts> = {
     ENG: {
-        title: "Welcome to SayPlan",
         description:
-            "The smart planner that adapts to you. Just say it, and it's planned.\nExperience intelligent scheduling with voice and location optimization.",
-        learnMoreButton: "Learn More About SayPlan",
+            "Your smart planner that adapts to you. Just speak, and your plan is complete.Plan your day and share your achievements with the world.",
+        learnMoreButton: "Learn More About Silhouette",
         signInButton: "Sign in with Google",
     },
     KOR: {
-        title: "Welcome to SayPlan",
         description:
-            "사용자에게 맞춰가는 스마트 플래너입니다. 말하기만 하면 계획이 완성됩니다.\n음성 인식과 위치 최적화로 지능적인 일정 관리를 경험하세요.",
-        learnMoreButton: "SayPlan에 대해 더 알아보기",
+            "당신에게 맞춰지는 스마트 플래너. 말로 하면 계획이 완성돼요. 일상을 계획하고, 당신의 성취를 세상과 공유하세요.",
+        learnMoreButton: "Silhouette에 대해 더 알아보기",
         signInButton: "구글 계정으로 로그인",
     },
 };

@@ -34,6 +34,13 @@ export default function WebHeader() {
             <nav className="web-header-nav">
                 {/* Brand */}
                 <Link href="/" className="web-header-brand" onClick={closeMenu}>
+                    {/* <Image
+                        width={120}
+                        height={30}
+                        src="/web_logo.png"
+                        alt="Silhouette Logo"
+                        className="simple-footer-logo"
+                    /> */}
                     <p className="web-header-logo">Silhouette</p>
                 </Link>
 

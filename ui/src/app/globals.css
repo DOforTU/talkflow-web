@@ -209,7 +209,7 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-dark);
+    background: var(--primary-light);
 }
 
 /* Responsive */

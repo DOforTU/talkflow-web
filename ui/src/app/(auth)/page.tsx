@@ -49,33 +49,39 @@ export default function MainPage() {
             <main className="main-section">
                 <div className="main-container">
                     <div className="main-intro">
-                        <div className="example-ui"></div>
+                        <Image
+                            width={240}
+                            height={440}
+                            src="/temp_ui.png"
+                            alt="Mobile UI Example"
+                            className="example-ui"
+                        />
                     </div>
                     <div className="main-divider"></div>
                     <div className="main-content">
-                        {/* Logo */}
-                        <div className="main-logo">
-                            <Image
-                                width={100}
-                                height={100}
-                                src="/app_logo.png"
-                                alt="SayPlan Logo"
-                                className="main-logo-image"
-                            />
+                        <div className="main-text">
+                            {/* Logo */}
+                            <div className="main-logo">
+                                <Image
+                                    width={180}
+                                    height={60}
+                                    src="/web_logo_shadow.png"
+                                    alt="Silhouette Logo"
+                                    className="simple-footer-logo"
+                                />
+                                {/* Silhouette */}
+                            </div>
+
+                            {/* Description */}
+                            <p className="main-description">
+                                {texts.description.split("\n").map((line, index) => (
+                                    <span key={index}>
+                                        {line}
+                                        {index < texts.description.split("\n").length - 1 && <br />}
+                                    </span>
+                                ))}
+                            </p>
                         </div>
-
-                        {/* Heading */}
-                        <h1 className="main-title">{texts.title}</h1>
-
-                        {/* Description */}
-                        <p className="main-description">
-                            {texts.description.split("\n").map((line, index) => (
-                                <span key={index}>
-                                    {line}
-                                    {index < texts.description.split("\n").length - 1 && <br />}
-                                </span>
-                            ))}
-                        </p>
 
                         {/* CTA Buttons */}
                         <div className="main-actions">

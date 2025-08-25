@@ -132,7 +132,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-                    <p>&copy; 2025 SayPlan. All rights reserved.</p>
+                    <p>&copy; 2025 Silhouette. All rights reserved.</p>
                     <div className="footer-links">
                         <a href="/privacy" className="footer-bottom-link">
                             Privacy Policy

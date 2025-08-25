@@ -9,7 +9,16 @@ export default function AppHeader() {
 
     return (
         <header className="app-header">
-            <div className="header-title">TalkFlow</div>
+            <div className="header-title">
+                {/* Silhouette */}
+                <Image
+                    width={96}
+                    height={24}
+                    src="/web_logo.png"
+                    alt="Silhouette Logo"
+                    className="simple-footer-logo"
+                />
+            </div>
             <div className="header-actions">
                 <div className="header-profile">
                     {currentProfile?.avatarUrl ? (

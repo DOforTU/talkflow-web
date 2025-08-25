@@ -17,8 +17,8 @@ export interface HeroSectionTexts {
 
 export const heroSectionTexts: Record<"ENG" | "KOR", HeroSectionTexts> = {
     ENG: {
-        titleLine1: "Plan Silhouette,",
-        titleLine2: "Leave Silhouette.",
+        titleLine1: "Shape Your Silhouette. ",
+        titleLine2: "Share Your Silhouette.",
         subtitle:
             "The smart planner that adapts to you. Speak naturally or type freely — Silhouette understands both and creates perfect schedules with location optimization.",
         tryFreeButton: "Try Free Now",
@@ -34,8 +34,8 @@ export const heroSectionTexts: Record<"ENG" | "KOR", HeroSectionTexts> = {
         locationValue: "Cafe in Gangnam",
     },
     KOR: {
-        titleLine1: "계획하고 남겨보세요.",
-        titleLine2: "당신의 실루엣을",
+        titleLine1: "당신의 실루엣을",
+        titleLine2: "계획하고 남겨보세요.",
         subtitle:
             "당신에게 맞춰 적응하는 스마트 플래너입니다. 자연스럽게 말하거나 자유롭게 타이핑하세요. 실루엣이 모두 이해하고 위치 최적화와 함께 완벽한 일정을 만들어드립니다.",
         tryFreeButton: "무료로 시작하기",
