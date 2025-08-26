@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/Language";
-import { heroSectionTexts } from "@/text/HeroSection";
+import { heroSectionTexts } from "@/text/about/HeroSection";
 import "./HeroSection.css";
 import Link from "next/link";
 

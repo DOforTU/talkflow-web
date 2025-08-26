@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useLanguage } from "@/context/Language";
-import { simpleFooterTexts } from "@/text/SimpleFooter";
+import { simpleFooterTexts } from "@/text/main/SimpleFooter";
 import "./SimpleFooter.css";
 
 export default function SimpleFooter() {

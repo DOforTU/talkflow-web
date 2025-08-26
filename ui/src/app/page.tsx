@@ -3,29 +3,38 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import SmartHeader from "@/components/headers/SmartHeader";
 import LanguageSelector from "@/components/LanguageSelector";
 import { loginWithGoogle } from "@/lib/api/auth";
 import { useAuth } from "@/context/Auth";
 import { useLanguage } from "@/context/Language";
-import { mainPageTexts } from "@/text/MainPage";
+import { mainPageTexts } from "@/text/main/MainPage";
 import "./MainPage.css";
 import SimpleFooter from "@/components/footers/SimpleFooter";
 
 export default function MainPage() {
     const router = useRouter();
-    const { currentUser, isLoading } = useAuth();
+    const { currentUser, currentProfile, isLoading } = useAuth();
     const { currentLanguage } = useLanguage();
 
     const texts = mainPageTexts[currentLanguage];
 
-    // 로그인한 사용자는 /home으로 리다이렉트
+    const isOnboardingComplete = useCallback(() => {
+        return currentProfile?.language && currentUser?.firstName && currentUser?.lastName;
+    }, [currentProfile?.language, currentUser?.firstName, currentUser?.lastName]);
+
     useEffect(() => {
+        // 로그인했지만 온보딩이 안된 사용자는 /onboarding으로 리다이렉트
         if (!isLoading && currentUser) {
-            router.push("/app/home");
+            if (!isOnboardingComplete()) {
+                router.push("/onboarding");
+            } else {
+                // 온보딩이 되었다면 /home으로 리다이렉트
+                router.push("/home");
+            }
         }
-    }, [currentUser, isLoading, router]);
+    }, [currentUser, isLoading, isOnboardingComplete, router]);
 
     // 로딩 중이거나 로그인한 사용자면 빈 화면 표시
     if (isLoading || currentUser) {

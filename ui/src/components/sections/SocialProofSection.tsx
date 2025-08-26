@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/Language";
-import { socialProofSectionTexts } from "@/text/SocialProofSection";
+import { socialProofSectionTexts } from "@/text/about/SocialProofSection";
 import "./SocialProofSection.css";
 
 export default function SocialProofSection() {

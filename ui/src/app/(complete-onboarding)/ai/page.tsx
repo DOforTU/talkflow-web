@@ -18,18 +18,14 @@ export default function AIPage() {
                                 <div className="message-content">
                                     안녕하세요! 무엇을 도와드릴까요?
                                     <br />
-                                    예: "내일 오후 2시에 회의 일정 추가해줘"
+                                    예: &quot;내일 오후 2시에 회의 일정 추가해줘&quot;
                                 </div>
                             </div>
                         </div>
 
                         <div className="chat-input-container">
                             <div className="chat-input-wrapper">
-                                <input
-                                    type="text"
-                                    className="chat-input"
-                                    placeholder="AI에게 메시지를 입력하세요..."
-                                />
+                                <input type="text" className="chat-input" placeholder="AI에게 메시지를 입력하세요..." />
                                 <button className="send-btn">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path

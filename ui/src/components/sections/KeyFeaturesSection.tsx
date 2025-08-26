@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/Language";
-import { keyFeaturesSectionTexts } from "@/text/KeyFeaturesSection";
+import { keyFeaturesSectionTexts } from "@/text/about/KeyFeaturesSection";
 import "./KeyFeaturesSection.css";
 import Image from "next/image";
 

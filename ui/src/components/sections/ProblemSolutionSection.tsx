@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/Language";
-import { problemSolutionSectionTexts } from "@/text/ProblemSolutionSection";
+import { problemSolutionSectionTexts } from "@/text/about/ProblemSolutionSection";
 import "./ProblemSolutionSection.css";
 
 export default function ProblemSolutionSection() {

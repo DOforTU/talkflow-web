@@ -39,7 +39,7 @@ export default function AppStartPage() {
             }
 
             if (isOnboardingComplete()) {
-                router.push("/app/home");
+                router.push("/home");
                 return;
             }
 
@@ -77,7 +77,7 @@ export default function AppStartPage() {
 
             if (response.data.success) {
                 // 온보딩 완료 후 페이지 새로고침하여 Auth Context 업데이트
-                window.location.href = "/app/home";
+                window.location.href = "/home";
             } else {
                 throw new Error(response.data.message || "Unknown error");
             }

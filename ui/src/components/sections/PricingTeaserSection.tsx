@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/context/Language";
-import { pricingTeaserSectionTexts } from "@/text/PricingTeaserSection";
+import { pricingTeaserSectionTexts } from "@/text/about/PricingTeaserSection";
 import "./PricingTeaserSection.css";
 import Link from "next/link";
 

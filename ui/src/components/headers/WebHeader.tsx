@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/context/Language";
-import { webHeaderTexts } from "@/text/WebHeader";
+import { webHeaderTexts } from "@/text/main/WebHeader";
 import "./WebHeader.css";
 
 export default function WebHeader() {
