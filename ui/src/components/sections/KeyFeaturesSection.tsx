@@ -49,7 +49,7 @@ export default function KeyFeaturesSection() {
                             <Image
                                 width={262}
                                 height={568}
-                                src="/plan_ur_sil.png"
+                                src="/map_ur_plan.png"
                                 alt="Mobile UI Example"
                                 className="example-ui"
                             />
