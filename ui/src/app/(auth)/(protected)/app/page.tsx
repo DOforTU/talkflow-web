@@ -115,7 +115,7 @@ export default function AppStartPage() {
 
                         <div className="form-row">
                             <div className="form-group">
-                                <label className="form-label">성</label>
+                                <label className="form-label">이름</label>
                                 <input
                                     type="text"
                                     className="form-input"
@@ -125,7 +125,7 @@ export default function AppStartPage() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">이름</label>
+                                <label className="form-label">성</label>
                                 <input
                                     type="text"
                                     className="form-input"
