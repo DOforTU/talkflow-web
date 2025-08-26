@@ -41,6 +41,13 @@ export default function BottomNav() {
                 </svg>
                 <span>지도</span>
             </Link>
+            <Link href="/app/silhouette" className={`nav-item ${isActive("/app/silhouette") ? "active" : ""}`}>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                    <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none" />
+                </svg>
+                <span>실루엣</span>
+            </Link>
             <Link href="/app/ai" className={`nav-item ${isActive("/app/ai") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect
@@ -53,34 +60,10 @@ export default function BottomNav() {
                         height="12"
                         rx="2"
                     />
-                    <circle
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        cx="9"
-                        cy="10"
-                        r="1"
-                    />
-                    <circle
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        cx="15"
-                        cy="10"
-                        r="1"
-                    />
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 14h6"
-                    />
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 6V4M12 20v-2"
-                    />
+                    <circle strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} cx="9" cy="10" r="1" />
+                    <circle strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} cx="15" cy="10" r="1" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14h6" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4M12 20v-2" />
                 </svg>
                 <span>AI</span>
             </Link>
