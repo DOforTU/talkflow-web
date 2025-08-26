@@ -6,7 +6,7 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    padding: 2rem 1rem;
+    padding: 4rem 1rem;
 }
 
 /* Loading State */
@@ -24,6 +24,16 @@
     border-top: 2px solid var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
+}
+
+.simple-header {
+    padding: 1rem 2rem;
+    max-width: 768px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 16px;
 }
 
 @keyframes spin {
@@ -104,7 +114,7 @@
 .form-input,
 .form-select {
     padding: 0.75rem;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--border);
     border-radius: 6px;
     background-color: var(--bg-primary);
     color: var(--text-primary);

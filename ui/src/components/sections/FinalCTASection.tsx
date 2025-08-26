@@ -1,8 +1,12 @@
 "use client";
 
+import { useLanguage } from "@/context/Language";
+import { finalCTASectionTexts } from "@/text/about/FinalCTASection";
 import "./FinalCTASection.css";
 
 export default function FinalCTASection() {
+    const { currentLanguage } = useLanguage();
+    const texts = finalCTASectionTexts[currentLanguage];
     return (
         <section className="final-cta-section">
             <div className="final-cta-container">
@@ -17,12 +21,10 @@ export default function FinalCTASection() {
                 <div className="final-cta-content">
                     <div className="final-cta-header">
                         <h2 className="final-cta-title">
-                            Ready to Create Your
-                            <span className="title-accent"> Silhouette</span>?
+                            {texts.title.main}
+                            <span className="title-accent">{texts.title.accent}</span>?
                         </h2>
-                        <p className="final-cta-subtitle">
-                            Join thousands who are already living more organized, productive lives
-                        </p>
+                        <p className="final-cta-subtitle">{texts.subtitle}</p>
                     </div>
 
                     {/* Feature Highlights */}
@@ -38,7 +40,7 @@ export default function FinalCTASection() {
                                     />
                                 </svg>
                             </div>
-                            <span>Voice & Text Planning</span>
+                            <span>{texts.features.voiceText}</span>
                         </div>
                         <div className="highlight-item">
                             <div className="highlight-icon">
@@ -57,7 +59,7 @@ export default function FinalCTASection() {
                                     />
                                 </svg>
                             </div>
-                            <span>Smart Route Planning</span>
+                            <span>{texts.features.routePlanning}</span>
                         </div>
                         <div className="highlight-item">
                             <div className="highlight-icon">
@@ -70,7 +72,7 @@ export default function FinalCTASection() {
                                     />
                                 </svg>
                             </div>
-                            <span>Expense Tracking</span>
+                            <span>{texts.features.expenseTracking}</span>
                         </div>
                         <div className="highlight-item">
                             <div className="highlight-icon">
@@ -89,31 +91,31 @@ export default function FinalCTASection() {
                                     />
                                 </svg>
                             </div>
-                            <span>Moment Sharing</span>
+                            <span>{texts.features.momentSharing}</span>
                         </div>
                     </div>
 
                     {/* Main CTA */}
                     <div className="final-cta-main">
                         <button className="cta-button">
-                            <span className="button-text">Start Your Journey</span>
+                            <span className="button-text">{texts.ctaButton}</span>
                         </button>
-                        <p className="cta-subtext">Free to start • No credit card required</p>
+                        <p className="cta-subtext">{texts.ctaSubtext}</p>
                     </div>
 
                     {/* Social Proof */}
                     <div className="social-proof">
                         <div className="proof-item">
-                            <div className="proof-number">10K+</div>
-                            <div className="proof-label">Active Users</div>
+                            <div className="proof-number">{texts.socialProof.activeUsers.number}</div>
+                            <div className="proof-label">{texts.socialProof.activeUsers.label}</div>
                         </div>
                         <div className="proof-item">
-                            <div className="proof-number">4.9★</div>
-                            <div className="proof-label">App Rating</div>
+                            <div className="proof-number">{texts.socialProof.appRating.number}</div>
+                            <div className="proof-label">{texts.socialProof.appRating.label}</div>
                         </div>
                         <div className="proof-item">
-                            <div className="proof-number">99%</div>
-                            <div className="proof-label">Satisfaction</div>
+                            <div className="proof-number">{texts.socialProof.satisfaction.number}</div>
+                            <div className="proof-label">{texts.socialProof.satisfaction.label}</div>
                         </div>
                     </div>
 
@@ -129,7 +131,7 @@ export default function FinalCTASection() {
                                 />
                             </svg>
                         </div>
-                        <p>&quot;Your perfect day is just one silhouette away&quot;</p>
+                        <p>&quot;{texts.finalMessage}&quot;</p>
                     </div>
                 </div>
             </div>

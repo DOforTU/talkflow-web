@@ -1,89 +1,93 @@
 export interface FinalCTASectionTexts {
     title: {
-        line1: string;
-        line2: string;
+        main: string;
+        accent: string;
     };
     subtitle: string;
-    benefits: {
-        timeSaver: {
-            title: string;
-            text: string;
+    features: {
+        voiceText: string;
+        routePlanning: string;
+        expenseTracking: string;
+        momentSharing: string;
+    };
+    ctaButton: string;
+    ctaSubtext: string;
+    socialProof: {
+        activeUsers: {
+            number: string;
+            label: string;
         };
-        voiceFreedom: {
-            title: string;
-            text: string;
+        appRating: {
+            number: string;
+            label: string;
         };
-        aiLearning: {
-            title: string;
-            text: string;
+        satisfaction: {
+            number: string;
+            label: string;
         };
     };
-    buttons: {
-        primary: string;
-        secondary: string;
-    };
-    trustIndicators: string[];
+    finalMessage: string;
 }
 
 export const finalCTASectionTexts: Record<"ENG" | "KOR", FinalCTASectionTexts> = {
     ENG: {
         title: {
-            line1: "Ready to Transform",
-            line2: "Your Planning?"
+            main: "Ready to Create Your",
+            accent: " Silhouette",
         },
-        subtitle: "Join thousands of users who've already discovered the power of hybrid voice and text planning. Start your journey to effortless scheduling today.",
-        benefits: {
-            timeSaver: {
-                title: "Save 30+ Minutes Daily",
-                text: "Smart route optimization and AI assistance"
+        subtitle: "Join thousands who are already living more organized, productive lives",
+        features: {
+            voiceText: "Voice & Text Planning",
+            routePlanning: "Smart Route Planning",
+            expenseTracking: "Expense Tracking",
+            momentSharing: "Moment Sharing",
+        },
+        ctaButton: "Start Your Journey",
+        ctaSubtext: "Free to start • No credit card required",
+        socialProof: {
+            activeUsers: {
+                number: "10K+",
+                label: "Active Users",
             },
-            voiceFreedom: {
-                title: "Voice + Text Freedom",
-                text: "Adapt to any situation seamlessly"
+            appRating: {
+                number: "4.9★",
+                label: "App Rating",
             },
-            aiLearning: {
-                title: "AI That Learns",
-                text: "Smarter suggestions over time"
-            }
+            satisfaction: {
+                number: "99%",
+                label: "Satisfaction",
+            },
         },
-        buttons: {
-            primary: "Start Free Today",
-            secondary: "Watch Demo First"
-        },
-        trustIndicators: [
-            "No credit card required",
-            "Setup in under 2 minutes",
-            "Cancel anytime"
-        ]
+        finalMessage: "Your perfect day is just one silhouette away",
     },
     KOR: {
         title: {
-            line1: "일정 관리를",
-            line2: "혁신할 준비가 되셨나요?"
+            main: "당신의",
+            accent: " 실루엣을 만들어보세요",
         },
-        subtitle: "하이브리드 음성 및 텍스트 플래닝의 힘을 이미 발견한 수천 명의 사용자와 함께하세요. 오늘 손쉬운 일정 관리 여정을 시작하세요.",
-        benefits: {
-            timeSaver: {
-                title: "매일 30분 이상 절약",
-                text: "스마트 경로 최적화와 AI 어시스턴트"
+        subtitle: "이미 더 체계적이고 생산적인 삶을 살고 있는 수천 명과 함께하세요",
+        features: {
+            voiceText: "음성 & 텍스트 플래닝",
+            routePlanning: "스마트 경로 계획",
+            expenseTracking: "지출 추적",
+            momentSharing: "순간 공유",
+        },
+        ctaButton: "여행을 시작하세요",
+        ctaSubtext: "무료로 시작 • 신용카드 필요 없음",
+        socialProof: {
+            activeUsers: {
+                number: "10K+",
+                label: "활성 사용자",
             },
-            voiceFreedom: {
-                title: "음성 + 텍스트 자유도",
-                text: "어떤 상황에도 원활하게 적응"
+            appRating: {
+                number: "4.9★",
+                label: "앱 평점",
             },
-            aiLearning: {
-                title: "학습하는 AI",
-                text: "시간이 지날수록 더 똑똑한 제안"
-            }
+            satisfaction: {
+                number: "99%",
+                label: "만족도",
+            },
         },
-        buttons: {
-            primary: "오늘 무료로 시작하기",
-            secondary: "먼저 데모 보기"
-        },
-        trustIndicators: [
-            "신용카드 필요 없음",
-            "2분 이내 설정 완료",
-            "언제든 취소 가능"
-        ]
-    }
+        finalMessage: "완벽한 하루는 하나의 실루엣 차이입니다",
+    },
 };

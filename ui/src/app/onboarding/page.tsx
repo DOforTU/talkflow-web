@@ -3,17 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/context/Auth";
+import { useLanguage } from "@/context/Language";
 import { completeOnboarding } from "@/lib/api/auth";
+import { onboardingTexts } from "@/text/onboarding";
 import "./AppStartPage.css";
-
-const LANGUAGES = [
-    { value: "ko", label: "한국어" },
-    { value: "en", label: "English" },
-];
+import LanguageSelector from "@/components/LanguageSelector";
+import SmartHeader from "@/components/headers/SmartHeader";
 
 export default function AppStartPage() {
     const router = useRouter();
     const { currentUser, currentProfile, isLoading } = useAuth();
+    const { currentLanguage } = useLanguage();
+    const texts = onboardingTexts[currentLanguage];
 
     const [formData, setFormData] = useState({
         firstName: "",
@@ -60,7 +61,7 @@ export default function AppStartPage() {
         e.preventDefault();
 
         if (!formData.firstName || !formData.lastName || !formData.nickname || !formData.language) {
-            alert("모든 정보를 입력해주세요.");
+            alert(texts.alerts.fillAllFields);
             return;
         }
 
@@ -85,7 +86,7 @@ export default function AppStartPage() {
             console.error("Profile update error:", error);
             const errorMessage =
                 (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-                "프로필 설정 중 오류가 발생했습니다.";
+                texts.alerts.profileUpdateError;
             alert(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -103,19 +104,25 @@ export default function AppStartPage() {
 
     return (
         <div className="app-start-page">
+            <SmartHeader>
+                <header className="simple-header">
+                    <LanguageSelector />
+                </header>
+            </SmartHeader>
+
             <div className="onboarding-container">
                 <div className="onboarding-header">
-                    <h1 className="onboarding-title">Welcome to SayPlan!</h1>
+                    <h1 className="onboarding-title">{texts.header.title}</h1>
                 </div>
 
                 <form className="onboarding-form" onSubmit={handleSubmit}>
                     {/* 이름 정보 */}
                     <div className="form-section">
-                        <h3 className="section-title">이름 정보</h3>
+                        <h3 className="section-title">{texts.nameSection.title}</h3>
 
                         <div className="form-row">
                             <div className="form-group">
-                                <label className="form-label">이름</label>
+                                <label className="form-label">{texts.nameSection.firstName}</label>
                                 <input
                                     type="text"
                                     className="form-input"
@@ -125,7 +132,7 @@ export default function AppStartPage() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">성</label>
+                                <label className="form-label">{texts.nameSection.lastName}</label>
                                 <input
                                     type="text"
                                     className="form-input"
@@ -137,35 +144,31 @@ export default function AppStartPage() {
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">닉네임</label>
+                            <label className="form-label">{texts.nameSection.nickname}</label>
                             <input
                                 type="text"
                                 className="form-input"
                                 value={formData.nickname}
                                 onChange={(e) => setFormData((prev) => ({ ...prev, nickname: e.target.value }))}
                                 maxLength={30}
-                                placeholder="사용하실 닉네임을 입력해주세요"
+                                placeholder={texts.nameSection.nicknamePlaceholder}
                             />
                         </div>
                     </div>
 
                     {/* 언어 설정 */}
                     <div className="form-section">
-                        <h3 className="section-title">언어 설정</h3>
+                        <h3 className="section-title">{texts.languageSection.title}</h3>
 
                         <div className="form-group">
-                            <label className="form-label">표시 언어</label>
                             <select
                                 className="form-select"
                                 value={formData.language}
                                 onChange={(e) => setFormData((prev) => ({ ...prev, language: e.target.value }))}
                             >
-                                <option value="">언어를 선택하세요</option>
-                                {LANGUAGES.map((lang) => (
-                                    <option key={lang.value} value={lang.value}>
-                                        {lang.label}
-                                    </option>
-                                ))}
+                                <option value="">{texts.languageSection.selectPlaceholder}</option>
+                                <option value="ko">{texts.languageSection.options.ko}</option>
+                                <option value="en">{texts.languageSection.options.en}</option>
                             </select>
                         </div>
                     </div>
@@ -177,7 +180,7 @@ export default function AppStartPage() {
                             className={`submit-button ${isSubmitting ? "loading" : ""}`}
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? "설정 중..." : "시작하기"}
+                            {isSubmitting ? texts.actions.submittingButton : texts.actions.submitButton}
                         </button>
                     </div>
                 </form>

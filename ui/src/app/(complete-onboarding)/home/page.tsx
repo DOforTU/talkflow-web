@@ -1,10 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/context/Auth";
+import { homeTexts } from "@/text/app/home";
+import { SupportedLanguage } from "@/lib/types/users.interface";
 import "./HomePage.css";
 
 export default function HomePage() {
+    const { currentProfile } = useAuth();
     const [currentDate, setCurrentDate] = useState(new Date());
+
+    // 언어 설정 (currentProfile.language 기반, 기본값은 KO)
+    const currentLanguage =
+        currentProfile?.language === SupportedLanguage.EN ? SupportedLanguage.EN : SupportedLanguage.KO;
+    const texts = homeTexts[currentLanguage];
 
     // 캘린더 관련 함수들
     const getDaysInMonth = (date: Date) => {
@@ -16,7 +25,9 @@ export default function HomePage() {
     };
 
     const formatMonth = (date: Date) => {
-        return date.toLocaleDateString("ko-KR", { year: "numeric", month: "long" });
+        // 언어에 따라 다른 locale 사용
+        const locale = currentLanguage === SupportedLanguage.EN ? "en-US" : "ko-KR";
+        return date.toLocaleDateString(locale, { year: "numeric", month: "long" });
     };
 
     const isToday = (day: number) => {
@@ -73,7 +84,15 @@ export default function HomePage() {
     };
 
     const calendarDays = generateCalendarDays();
-    const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+    const dayNames = [
+        texts.calendar.dayNames.sunday,
+        texts.calendar.dayNames.monday,
+        texts.calendar.dayNames.tuesday,
+        texts.calendar.dayNames.wednesday,
+        texts.calendar.dayNames.thursday,
+        texts.calendar.dayNames.friday,
+        texts.calendar.dayNames.saturday,
+    ];
 
     return (
         <div className="home-page">
@@ -126,11 +145,17 @@ export default function HomePage() {
                                     } ${dayOfWeek === 0 ? "sunday" : ""}`}
                                     onClick={() => {
                                         if (dateInfo.isCurrentMonth) {
-                                            alert(
-                                                `${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월 ${
-                                                    dateInfo.day
-                                                }일 클릭`
-                                            );
+                                            const alertMessage =
+                                                currentLanguage === SupportedLanguage.EN
+                                                    ? texts.alerts.dateClick
+                                                          .replace("{year}", currentDate.getFullYear().toString())
+                                                          .replace("{month}", (currentDate.getMonth() + 1).toString())
+                                                          .replace("{day}", dateInfo.day.toString())
+                                                    : texts.alerts.dateClick
+                                                          .replace("{year}", currentDate.getFullYear().toString())
+                                                          .replace("{month}", (currentDate.getMonth() + 1).toString())
+                                                          .replace("{day}", dateInfo.day.toString());
+                                            alert(alertMessage);
                                         }
                                     }}
                                 >
@@ -143,32 +168,32 @@ export default function HomePage() {
 
                 {/* Today's Schedule */}
                 <section className="today-schedule">
-                    <h2 className="today-schedule-title">일정</h2>
+                    <h2 className="today-schedule-title">{texts.schedule.title}</h2>
                     <div className="schedule-list">
                         {/* 임시 일정 데이터 */}
                         <div className="schedule-item">
                             <div className="schedule-time">09:00</div>
-                            <div className="schedule-content">팀 회의</div>
+                            <div className="schedule-content">{texts.schedule.sampleSchedules.teamMeeting}</div>
                         </div>
                         <div className="schedule-item">
                             <div className="schedule-time">14:00</div>
-                            <div className="schedule-content">프로젝트 검토</div>
+                            <div className="schedule-content">{texts.schedule.sampleSchedules.projectReview}</div>
                         </div>
                         <div className="schedule-item">
                             <div className="schedule-time">16:30</div>
-                            <div className="schedule-content">클라이언트 미팅</div>
+                            <div className="schedule-content">{texts.schedule.sampleSchedules.clientMeeting}</div>
                         </div>
                         {/* 일정이 없을 때 */}
                         {/* <div className="no-schedule">
-                            오늘 등록된 일정이 없습니다
+                            {texts.schedule.noSchedule}
                         </div> */}
                     </div>
                 </section>
                 {/* Voice Recording Button */}
                 <button
                     className="voice-record-btn"
-                    onClick={() => alert("음성 녹음 기능 준비중입니다!")}
-                    aria-label="음성으로 계획 추가"
+                    onClick={() => alert(texts.voice.recordingReady)}
+                    aria-label={texts.voice.ariaLabel}
                 >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
