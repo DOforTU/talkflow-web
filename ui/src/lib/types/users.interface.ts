@@ -67,7 +67,7 @@ export interface User extends CommonEntity {
 // ===== User Profile For Using Client =====
 export interface Profile {
     id: UUID;
-    username: string;
+    nickname: string;
     timezone: SupportedTimezone;
     language: SupportedLanguage;
     avatarUrl: string;

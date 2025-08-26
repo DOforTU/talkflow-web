@@ -18,6 +18,7 @@ export default function AppStartPage() {
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
+        nickname: "",
         language: "",
     });
 
@@ -47,6 +48,7 @@ export default function AppStartPage() {
                 setFormData({
                     firstName: currentUser.firstName,
                     lastName: currentUser.lastName,
+                    nickname: currentProfile.nickname,
                     language: currentProfile.language || "",
                 });
             }
@@ -57,7 +59,7 @@ export default function AppStartPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.firstName || !formData.lastName || !formData.language) {
+        if (!formData.firstName || !formData.lastName || !formData.nickname || !formData.language) {
             alert("모든 정보를 입력해주세요.");
             return;
         }
@@ -69,6 +71,7 @@ export default function AppStartPage() {
             const response = await completeOnboarding({
                 firstName: formData.firstName,
                 lastName: formData.lastName,
+                nickname: formData.nickname,
                 language: formData.language,
             });
 
@@ -131,6 +134,18 @@ export default function AppStartPage() {
                                     maxLength={30}
                                 />
                             </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">닉네임</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={formData.nickname}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, nickname: e.target.value }))}
+                                maxLength={30}
+                                placeholder="사용하실 닉네임을 입력해주세요"
+                            />
                         </div>
                     </div>
 

@@ -46,6 +46,11 @@ export async function refreshToken() {
 }
 
 // ===== Onboarding =====
-export async function completeOnboarding(onboardingData: { firstName: string; lastName: string; language: string }) {
+export async function completeOnboarding(onboardingData: {
+    firstName: string;
+    lastName: string;
+    nickname: string;
+    language: string;
+}) {
     return await apiClient.post("/api/auth/onboarding", onboardingData);
 }
