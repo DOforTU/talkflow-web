@@ -33,10 +33,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // 최초 유저 정보 가져오기
+    // 토큰 존재 여부 확인
+    const hasAccessToken = () => {
+        if (typeof window === "undefined") return false;
+
+        // 쿠키가 비어있으면 바로 false 반환
+        if (!document.cookie || document.cookie.trim() === "") {
+            return false;
+        }
+
+        // 쿠키에서 accessToken 확인
+        const cookies = document.cookie.split(";");
+        const accessTokenCookie = cookies.find((cookie) => cookie.trim().startsWith("accessToken="));
+
+        if (accessTokenCookie) {
+            const tokenValue = accessTokenCookie.split("=")[1];
+            return tokenValue && tokenValue.trim() !== "";
+        }
+
+        // localStorage에서 accessToken 확인 (백업)
+        const localToken = localStorage.getItem("accessToken");
+        return localToken && localToken.trim() !== "";
+    };
+
+    // 최초 유저 정보 가져오기 - 토큰이 있을 때만
     useEffect(() => {
         const fetchUser = async () => {
             try {
+                const hasToken = hasAccessToken();
+
+                // 토큰이 없으면 auth/me 호출하지 않음
+                if (!hasToken) {
+                    setCurrentUser(null);
+                    setCurrentProfile(null);
+                    setIsLoading(false);
+                    return;
+                }
+
                 const userData = await getCurrentUser();
 
                 // User와 Profile 데이터 분리 및 타입 변환
@@ -44,7 +77,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
                 setCurrentUser(mapUserDTOToUser(userDTO));
                 setCurrentProfile(profile);
-            } catch {
+            } catch (error) {
+                console.error("Failed to fetch current user:", error);
                 setCurrentUser(null);
                 setCurrentProfile(null);
             } finally {
@@ -52,16 +86,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
         };
         fetchUser();
-    }, []);
-
-    // 토큰 자동 갱신
+    }, []); // 토큰 자동 갱신 - 토큰이 있고 유저가 로그인된 상태일 때만
     useEffect(() => {
-        if (!currentUser) return;
+        if (!currentUser || !hasAccessToken()) return;
 
         const interval = setInterval(async () => {
             try {
                 await refreshToken();
-            } catch {
+            } catch (error) {
+                console.error("Token refresh failed:", error);
                 await logoutApi();
                 setCurrentUser(null);
                 setCurrentProfile(null);
