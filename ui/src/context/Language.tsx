@@ -1,12 +1,14 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
+import { SupportedLanguage } from "@/lib/types/users.interface";
 
 export type Language = "ENG" | "KOR";
 
 interface LanguageContextType {
     currentLanguage: Language;
     setLanguage: (language: Language) => void;
+    getProfileBasedLanguage: (profileLanguage?: SupportedLanguage) => SupportedLanguage;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -20,7 +22,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         // localStorage.setItem("language", language);
     };
 
-    return <LanguageContext.Provider value={{ currentLanguage, setLanguage }}>{children}</LanguageContext.Provider>;
+    // Profile 언어를 기반으로 SupportedLanguage 반환 (인증된 페이지용)
+    const getProfileBasedLanguage = (profileLanguage?: SupportedLanguage): SupportedLanguage => {
+        return profileLanguage === SupportedLanguage.EN ? SupportedLanguage.EN : SupportedLanguage.KO;
+    };
+
+    return (
+        <LanguageContext.Provider value={{ currentLanguage, setLanguage, getProfileBasedLanguage }}>
+            {children}
+        </LanguageContext.Provider>
+    );
 }
 
 export function useLanguage() {
@@ -29,4 +40,23 @@ export function useLanguage() {
         throw new Error("useLanguage must be used within a LanguageProvider");
     }
     return context;
+}
+
+// 인증된 페이지에서 사용할 훅 (profile 언어 기반)
+export function useProfileLanguage() {
+    const { getProfileBasedLanguage } = useLanguage();
+
+    return {
+        getLanguage: (profileLanguage?: SupportedLanguage) => getProfileBasedLanguage(profileLanguage),
+    };
+}
+
+// Auth와 Language를 통합한 편의 훅
+// 사용법: const { currentLanguage } = useAuthLanguage(currentProfile?.language);
+export function useAuthLanguage(profileLanguage?: SupportedLanguage) {
+    const { getProfileBasedLanguage } = useLanguage();
+
+    const currentLanguage = getProfileBasedLanguage(profileLanguage);
+
+    return { currentLanguage };
 }

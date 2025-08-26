@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/Auth";
+import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
 import { SupportedLanguage } from "@/lib/types/users.interface";
 import "./HomePage.css";
 
 export default function HomePage() {
     const { currentProfile } = useAuth();
+    const { currentLanguage } = useAuthLanguage(currentProfile?.language);
     const [currentDate, setCurrentDate] = useState(new Date());
 
-    // 언어 설정 (currentProfile.language 기반, 기본값은 KO)
-    const currentLanguage =
-        currentProfile?.language === SupportedLanguage.EN ? SupportedLanguage.EN : SupportedLanguage.KO;
     const texts = homeTexts[currentLanguage];
 
     // 캘린더 관련 함수들
