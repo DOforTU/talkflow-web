@@ -50,20 +50,12 @@ export default function BottomNav() {
             </Link>
             <Link href="/ai" className={`nav-item ${isActive("/ai") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <rect
+                    <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        x="6"
-                        y="6"
-                        width="12"
-                        height="12"
-                        rx="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                     />
-                    <circle strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} cx="9" cy="10" r="1" />
-                    <circle strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} cx="15" cy="10" r="1" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14h6" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4M12 20v-2" />
                 </svg>
                 <span>AI</span>
             </Link>
