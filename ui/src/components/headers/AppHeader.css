@@ -6,12 +6,14 @@
     max-width: 768px;
     margin: 0 auto;
     background-color: var(--bg-primary);
-    padding: 1rem 2rem;
+    padding: 0 1rem;
+    padding-top: calc(1rem + 44px); /* Original 1rem + 44px for mobile safe area */
+    padding-bottom: 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 60px;
-    margin-top: 16px;
+    box-shadow: var(--card-shadow-bottom-only);
 }
 
 .header-title {

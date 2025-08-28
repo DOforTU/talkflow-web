@@ -1,7 +1,6 @@
 "use client";
 
 import AppHeader from "@/components/headers/AppHeader";
-import SmartHeader from "@/components/headers/SmartHeader";
 import BottomNav from "@/components/navigation/BottomNav";
 import { useAuth } from "@/context/Auth";
 import { useRouter } from "next/navigation";
@@ -39,12 +38,10 @@ export default function ProtectedLayout({
     }
 
     return (
-        <>
-            <SmartHeader>
-                <AppHeader />
-            </SmartHeader>
+        <div className="page-container">
+            <AppHeader />
             {children}
             <BottomNav />
-        </>
+        </div>
     );
 }

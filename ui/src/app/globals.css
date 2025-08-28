@@ -1,5 +1,8 @@
 /* SayPlan Global Styles - Based on server/api/static/css/base.css */
 
+/* Pretendard Font Import */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css");
+
 :root {
     --point-color: #ec4899;
 
@@ -42,9 +45,15 @@
     --voice-error: #f44336;
 
     /* Typography */
-    --font-family-primary: "PT Serif", serif;
-    --font-family-mono: "PT Serif", serif;
+    /* --font-family-primary: "PT Serif", serif; */
+    /* --font-family-mono: "PT Serif", serif; */
+    --font-family-primary: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue",
+        "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol", sans-serif;
+    --font-family-mono: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+        "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", monospace;
 
+    --font-size-xxs: 10px;
     --font-size-xs: 12px;
     --font-size-sm: 14px;
     --font-size-base: 16px;
@@ -54,8 +63,9 @@
 
     /* UI Elements */
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --card-shadow-weak: 0 1px 1px rgba(0, 0, 0, 0.08);
+    --card-shadow-weak: 0 2px 4px rgba(0, 0, 0, 0.08);
     --card-shadow-strong: 0 8px 40px rgba(0, 0, 0, 0.15);
+    --card-shadow-bottom-only: 0 1px 1px rgba(0, 0, 0, 0.1);
     --border-radius: 12px;
     --glassmorphism: rgba(255, 255, 255, 0.15);
 
@@ -231,5 +241,29 @@ a:hover {
     .btn {
         padding: 10px 20px;
         font-size: var(--font-size-sm);
+    }
+}
+
+/* Layout adjustments for sidebar navigation */
+/* Desktop: Add left margin for sidebar */
+@media (min-width: 769px) {
+    /* Main content containers that need to avoid sidebar overlap */
+    .home-page,
+    .page-container {
+        margin-left: 240px;
+    }
+
+    /* Specific adjustments for pages that might need it */
+    body {
+        overflow-x: hidden;
+    }
+}
+
+/* Mobile: Ensure bottom spacing for bottom nav */
+@media (max-width: 768px) {
+    .home-page,
+    .page-container,
+    main {
+        padding-bottom: 80px; /* Space for bottom nav */
     }
 }

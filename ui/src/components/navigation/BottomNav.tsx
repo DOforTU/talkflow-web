@@ -13,7 +13,7 @@ export default function BottomNav() {
 
     return (
         <nav className="bottom-nav">
-            <Link href="/app/home" className={`nav-item ${isActive("/home") ? "active" : ""}`}>
+            <Link href="/home" className={`nav-item ${isActive("/home") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                         strokeLinecap="round"
@@ -24,7 +24,7 @@ export default function BottomNav() {
                 </svg>
                 <span>홈</span>
             </Link>
-            <Link href="/app/map" className={`nav-item ${isActive("/map") ? "active" : ""}`}>
+            <Link href="/map" className={`nav-item ${isActive("/map") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                         strokeLinecap="round"
@@ -41,14 +41,14 @@ export default function BottomNav() {
                 </svg>
                 <span>지도</span>
             </Link>
-            <Link href="/app/silhouette" className={`nav-item ${isActive("/silhouette") ? "active" : ""}`}>
+            <Link href="/silhouette" className={`nav-item ${isActive("/silhouette") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" strokeWidth={2} />
                     <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none" />
                 </svg>
                 <span>실루엣</span>
             </Link>
-            <Link href="/app/ai" className={`nav-item ${isActive("/ai") ? "active" : ""}`}>
+            <Link href="/ai" className={`nav-item ${isActive("/ai") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect
                         strokeLinecap="round"
@@ -67,7 +67,7 @@ export default function BottomNav() {
                 </svg>
                 <span>AI</span>
             </Link>
-            <Link href="/app/all" className={`nav-item ${isActive("/all") ? "active" : ""}`}>
+            <Link href="/all" className={`nav-item ${isActive("/all") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
