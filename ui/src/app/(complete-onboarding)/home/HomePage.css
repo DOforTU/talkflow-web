@@ -174,7 +174,7 @@
 .voice-record-btn {
     position: fixed;
     bottom: 70px;
-    right: max(2rem, calc((100vw - 768px) / 2 + 1rem));
+    right: max(2rem, calc((100vw - 768px) / 3 + 1rem));
     width: 56px;
     height: 56px;
     border-radius: 50%;
