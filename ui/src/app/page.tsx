@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import SmartHeader from "@/components/headers/SmartHeader";
 import LanguageSelector from "@/components/LanguageSelector";
-import { loginWithGoogle } from "@/lib/api/auth";
-import { useAuth } from "@/context/Auth";
+import { useAuthStore } from "@/store/authStore";
+import { useGoogleLogin } from "@/hooks/useAuth";
 import { useLanguage } from "@/context/Language";
 import { mainPageTexts } from "@/text/main/MainPage";
 import "./MainPage.css";
@@ -15,18 +15,19 @@ import SimpleFooter from "@/components/footers/SimpleFooter";
 
 export default function MainPage() {
     const router = useRouter();
-    const { currentUser, currentProfile, isLoading } = useAuth();
+    const { user, profile, isAuthenticated } = useAuthStore();
     const { currentLanguage } = useLanguage();
+    const { login: googleLogin } = useGoogleLogin();
 
     const texts = mainPageTexts[currentLanguage];
 
     const isOnboardingComplete = useCallback(() => {
-        return currentProfile?.language && currentUser?.firstName && currentUser?.lastName;
-    }, [currentProfile?.language, currentUser?.firstName, currentUser?.lastName]);
+        return profile?.language && user?.firstName && user?.lastName;
+    }, [profile?.language, user?.firstName, user?.lastName]);
 
     useEffect(() => {
         // 로그인했지만 온보딩이 안된 사용자는 /onboarding으로 리다이렉트
-        if (!isLoading && currentUser) {
+        if (isAuthenticated && user) {
             if (!isOnboardingComplete()) {
                 router.push("/onboarding");
             } else {
@@ -34,10 +35,14 @@ export default function MainPage() {
                 router.push("/home");
             }
         }
-    }, [currentUser, isLoading, isOnboardingComplete, router]);
+    }, [user, isAuthenticated, isOnboardingComplete, router]);
 
-    // 로딩 중이거나 로그인한 사용자면 빈 화면 표시
-    if (isLoading || currentUser) {
+    const handleGoogleLogin = () => {
+        googleLogin();
+    };
+
+    // 로그인한 사용자면 빈 화면 표시 (리다이렉트 중)
+    if (isAuthenticated && user) {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -98,7 +103,7 @@ export default function MainPage() {
                                 {texts.learnMoreButton}
                             </Link>
 
-                            <button className="main-btn-google" onClick={() => loginWithGoogle()}>
+                            <button className="main-btn-google" onClick={handleGoogleLogin}>
                                 <svg className="main-google-icon" viewBox="0 0 24 24">
                                     <path
                                         fill="#4285F4"
