@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useAuth } from "@/context/Auth";
+import { useAuthStore } from "@/store/authStore";
 import "./AppHeader.css";
 
 export default function AppHeader() {
-    const { currentProfile } = useAuth();
+    const { profile } = useAuthStore();
 
     return (
         <header className="app-header">
@@ -21,14 +21,8 @@ export default function AppHeader() {
             </div>
             <div className="header-actions">
                 <div className="header-profile">
-                    {currentProfile?.avatarUrl ? (
-                        <Image
-                            width={40}
-                            height={40}
-                            src={currentProfile.avatarUrl}
-                            alt="Profile"
-                            className="profile-image"
-                        />
+                    {profile?.avatarUrl ? (
+                        <Image width={40} height={40} src={profile.avatarUrl} alt="Profile" className="profile-image" />
                     ) : (
                         <div
                             className="profile-image"

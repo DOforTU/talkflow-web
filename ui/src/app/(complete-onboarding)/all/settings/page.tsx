@@ -1,11 +1,9 @@
 "use client";
 
-import { useAuth } from "@/context/Auth";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function HomePage() {
-    const { currentUser, currentProfile } = useAuth();
     const [currentDate, setCurrentDate] = useState(new Date());
 
     // 캘린더 관련 함수들
