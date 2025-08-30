@@ -1,15 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/context/Auth";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
 import { SupportedLanguage } from "@/lib/types/users.interface";
 import "./HomePage.css";
 
 export default function HomePage() {
-    const { currentProfile } = useAuth();
-    const { currentLanguage } = useAuthLanguage(currentProfile?.language);
+    const { currentLanguage } = useAuthLanguage();
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const texts = homeTexts[currentLanguage];

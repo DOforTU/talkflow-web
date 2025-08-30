@@ -3,7 +3,7 @@
 import { Dancing_Script, PT_Serif } from "next/font/google";
 import { LanguageProvider } from "@/context/Language";
 import "./globals.css";
-import { AuthProvider } from "@/context/Auth";
+import Providers from "./providers";
 
 const dancingScript = Dancing_Script({
     subsets: ["latin"],
@@ -29,9 +29,9 @@ export default function RootLayout({
                 <link rel="icon" href="/app_logo.png" />
             </head>
             <body className={` ${dancingScript.variable} ${ptSerif.variable} antialiased`}>
-                <AuthProvider>
+                <Providers>
                     <LanguageProvider>{children}</LanguageProvider>
-                </AuthProvider>
+                </Providers>
             </body>
         </html>
     );
