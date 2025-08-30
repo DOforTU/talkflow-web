@@ -71,17 +71,17 @@ export default function ProfileImageUpload({
     const displayImageUrl = preview || currentImageUrl;
 
     return (
-        <div className="flex flex-col items-center space-y-4">
+        <div className="profile-image-upload">
             {/* 이미지 미리보기 */}
-            <div className="relative">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+            <div className="image-preview-container">
+                <div className="image-preview">
                     {displayImageUrl ? (
                         <Image
                             src={displayImageUrl}
                             alt="프로필 이미지"
                             width={128}
                             height={128}
-                            className="w-full h-full object-cover"
+                            className="preview-image"
                             onError={(e) => {
                                 console.error("Image load error:", e);
                                 console.log("Failed to load image URL:", displayImageUrl);
@@ -91,37 +91,37 @@ export default function ProfileImageUpload({
                             }}
                         />
                     ) : (
-                        <div className="text-gray-400 text-sm">이미지 없음</div>
+                        <div className="no-image-placeholder">이미지 없음</div>
                     )}
                 </div>
 
                 {uploading && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-                        <div className="text-white text-sm">업로드 중...</div>
+                    <div className="upload-overlay">
+                        <div className="upload-text">업로드 중...</div>
                     </div>
                 )}
             </div>
 
-            {/* 파일 선택 버튼 */}
-            <div className="relative">
+            {/* 통합된 파일 선택 버튼 */}
+            <div className="file-upload-wrapper">
                 <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
                     disabled={disabled || uploading}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                    className="file-input"
+                    id="profile-image-input"
                 />
-                <button
-                    type="button"
-                    disabled={disabled || uploading}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                <label
+                    htmlFor="profile-image-input"
+                    className={`upload-button ${disabled || uploading ? 'disabled' : ''}`}
                 >
                     {uploading ? "업로드 중..." : "이미지 선택"}
-                </button>
+                </label>
             </div>
 
             {/* 파일 형식 및 크기 안내 */}
-            <p className="text-xs text-gray-500 text-center">
+            <p className="upload-info">
                 JPG, PNG, GIF, WebP 형식
                 <br />
                 최대 5MB
