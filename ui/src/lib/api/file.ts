@@ -6,7 +6,7 @@ export interface FileUploadResponse {
 
 export const fileApi = {
     // 파일 업로드 (사용자 프로필 이미지)
-    uploadFile: async (file: File, type: "user" | "team" = "user"): Promise<FileUploadResponse> => {
+    uploadFile: async (file: File, type: "user" | "silhouette" = "user"): Promise<FileUploadResponse> => {
         const formData = new FormData();
         formData.append("file", file);
 

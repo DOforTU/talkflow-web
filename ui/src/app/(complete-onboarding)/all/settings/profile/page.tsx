@@ -56,6 +56,37 @@ export default function ProfileSettingsPage() {
         }));
     };
 
+    const handleResetToDefaultAvatar = async () => {
+        if (!profile) {
+            alert("프로필 정보를 불러올 수 없습니다.");
+            return;
+        }
+
+        if (!confirm("기본 이미지로 변경하시겠습니까?")) {
+            return;
+        }
+
+        try {
+            setSaving(true);
+            const updatedProfile = await profileApi.resetToDefaultAvatar(Number(profile.id));
+
+            // 스토어와 폼 상태 모두 업데이트
+            setProfile(updatedProfile);
+            setFormData((prev) => ({
+                ...prev,
+                avatarUrl: updatedProfile.avatarUrl,
+                version: updatedProfile.version,
+            }));
+
+            alert("기본 이미지로 변경되었습니다!");
+        } catch (error: unknown) {
+            console.error("기본 이미지 변경 실패:", error);
+            alert("기본 이미지 변경에 실패했습니다. 다시 시도해주세요.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -135,6 +166,7 @@ export default function ProfileSettingsPage() {
                             <ProfileImageUpload
                                 currentImageUrl={formData.avatarUrl}
                                 onImageUrlChange={handleImageUrlChange}
+                                onResetToDefault={handleResetToDefaultAvatar}
                                 disabled={saving}
                             />
                         </div>
@@ -201,42 +233,11 @@ export default function ProfileSettingsPage() {
 
                     {/* 저장 버튼 */}
                     <div className="form-actions">
-                        <button type="submit" disabled={saving} className="save-button btn-primary">
+                        <button type="submit" disabled={saving} className="update-profile-button btn-primary">
                             {saving ? "저장 중..." : "저장"}
                         </button>
                     </div>
                 </form>
-
-                {/* 디버그 정보 */}
-                <div className="debug-section">
-                    <h3 className="debug-title">디버그 정보 (Google Storage 테스트용)</h3>
-                    <div className="debug-info">
-                        <div>
-                            <strong>사용자 ID:</strong> {user.id}
-                        </div>
-                        <div>
-                            <strong>프로필 ID:</strong> {profile.id}
-                        </div>
-                        <div>
-                            <strong>현재 닉네임:</strong> {profile.nickname}
-                        </div>
-                        <div>
-                            <strong>현재 아바타 URL:</strong> {profile.avatarUrl}
-                        </div>
-                        <div>
-                            <strong>프로필 버전:</strong> {formData.version}
-                        </div>
-                        <div className="test-instructions">
-                            <p className="test-instructions-title">Google Storage 테스트 방법:</p>
-                            <ul className="test-instructions-list">
-                                <li>이미지를 선택하면 Google Cloud Storage에 업로드됩니다</li>
-                                <li>저장 후 기존 이미지는 자동으로 삭제됩니다</li>
-                                <li>Network 탭에서 API 호출을 확인할 수 있습니다</li>
-                                <li>업로드된 이미지 URL이 아바타 URL에 표시됩니다</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     );

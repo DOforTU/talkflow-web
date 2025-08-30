@@ -29,4 +29,10 @@ export const profileApi = {
         const response = await apiClient.patch(`api/profiles/${profileId}`, updateData);
         return response.data.data;
     },
+
+    // 기본 이미지로 변경
+    resetToDefaultAvatar: async (profileId: number): Promise<Profile> => {
+        const response = await apiClient.post(`api/profiles/${profileId}/reset-avatar`);
+        return response.data.data;
+    },
 };

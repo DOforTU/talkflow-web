@@ -7,12 +7,14 @@ import { fileApi } from "@/lib/api/file";
 interface ProfileImageUploadProps {
     currentImageUrl?: string;
     onImageUrlChange: (url: string) => void;
+    onResetToDefault?: () => void;
     disabled?: boolean;
 }
 
 export default function ProfileImageUpload({
     currentImageUrl,
     onImageUrlChange,
+    onResetToDefault,
     disabled = false,
 }: ProfileImageUploadProps) {
     const [uploading, setUploading] = useState(false);
@@ -43,10 +45,6 @@ export default function ProfileImageUpload({
 
             // 파일 업로드
             const response = await fileApi.uploadFile(file, "user");
-
-            // 디버깅용 로그
-            console.log("Upload response:", response);
-            console.log("Image URL:", response.url);
 
             // 업로드 성공 시 부모 컴포넌트에 URL 전달
             onImageUrlChange(response.url);
@@ -102,22 +100,35 @@ export default function ProfileImageUpload({
                 )}
             </div>
 
-            {/* 통합된 파일 선택 버튼 */}
-            <div className="file-upload-wrapper">
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    disabled={disabled || uploading}
-                    className="file-input"
-                    id="profile-image-input"
-                />
-                <label
-                    htmlFor="profile-image-input"
-                    className={`upload-button ${disabled || uploading ? 'disabled' : ''}`}
-                >
-                    {uploading ? "업로드 중..." : "이미지 선택"}
-                </label>
+            {/* 버튼들 */}
+            <div className="upload-buttons">
+                <div className="file-upload-wrapper">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        disabled={disabled || uploading}
+                        className="file-input"
+                        id="profile-image-input"
+                    />
+                    <label
+                        htmlFor="profile-image-input"
+                        className={`upload-avatar-button btn-primary ${disabled || uploading ? "disabled" : ""}`}
+                    >
+                        {uploading ? "업로드 중..." : "이미지 선택"}
+                    </label>
+                </div>
+
+                {onResetToDefault && (
+                    <button
+                        type="button"
+                        onClick={onResetToDefault}
+                        disabled={disabled}
+                        className="reset-avatar-button"
+                    >
+                        기본 이미지로 변경
+                    </button>
+                )}
             </div>
 
             {/* 파일 형식 및 크기 안내 */}
