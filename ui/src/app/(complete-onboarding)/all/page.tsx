@@ -12,11 +12,11 @@ export default function AllPage() {
     const { mutate: logout } = useLogout();
 
     const handleProfileSettings = () => {
-        router.push("/profile/settings");
+        router.push("/all/settings/profile");
     };
 
     const handleAccountSettings = () => {
-        router.push("/account/settings");
+        router.push("/all/settings/account");
     };
 
     const handleLogout = () => {

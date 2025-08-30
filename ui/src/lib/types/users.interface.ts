@@ -72,4 +72,5 @@ export interface Profile {
     language: SupportedLanguage;
     avatarUrl: string;
     bio?: string | null;
+    version: number;
 }
