@@ -37,14 +37,12 @@ export default function HomePage() {
     const getSelectedDateEvents = () => {
         return events
             .filter((event) => {
-                const eventDate = new Date(event.startTime);
-                return (
-                    eventDate.getDate() === selectedDate.getDate() &&
-                    eventDate.getMonth() === selectedDate.getMonth() &&
-                    eventDate.getFullYear() === selectedDate.getFullYear()
-                );
+                // "2025-09-01 19:30" -> "2025-09-01" 추출
+                const eventDateStr = event.startTime.split(' ')[0];
+                const selectedDateStr = selectedDate.toISOString().split('T')[0];
+                return eventDateStr === selectedDateStr;
             })
-            .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+            .sort((a, b) => a.startTime.localeCompare(b.startTime));
     };
 
     // 날짜 선택 핸들러
@@ -77,11 +75,7 @@ export default function HomePage() {
                                     getSelectedDateEvents().map((event) => (
                                         <div key={event.id} className="schedule-item">
                                             <div className="schedule-time">
-                                                {new Date(event.startTime).toLocaleTimeString("ko-KR", {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                    hour12: false,
-                                                })}
+                                                {event.isAllDay ? texts.schedule.allDay : event.startTime.split(' ')[1]}
                                             </div>
                                             <div className="schedule-content">
                                                 <div className="schedule-title">{event.title}</div>

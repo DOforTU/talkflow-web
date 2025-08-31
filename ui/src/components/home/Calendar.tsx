@@ -61,12 +61,10 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
     // 특정 날짜의 이벤트 가져오기
     const getEventsForDate = (date: Date) => {
         return events.filter((event) => {
-            const eventDate = new Date(event.startTime);
-            return (
-                eventDate.getDate() === date.getDate() &&
-                eventDate.getMonth() === date.getMonth() &&
-                eventDate.getFullYear() === date.getFullYear()
-            );
+            // "2025-09-01 19:30" -> "2025-09-01" 추출
+            const eventDateStr = event.startTime.split(' ')[0];
+            const targetDateStr = date.toISOString().split('T')[0];
+            return eventDateStr === targetDateStr;
         });
     };
 

@@ -10,8 +10,8 @@ export const eventApi = {
         // 여기서 ResponseEvent[]로 변환
         const responseEvents: ResponseEvent[] = responseEventsDto.map((event) => ({
             ...event,
-            startTime: new Date(event.startTime),
-            endTime: new Date(event.endTime),
+            startTime: event.startTime, // 이제 문자열 그대로 사용
+            endTime: event.endTime,     // 이제 문자열 그대로 사용
             createdAt: new Date(event.createdAt),
             updatedAt: new Date(event.updatedAt),
             deletedAt: event.deletedAt ? new Date(event.deletedAt) : null,
