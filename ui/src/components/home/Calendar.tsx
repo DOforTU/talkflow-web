@@ -64,6 +64,8 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
             // "2025-09-01 19:30" -> "2025-09-01" 추출
             const eventDateStr = event.startTime.split(' ')[0];
             const targetDateStr = date.toISOString().split('T')[0];
+            
+            // 년도, 월, 일이 모두 일치하는지 확인
             return eventDateStr === targetDateStr;
         });
     };

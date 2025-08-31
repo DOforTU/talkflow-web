@@ -22,6 +22,7 @@ export default function HomePage() {
             try {
                 setIsLoading(true);
                 const fetchedEvents = await eventApi.getMyEvents();
+                console.log("All loaded events:", fetchedEvents);
                 setEvents(fetchedEvents);
             } catch (error) {
                 console.error("Failed to load events:", error);
@@ -33,21 +34,62 @@ export default function HomePage() {
         loadEvents();
     }, []);
 
-    // 선택된 날짜의 이벤트 가져오기
+    // 선택된 날짜의 이벤트 가져기기
     const getSelectedDateEvents = () => {
-        return events
-            .filter((event) => {
-                // "2025-09-01 19:30" -> "2025-09-01" 추출
-                const eventDateStr = event.startTime.split(' ')[0];
-                const selectedDateStr = selectedDate.toISOString().split('T')[0];
-                return eventDateStr === selectedDateStr;
-            })
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+        const selectedDateStr = selectedDate.toISOString().split("T")[0];
+        
+        const filteredEvents = events.filter((event) => {
+            // "2025-09-01 19:30" -> "2025-09-01" 추출
+            const eventDateStr = event.startTime.split(" ")[0];
+            const matches = eventDateStr === selectedDateStr;
+            
+            // 디버깅용 로그 - 모든 날짜에 대해 로그
+            console.log("Event filtering:", {
+                eventTitle: event.title,
+                eventDateStr,
+                selectedDateStr,
+                matches,
+                eventStartTime: event.startTime
+            });
+            
+            return matches;
+        });
+        
+        return filteredEvents.sort((a, b) => {
+            // 하루종일 이벤트를 맨 위로, 나머지는 시간순
+            if (a.isAllDay && !b.isAllDay) return -1;
+            if (!a.isAllDay && b.isAllDay) return 1;
+            return a.startTime.localeCompare(b.startTime);
+        });
     };
 
     // 날짜 선택 핸들러
     const handleDateSelect = (date: Date) => {
         setSelectedDate(date);
+    };
+
+    // 두 지점 간 직선 거리 계산 (Haversine formula)
+    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+        const R = 6371000; // 지구 반지름 (미터)
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // 미터 단위
+    };
+
+    // 거리를 적절한 단위로 포맷
+    const formatDistance = (distance: number): string => {
+        if (distance >= 1000) {
+            return `${(distance / 1000).toFixed(1)}km`;
+        } else {
+            return `${Math.round(distance)}m`;
+        }
     };
 
     return (
@@ -72,28 +114,76 @@ export default function HomePage() {
                         ) : (
                             <>
                                 {getSelectedDateEvents().length > 0 ? (
-                                    getSelectedDateEvents().map((event) => (
-                                        <div key={event.id} className="schedule-item">
-                                            <div className="schedule-time">
-                                                {event.isAllDay ? texts.schedule.allDay : event.startTime.split(' ')[1]}
-                                            </div>
-                                            <div className="schedule-content">
-                                                <div className="schedule-title">{event.title}</div>
-                                                {event.description && (
-                                                    <div className="schedule-description">{event.description}</div>
-                                                )}
-                                                {event.location && (
-                                                    <div className="schedule-location">
-                                                        📍 {event.location.nameKo || event.location.nameEn}
+                                    (() => {
+                                        let timedEventIndex = 0;
+                                        const events = getSelectedDateEvents();
+                                        
+                                        return events.map((event, index) => {
+                                            // 현재 이벤트가 시간 이벤트인 경우에만 번호 증가
+                                            const currentEventNumber = event.isAllDay ? null : ++timedEventIndex;
+                                            
+                                            // 이전 location이 있는 이벤트 찾기 (현재 이벤트에 location이 있을 때만)
+                                            let prevLocationEvent = null;
+                                            let distance = null;
+                                            
+                                            if (event.location) {
+                                                // 현재 이벤트보다 이전 이벤트 중에서 location이 있는 것 찾기
+                                                for (let i = index - 1; i >= 0; i--) {
+                                                    if (events[i].location) {
+                                                        prevLocationEvent = events[i];
+                                                        distance = calculateDistance(
+                                                            prevLocationEvent.location!.latitude,
+                                                            prevLocationEvent.location!.longitude,
+                                                            event.location.latitude,
+                                                            event.location.longitude
+                                                        );
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            
+                                            return (
+                                                <div key={event.id}>
+                                                    {/* 거리 표시 - 현재 이벤트 위에 표시 */}
+                                                    {distance && (
+                                                        <div className="schedule-distance">
+                                                            <div className="distance-line"></div>
+                                                            <div className="distance-text">{formatDistance(distance)}</div>
+                                                        </div>
+                                                    )}
+                                                    <div className="schedule-item">
+                                                        <div
+                                                            className="schedule-color-dot"
+                                                            style={{ backgroundColor: event.colorCode }}
+                                                        >
+                                                            {currentEventNumber || ""}
+                                                        </div>
+                                                        <div className="schedule-time">
+                                                            {event.isAllDay ? (
+                                                                texts.schedule.allDay
+                                                            ) : (
+                                                                <>
+                                                                    <div>{event.startTime.split(" ")[1]}</div>
+                                                                    <div>{event.endTime.split(" ")[1]}</div>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                        <div className="schedule-content">
+                                                            <div className="schedule-title">{event.title}</div>
+                                                            {event.description && (
+                                                                <div className="schedule-description">{event.description}</div>
+                                                            )}
+                                                            {event.location && (
+                                                                <div className="schedule-location">
+                                                                    📍 {event.location.nameKo || event.location.nameEn}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                )}
-                                            </div>
-                                            <div
-                                                className="schedule-color"
-                                                style={{ backgroundColor: event.colorCode }}
-                                            ></div>
-                                        </div>
-                                    ))
+                                                </div>
+                                            );
+                                        });
+                                    })()
                                 ) : (
                                     <div className="no-schedule">
                                         {selectedDate.toDateString() === new Date().toDateString()
