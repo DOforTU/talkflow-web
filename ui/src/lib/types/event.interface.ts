@@ -29,3 +29,24 @@ export interface ResponseEventDto {
     location: ResponseLocationDto | null;
     recurringEventId: number | null;
 }
+
+export interface ResponseEvent {
+    id: number;
+    title: string;
+    description: string | null;
+    startTime: Date; // Date는 JSON으로 전송시 string으로 변환됨
+    endTime: Date; // Date는 JSON으로 전송시 string으로 변환됨
+    isAllDay: boolean;
+    colorCode: string;
+    version: number;
+
+    // time columns: Date는 JSON으로 전송시 string으로 변환됨
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+
+    // parts of relations
+    userId: number;
+    location: ResponseLocationDto | null;
+    recurringEventId: number | null;
+}

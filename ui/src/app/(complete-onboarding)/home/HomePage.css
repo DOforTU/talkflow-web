@@ -111,8 +111,13 @@
 }
 
 .calendar-day.today {
-    border: 2px solid var(--text-1);
+    background-color: var(--accent);
     color: var(--text-1);
+}
+
+.calendar-day.selected {
+    border: 2px solid var(--text-3);
+    box-shadow: 0 0 0 1px var(--accent);
 }
 
 .calendar-day.other-month {
@@ -123,13 +128,56 @@
     color: var(--error);
 }
 
-/* Today's Schedule Section */
-.today-schedule {
+/* Calendar Day Events */
+.calendar-day-number {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.calendar-day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.calendar-event {
+    font-size: 0.625rem;
+    padding: 1px 3px;
+    border-radius: 2px;
+    color: white;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    line-height: 1.2;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.calendar-event-more {
+    font-size: 0.625rem;
+    color: var(--text-3);
+    text-align: center;
+    font-weight: 600;
+    margin-top: 1px;
+}
+
+.calendar-day.has-events {
+    padding: 0.1rem 0.2rem;
+}
+
+.calendar-day.has-events .calendar-day-number {
+    margin-bottom: 0.1rem;
+}
+
+/* Selected Day Schedule Section */
+.select-day-schedule {
     padding: 1rem;
     background-color: var(--bg-primary);
 }
 
-.today-schedule-title {
+.select-day-schedule-title {
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--text-1);
@@ -144,23 +192,66 @@
 
 .schedule-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
     padding: 0.75rem;
     border-radius: 8px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    position: relative;
 }
 
 .schedule-time {
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-1);
-    min-width: 60px;
+    min-width: 50px;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--bg-tertiary);
+    border-radius: 4px;
+    text-align: center;
 }
 
 .schedule-content {
     flex: 1;
+}
+
+.schedule-title {
     font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-1);
+    margin-bottom: 0.25rem;
+}
+
+.schedule-description {
+    font-size: 0.875rem;
     color: var(--text-2);
+    margin-bottom: 0.25rem;
+}
+
+.schedule-location {
+    font-size: 0.8rem;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.schedule-color {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.schedule-loading {
+    text-align: center;
+    color: var(--text-3);
+    font-size: 0.875rem;
+    padding: 2rem 0;
 }
 
 .no-schedule {
