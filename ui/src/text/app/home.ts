@@ -1,4 +1,4 @@
-import { SupportedLanguage } from "@/lib/types/users.interface";
+import { SupportedLanguage } from "@/lib/types/user.interface";
 
 export interface HomeTexts {
     calendar: {

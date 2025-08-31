@@ -1,4 +1,4 @@
-import { CommonDTOEntity, CommonEntity, UUID } from "./common.interface";
+import { CommonDTOEntity, CommonEntity } from "./common.interface";
 
 //  ===== Enum =====
 export enum UserRole {
@@ -36,41 +36,54 @@ export interface AuthContextType {
 }
 
 // ===== Current User =====
-export interface CurrentUserDTO extends UserDTO {
+export interface UserWithProfileDTO extends UserDTO {
     profile: Profile | null;
 }
 
 // ===== User DTO From Server =====
 export interface UserDTO extends CommonDTOEntity {
-    id: UUID;
+    id: number;
     email: string;
     username: string;
     firstName: string;
     lastName: string;
     role: UserRole;
     provider: UserProvider;
+    version: number;
     lastLogin?: string | null;
 }
 
 // ===== User For Using Client =====
 export interface User extends CommonEntity {
-    id: UUID;
+    id: number;
     email: string;
     username: string;
     firstName: string;
     lastName: string;
     role: UserRole;
     provider: UserProvider;
+    version: number;
     lastLogin?: Date | null;
 }
 
 // ===== User Profile For Using Client =====
 export interface Profile {
-    id: UUID;
+    id: number;
     nickname: string;
-    timezone: SupportedTimezone;
-    language: SupportedLanguage;
     avatarUrl: string;
-    bio?: string | null;
+    version: number;
+
+    // nullable
+    language: SupportedLanguage | null;
+    bio: string | null;
+}
+
+// ===== Request =====
+
+export interface UpdateProfileDto {
+    nickname?: string;
+    avatarUrl?: string;
+    language?: SupportedLanguage;
+    bio?: string;
     version: number;
 }

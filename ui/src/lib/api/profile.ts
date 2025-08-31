@@ -1,25 +1,9 @@
 import apiClient from "./client";
-import { Profile } from "../types/users.interface";
-
-export interface UpdateProfileDto {
-    nickname?: string;
-    avatarUrl?: string;
-    language?: "ko" | "en";
-    bio?: string;
-    version: number;
-}
-
-export interface ResponseProfileDto {
-    id: number;
-    nickname: string;
-    avatarUrl: string;
-    language: string | null;
-    bio: string | null;
-}
+import { Profile, UpdateProfileDto } from "../types/user.interface";
 
 export const profileApi = {
     // 프로필 조회 (닉네임으로)
-    getProfileByNickname: async (nickname: string): Promise<ResponseProfileDto> => {
+    getProfileByNickname: async (nickname: string): Promise<Profile> => {
         const response = await apiClient.get(`api/profiles/${nickname}`);
         return response.data.data;
     },

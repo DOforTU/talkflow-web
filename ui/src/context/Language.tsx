@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { SupportedLanguage } from "@/lib/types/users.interface";
+import { SupportedLanguage } from "@/lib/types/user.interface";
 import { useAuthStore } from "@/store/authStore";
 
 export type Language = "ENG" | "KOR";

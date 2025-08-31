@@ -8,10 +8,10 @@ import {
 } from "@/lib/api/auth";
 import { useAuthStore } from "@/store/authStore";
 import { mapCommon } from "@/lib/utils/mapCommon";
-import { CurrentUserDTO, User } from "@/lib/types/users.interface";
+import { UserWithProfileDTO, User } from "@/lib/types/user.interface";
 
 // DTO에서 클라이언트 타입으로 변환
-function mapUserDTOToUser(userDTO: Omit<CurrentUserDTO, "profile">): User {
+function mapUserDTOToUser(userDTO: Omit<UserWithProfileDTO, "profile">): User {
     return {
         ...mapCommon(userDTO),
         id: userDTO.id,
@@ -21,6 +21,7 @@ function mapUserDTOToUser(userDTO: Omit<CurrentUserDTO, "profile">): User {
         lastName: userDTO.lastName,
         role: userDTO.role,
         provider: userDTO.provider,
+        version: userDTO.version,
         lastLogin: userDTO.lastLogin ? new Date(userDTO.lastLogin) : null,
     };
 }

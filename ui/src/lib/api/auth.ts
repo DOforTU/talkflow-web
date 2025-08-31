@@ -1,4 +1,4 @@
-import { CurrentUserDTO } from "../types/users.interface";
+import { UserWithProfileDTO } from "../types/user.interface";
 import apiClient from "./client";
 
 export function loginWithGoogle() {
@@ -6,7 +6,7 @@ export function loginWithGoogle() {
 }
 
 // ===== Get My Info =====
-export async function getCurrentUser(): Promise<CurrentUserDTO> {
+export async function getCurrentUser(): Promise<UserWithProfileDTO> {
     const response = await apiClient.get("/api/auth/me");
     return response.data.data;
 }

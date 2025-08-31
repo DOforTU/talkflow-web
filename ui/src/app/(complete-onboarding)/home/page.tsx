@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
-import { SupportedLanguage } from "@/lib/types/users.interface";
+import { SupportedLanguage } from "@/lib/types/user.interface";
 import "./HomePage.css";
 
 export default function HomePage() {
