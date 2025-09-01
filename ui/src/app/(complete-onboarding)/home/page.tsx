@@ -26,7 +26,6 @@ export default function HomePage() {
             try {
                 setIsLoading(true);
                 const fetchedEvents = await eventApi.getMyEvents();
-                console.log("All loaded events:", fetchedEvents);
                 setEvents(fetchedEvents);
             } catch (error) {
                 console.error("Failed to load events:", error);
@@ -41,24 +40,15 @@ export default function HomePage() {
     // 선택된 날짜의 이벤트 가져기기
     const getSelectedDateEvents = () => {
         const selectedDateStr = selectedDate.toISOString().split("T")[0];
-        
+
         const filteredEvents = events.filter((event) => {
             // "2025-09-01 19:30" -> "2025-09-01" 추출
             const eventDateStr = event.startTime.split(" ")[0];
             const matches = eventDateStr === selectedDateStr;
-            
-            // 디버깅용 로그 - 모든 날짜에 대해 로그
-            console.log("Event filtering:", {
-                eventTitle: event.title,
-                eventDateStr,
-                selectedDateStr,
-                matches,
-                eventStartTime: event.startTime
-            });
-            
+
             return matches;
         });
-        
+
         return filteredEvents.sort((a, b) => {
             // 하루종일 이벤트를 맨 위로, 나머지는 시간순
             if (a.isAllDay && !b.isAllDay) return -1;
@@ -81,7 +71,6 @@ export default function HomePage() {
             console.error("Failed to reload events:", error);
         }
     };
-
 
     // 두 지점 간 직선 거리 계산 (Haversine formula)
     const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -109,8 +98,8 @@ export default function HomePage() {
 
     return (
         <div className="home-page">
-                {/* Main Content */}
-                <main className="home-main">
+            {/* Main Content */}
+            <main className="home-main">
                 {/* Calendar Section */}
                 <Calendar events={events} onDateSelect={handleDateSelect} />
 
@@ -125,24 +114,24 @@ export default function HomePage() {
                             })}
                         </h2>
                         <div className="schedule-header-buttons">
-                            <button 
-                                className="create-event-btn" 
+                            <button
+                                className="create-event-btn"
                                 onClick={() => setShowCreateEventModal(true)}
                                 aria-label="일정 생성"
                             >
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <line x1="12" y1="5" x2="12" y2="19"/>
-                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
                                 </svg>
                             </button>
-                            <button 
-                                className="map-view-btn" 
+                            <button
+                                className="map-view-btn"
                                 onClick={() => setShowMapModal(true)}
                                 aria-label="지도 보기"
                             >
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                    <circle cx="12" cy="10" r="3" />
                                 </svg>
                             </button>
                         </div>
@@ -156,15 +145,15 @@ export default function HomePage() {
                                     (() => {
                                         let timedEventIndex = 0;
                                         const events = getSelectedDateEvents();
-                                        
+
                                         return events.map((event, index) => {
                                             // 현재 이벤트가 시간 이벤트인 경우에만 번호 증가
                                             const currentEventNumber = event.isAllDay ? null : ++timedEventIndex;
-                                            
+
                                             // 이전 location이 있는 이벤트 찾기 (현재 이벤트에 location이 있을 때만)
                                             let prevLocationEvent = null;
                                             let distance = null;
-                                            
+
                                             if (event.location) {
                                                 // 현재 이벤트보다 이전 이벤트 중에서 location이 있는 것 찾기
                                                 for (let i = index - 1; i >= 0; i--) {
@@ -180,14 +169,16 @@ export default function HomePage() {
                                                     }
                                                 }
                                             }
-                                            
+
                                             return (
                                                 <div key={event.id}>
                                                     {/* 거리 표시 - 현재 이벤트 위에 표시 */}
                                                     {distance && (
                                                         <div className="schedule-distance">
                                                             <div className="distance-line"></div>
-                                                            <div className="distance-text">{formatDistance(distance)}</div>
+                                                            <div className="distance-text">
+                                                                {formatDistance(distance)}
+                                                            </div>
                                                         </div>
                                                     )}
                                                     <div className="schedule-item">
@@ -210,7 +201,9 @@ export default function HomePage() {
                                                         <div className="schedule-content">
                                                             <div className="schedule-title">{event.title}</div>
                                                             {event.description && (
-                                                                <div className="schedule-description">{event.description}</div>
+                                                                <div className="schedule-description">
+                                                                    {event.description}
+                                                                </div>
                                                             )}
                                                             {event.location && (
                                                                 <div className="schedule-location">
@@ -252,7 +245,7 @@ export default function HomePage() {
                 </button>
             </main>
 
-            <MapModal 
+            <MapModal
                 isOpen={showMapModal}
                 onClose={() => setShowMapModal(false)}
                 events={events}

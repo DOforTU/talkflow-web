@@ -58,7 +58,7 @@ export function useAuthLanguage() {
     const { profile } = useAuthStore();
     const { getProfileBasedLanguage } = useLanguage();
 
-    const currentLanguage = getProfileBasedLanguage(profile?.language);
+    const currentLanguage = getProfileBasedLanguage(profile.language);
 
     return { currentLanguage };
 }

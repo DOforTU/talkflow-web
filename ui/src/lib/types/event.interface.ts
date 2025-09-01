@@ -21,7 +21,9 @@ export interface CreateLocationDto {
 }
 
 export interface CreateRecurringRuleDto {
-    // TODO: 반복 일정 관련 필드들 추가 예정
+    rule: string;
+    startDate: string;
+    endDate?: string;
 }
 
 // ===== Location Response DTO =====

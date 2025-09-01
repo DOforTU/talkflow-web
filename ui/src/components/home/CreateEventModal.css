@@ -303,6 +303,218 @@
     cursor: not-allowed;
 }
 
+/* Recurring */
+.recurring-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg-secondary);
+}
+
+.recurring-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.recurring-rule {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-1);
+}
+
+.recurring-dates {
+    font-size: 0.75rem;
+    color: var(--text-2);
+}
+
+.recurring-remove-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.recurring-remove-btn:hover {
+    background-color: var(--error);
+    color: white;
+}
+
+.recurring-remove-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+}
+
+.recurring-add-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: none;
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.recurring-add-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.recurring-add-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+/* Recurring Modal */
+.recurring-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    padding: 1rem;
+}
+
+.recurring-modal {
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--card-shadow-strong);
+}
+
+.recurring-content {
+    padding: 1.5rem;
+}
+
+.recurring-content .form-group select,
+.recurring-content .form-group input[type="number"],
+.recurring-content .form-group input[type="date"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--text-1);
+    background-color: var(--bg-primary);
+    transition: border-color 0.2s ease;
+}
+
+.recurring-content .form-group select:focus,
+.recurring-content .form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.interval-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.interval-group input {
+    width: 80px;
+    flex-shrink: 0;
+}
+
+.interval-group span {
+    font-size: 0.875rem;
+    color: var(--text-2);
+}
+
+.weekday-selector {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.weekday-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--bg-primary);
+    color: var(--text-2);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.weekday-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.weekday-btn.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.recurring-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.recurring-buttons button {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.recurring-buttons button:first-child {
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-2);
+}
+
+.recurring-buttons button:first-child:hover {
+    background: var(--bg-secondary);
+    color: var(--text-1);
+}
+
+.recurring-buttons button:last-child {
+    border: none;
+    background: var(--primary);
+    color: white;
+}
+
+.recurring-buttons button:last-child:hover {
+    background: var(--primary-light);
+}
+
 /* Location Modal Placeholder */
 .location-modal-placeholder {
     position: fixed;
