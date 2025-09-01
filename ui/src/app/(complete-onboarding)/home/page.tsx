@@ -6,6 +6,7 @@ import { homeTexts } from "@/text/app/home";
 import { ResponseEvent } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
 import Calendar from "../../../components/home/Calendar";
+import MapModal from "../../../components/home/MapModal";
 import "./HomePage.css";
 
 export default function HomePage() {
@@ -13,6 +14,7 @@ export default function HomePage() {
     const [events, setEvents] = useState<ResponseEvent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const [showMapModal, setShowMapModal] = useState(false);
 
     const texts = homeTexts[currentLanguage];
 
@@ -68,6 +70,7 @@ export default function HomePage() {
         setSelectedDate(date);
     };
 
+
     // 두 지점 간 직선 거리 계산 (Haversine formula)
     const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
         const R = 6371000; // 지구 반지름 (미터)
@@ -94,20 +97,32 @@ export default function HomePage() {
 
     return (
         <div className="home-page">
-            {/* Main Content */}
-            <main className="home-main">
+                {/* Main Content */}
+                <main className="home-main">
                 {/* Calendar Section */}
                 <Calendar events={events} onDateSelect={handleDateSelect} />
 
                 {/* Selected Day Schedule */}
                 <section className="select-day-schedule">
-                    <h2 className="select-day-schedule-title">
-                        {selectedDate.toLocaleDateString(currentLanguage === "en" ? "en-US" : "ko-KR", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                        })}
-                    </h2>
+                    <div className="schedule-header">
+                        <h2 className="select-day-schedule-title">
+                            {selectedDate.toLocaleDateString(currentLanguage === "en" ? "en-US" : "ko-KR", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            })}
+                        </h2>
+                        <button 
+                            className="map-view-btn" 
+                            onClick={() => setShowMapModal(true)}
+                            aria-label="지도 보기"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
                     <div className="schedule-list">
                         {isLoading ? (
                             <div className="schedule-loading">Loading...</div>
@@ -212,6 +227,13 @@ export default function HomePage() {
                     </svg>
                 </button>
             </main>
+
+            <MapModal 
+                isOpen={showMapModal}
+                onClose={() => setShowMapModal(false)}
+                events={events}
+                selectedDate={selectedDate}
+            />
         </div>
     );
 }
