@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { CreateEventDto, CreateLocationDto, CreateRecurringRuleDto } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
+import RecurringScheduleModal from "./RecurringScheduleModal";
+import LocationSearchModal from "./LocationSearchModal";
 import "./CreateEventModal.css";
 
 interface CreateEventModalProps {
@@ -23,14 +25,6 @@ const COLOR_OPTIONS = [
     "#64748B", // Slate
 ];
 
-type RecurringFrequency = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
-
-interface RecurringSettings {
-    frequency: RecurringFrequency;
-    interval: number;
-    weekdays?: number[]; // 0=일요일, 1=월요일, ...
-    endDate?: string;
-}
 
 export default function CreateEventModal({ isOpen, onClose, onEventCreated, selectedDate }: CreateEventModalProps) {
     const [formData, setFormData] = useState({
@@ -45,11 +39,6 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
     const [recurring, setRecurring] = useState<CreateRecurringRuleDto | null>(null);
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [showRecurringModal, setShowRecurringModal] = useState(false);
-    const [recurringSettings, setRecurringSettings] = useState<RecurringSettings>({
-        frequency: "WEEKLY",
-        interval: 1,
-        weekdays: [1], // 기본값: 월요일
-    });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const updateFormData = (field: string, value: string | boolean) => {
@@ -72,33 +61,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
         setLocation(null);
     };
 
-    const generateRRULE = (settings: RecurringSettings): string => {
-        let rrule = `FREQ=${settings.frequency};INTERVAL=${settings.interval}`;
-        
-        if (settings.frequency === "WEEKLY" && settings.weekdays && settings.weekdays.length > 0) {
-            const days = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
-            const convertedDays = settings.weekdays.map(day => {
-                // 하루씩 당기기: 화목토 → 월수금
-                const adjustedDay = (day + 6) % 7;
-                return days[adjustedDay];
-            });
-            const byDay = convertedDays.join(",");
-            rrule += `;BYDAY=${byDay}`;
-        }
-        
-        return rrule;
-    };
-
-    const handleRecurringApply = () => {
-        const startDate = selectedDate.toISOString().split("T")[0];
-        const rrule = generateRRULE(recurringSettings);
-        
-        const recurringData: CreateRecurringRuleDto = {
-            rule: rrule,
-            startDate,
-            endDate: recurringSettings.endDate,
-        };
-        
+    const handleRecurringApply = (recurringData: CreateRecurringRuleDto) => {
         setRecurring(recurringData);
         setShowRecurringModal(false);
     };
@@ -107,21 +70,6 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
         setRecurring(null);
     };
 
-    const updateRecurringSettings = (field: keyof RecurringSettings, value: any) => {
-        setRecurringSettings(prev => ({
-            ...prev,
-            [field]: value,
-        }));
-    };
-
-    const toggleWeekday = (day: number) => {
-        setRecurringSettings(prev => ({
-            ...prev,
-            weekdays: prev.weekdays?.includes(day) 
-                ? prev.weekdays.filter(d => d !== day)
-                : [...(prev.weekdays || []), day].sort()
-        }));
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -174,11 +122,6 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
         });
         setLocation(null);
         setRecurring(null);
-        setRecurringSettings({
-            frequency: "WEEKLY",
-            interval: 1,
-            weekdays: [1],
-        });
         onClose();
     };
 
@@ -279,7 +222,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                         </div>
                     </div>
 
-                    {/* <div className="form-group">
+                    <div className="form-group">
                         <label>위치</label>
                         {location ? (
                             <div className="location-display">
@@ -307,7 +250,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                                 <span>위치 추가</span>
                             </button>
                         )}
-                    </div> */}
+                    </div>
 
                     <div className="form-group">
                         <label>반복</label>
@@ -352,103 +295,18 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                 </form>
             </div>
 
-            {showLocationModal && (
-                <div className="location-modal-placeholder">
-                    <p>위치 추가 모달은 추후 구현 예정입니다.</p>
-                    <button onClick={() => setShowLocationModal(false)}>닫기</button>
-                </div>
-            )}
+            <LocationSearchModal
+                isOpen={showLocationModal}
+                onClose={() => setShowLocationModal(false)}
+                onLocationSelect={handleLocationAdd}
+            />
 
-            {showRecurringModal && (
-                <div className="recurring-modal-overlay" onClick={() => setShowRecurringModal(false)}>
-                    <div className="recurring-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>반복 설정</h3>
-                            <button 
-                                className="modal-close-btn" 
-                                onClick={() => setShowRecurringModal(false)}
-                                aria-label="모달 닫기"
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <line x1="18" y1="6" x2="6" y2="18" />
-                                    <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div className="recurring-content">
-                            <div className="form-group">
-                                <label>반복 빈도</label>
-                                <select 
-                                    value={recurringSettings.frequency} 
-                                    onChange={(e) => updateRecurringSettings("frequency", e.target.value as RecurringFrequency)}
-                                >
-                                    <option value="DAILY">매일</option>
-                                    <option value="WEEKLY">매주</option>
-                                    <option value="MONTHLY">매월</option>
-                                    <option value="YEARLY">매년</option>
-                                </select>
-                            </div>
-
-                            <div className="form-group">
-                                <label>간격</label>
-                                <div className="interval-group">
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="99"
-                                        value={recurringSettings.interval}
-                                        onChange={(e) => updateRecurringSettings("interval", parseInt(e.target.value))}
-                                    />
-                                    <span>
-                                        {recurringSettings.frequency === "DAILY" && "일마다"}
-                                        {recurringSettings.frequency === "WEEKLY" && "주마다"}
-                                        {recurringSettings.frequency === "MONTHLY" && "월마다"}
-                                        {recurringSettings.frequency === "YEARLY" && "년마다"}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {recurringSettings.frequency === "WEEKLY" && (
-                                <div className="form-group">
-                                    <label>요일 선택</label>
-                                    <div className="weekday-selector">
-                                        {["일", "월", "화", "수", "목", "금", "토"].map((day, index) => (
-                                            <button
-                                                key={index}
-                                                type="button"
-                                                className={`weekday-btn ${recurringSettings.weekdays?.includes(index) ? "selected" : ""}`}
-                                                onClick={() => toggleWeekday(index)}
-                                            >
-                                                {day}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="form-group">
-                                <label>종료 날짜 (선택사항)</label>
-                                <input
-                                    type="date"
-                                    value={recurringSettings.endDate || ""}
-                                    onChange={(e) => updateRecurringSettings("endDate", e.target.value || undefined)}
-                                    min={selectedDate.toISOString().split("T")[0]}
-                                />
-                            </div>
-
-                            <div className="recurring-buttons">
-                                <button type="button" onClick={() => setShowRecurringModal(false)}>
-                                    취소
-                                </button>
-                                <button type="button" onClick={handleRecurringApply}>
-                                    적용
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <RecurringScheduleModal
+                isOpen={showRecurringModal}
+                onClose={() => setShowRecurringModal(false)}
+                onApply={handleRecurringApply}
+                selectedDate={selectedDate}
+            />
         </div>
     );
 }

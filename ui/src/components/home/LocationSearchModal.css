@@ -1,0 +1,106 @@
+/* Location Modal */
+.location-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    padding: 1rem;
+}
+
+.location-modal {
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--card-shadow-strong);
+}
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-1);
+    margin: 0;
+}
+
+.modal-close-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-1);
+}
+
+.modal-close-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+/* Content */
+.location-content {
+    padding: 1.5rem;
+}
+
+/* Placeholder styling */
+.location-modal-placeholder {
+    text-align: center;
+    padding: 2rem;
+}
+
+.location-modal-placeholder p {
+    font-size: 1rem;
+    color: var(--text-2);
+    margin-bottom: 1.5rem;
+}
+
+.placeholder-close-btn {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-2);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.placeholder-close-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .location-modal {
+        margin: 1rem;
+        max-height: calc(100vh - 2rem);
+    }
+}
