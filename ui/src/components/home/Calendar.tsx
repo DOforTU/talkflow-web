@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
-import { SupportedLanguage } from "@/lib/types/user.interface";
 import { ResponseEventDto } from "@/lib/types/event.interface";
 import { getEventsForDate } from "@/lib/utils/eventUtils";
 import { getDaysInMonth, getFirstDayOfMonth, formatMonth, isSelected, getDayNames } from "@/lib/utils/calendarUtils";

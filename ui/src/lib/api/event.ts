@@ -18,7 +18,11 @@ export const eventApi = {
         return response.data.data;
     },
 
-    deleteEvent: async (eventId: number): Promise<void> => {
+    deleteSingleEvent: async (eventId: number): Promise<void> => {
         await apiClient.delete(`api/events/${eventId}`);
+    },
+
+    deleteRecurringEvents: async (eventId: number): Promise<void> => {
+        await apiClient.delete(`api/events/${eventId}/recurring/all`);
     },
 };

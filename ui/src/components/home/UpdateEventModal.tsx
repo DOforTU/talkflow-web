@@ -11,14 +11,10 @@ import {
 } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
 import { getLocalDateString } from "@/lib/utils/dateUtils";
-import {
-    COLOR_OPTIONS,
-    validateAndAdjustDateTime,
-    createDefaultFormData,
-    formatRecurringRule,
-} from "@/lib/utils/eventFormUtils";
+import { COLOR_OPTIONS, formatRecurringRule } from "@/lib/utils/eventFormUtils";
 import RecurringScheduleModal from "./RecurringScheduleModal";
 import LocationSearchModal from "./LocationSearchModal";
+import DeleteEventModal from "./DeleteEventModal";
 import "./UpdateEventModal.css";
 
 interface UpdateEventModalProps {
@@ -43,6 +39,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
     const [recurring, setRecurring] = useState<UpdateRecurringRuleDto | null>(null);
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [showRecurringModal, setShowRecurringModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -238,19 +235,33 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         }
     };
 
-    const handleDelete = async () => {
-        if (!event || !window.confirm("정말로 이 일정을 삭제하시겠습니까?")) return;
+    const handleDelete = () => {
+        setShowDeleteModal(true);
+    };
 
-        setIsSubmitting(true);
+    const handleDeleteSingle = async () => {
+        if (!event) return;
 
         try {
-            await eventApi.deleteEvent(event.id);
+            await eventApi.deleteSingleEvent(event.id);
             onEventUpdated();
+            setShowDeleteModal(false);
             handleClose();
         } catch (error) {
-            console.error("Failed to delete event:", error);
-        } finally {
-            setIsSubmitting(false);
+            console.error("Failed to delete single event:", error);
+        }
+    };
+
+    const handleDeleteRecurring = async () => {
+        if (!event) return;
+
+        try {
+            await eventApi.deleteRecurringEvents(event.id);
+            onEventUpdated();
+            setShowDeleteModal(false);
+            handleClose();
+        } catch (error) {
+            console.error("Failed to delete recurring events:", error);
         }
     };
 
@@ -500,6 +511,15 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                           }
                         : null
                 }
+            />
+
+            <DeleteEventModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onDeleteSingle={handleDeleteSingle}
+                onDeleteRecurring={handleDeleteRecurring}
+                isRecurring={!!event?.recurringEvent}
+                eventTitle={event?.title || ""}
             />
         </div>
     );
