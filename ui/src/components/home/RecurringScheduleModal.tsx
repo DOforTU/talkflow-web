@@ -18,17 +18,74 @@ interface RecurringScheduleModalProps {
     onClose: () => void;
     onApply: (recurring: CreateRecurringRuleDto) => void;
     selectedDate: Date;
+    existingRecurring?: CreateRecurringRuleDto | null;
 }
 
-export default function RecurringScheduleModal({ 
-    isOpen, 
-    onClose, 
-    onApply, 
-    selectedDate 
+export default function RecurringScheduleModal({
+    isOpen,
+    onClose,
+    onApply,
+    selectedDate,
+    existingRecurring,
 }: RecurringScheduleModalProps) {
+    // 로컬 시간대 기준으로 날짜 문자열 생성
+    const getLocalDateString = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
     // 선택된 날짜의 요일을 기본값으로 설정
     const getDefaultWeekday = () => {
         return [selectedDate.getDay()]; // 0=일요일, 1=월요일, ..., 6=토요일
+    };
+
+    // RRULE을 파싱하는 함수
+    const parseRRULE = (rrule: string): RecurringSettings => {
+        const settings: RecurringSettings = {
+            frequency: "WEEKLY",
+            interval: 1,
+            weekdays: getDefaultWeekday(),
+        };
+
+        // FREQ 파싱
+        const freqMatch = rrule.match(/FREQ=(\w+)/);
+        if (freqMatch) {
+            settings.frequency = freqMatch[1] as RecurringFrequency;
+        }
+
+        // INTERVAL 파싱
+        const intervalMatch = rrule.match(/INTERVAL=(\d+)/);
+        if (intervalMatch) {
+            settings.interval = parseInt(intervalMatch[1]);
+        }
+
+        // BYDAY 파싱 (WEEKLY인 경우)
+        if (settings.frequency === "WEEKLY") {
+            const bydayMatch = rrule.match(/BYDAY=([^;]+)/);
+            if (bydayMatch) {
+                const dayMap: { [key: string]: number } = {
+                    SU: 0,
+                    MO: 1,
+                    TU: 2,
+                    WE: 3,
+                    TH: 4,
+                    FR: 5,
+                    SA: 6,
+                };
+                const days = bydayMatch[1].split(",");
+                settings.weekdays = days
+                    .map((day) => {
+                        const mappedDay = dayMap[day.trim()];
+                        // RRULE의 요일을 JavaScript Date 객체의 요일로 변환 (일요일=0)
+                        return mappedDay !== undefined ? mappedDay : 0;
+                    })
+                    .sort();
+            }
+        }
+
+        return settings;
     };
 
     const [recurringSettings, setRecurringSettings] = useState<RecurringSettings>({
@@ -37,58 +94,66 @@ export default function RecurringScheduleModal({
         weekdays: getDefaultWeekday(),
     });
 
-    // selectedDate가 변경될 때마다 기본 요일 업데이트
+    // selectedDate가 변경되거나 기존 반복 설정이 있을 때 설정 업데이트
     useEffect(() => {
         if (isOpen) {
-            setRecurringSettings(prev => ({
-                ...prev,
-                weekdays: getDefaultWeekday(),
-            }));
+            if (existingRecurring && existingRecurring.rule) {
+                // 기존 반복 설정이 있으면 파싱해서 사용
+                const parsedSettings = parseRRULE(existingRecurring.rule);
+                setRecurringSettings({
+                    ...parsedSettings,
+                    endDate: existingRecurring.endDate,
+                });
+            } else {
+                // 기존 설정이 없으면 기본값 사용
+                setRecurringSettings((prev) => ({
+                    ...prev,
+                    weekdays: getDefaultWeekday(),
+                    endDate: undefined,
+                }));
+            }
         }
-    }, [selectedDate, isOpen]);
+    }, [selectedDate, isOpen, existingRecurring]);
 
     const generateRRULE = (settings: RecurringSettings): string => {
         let rrule = `FREQ=${settings.frequency};INTERVAL=${settings.interval}`;
-        
+
         if (settings.frequency === "WEEKLY" && settings.weekdays && settings.weekdays.length > 0) {
             const days = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
-            const convertedDays = settings.weekdays.map(day => {
-                const adjustedDay = (day + 6) % 7;
-                return days[adjustedDay];
-            });
+            const convertedDays = settings.weekdays.map((day) => days[day]);
             const byDay = convertedDays.join(",");
             rrule += `;BYDAY=${byDay}`;
         }
-        
+
         return rrule;
     };
 
     const updateRecurringSettings = (field: keyof RecurringSettings, value: any) => {
-        setRecurringSettings(prev => ({
+        setRecurringSettings((prev) => ({
             ...prev,
             [field]: value,
         }));
     };
 
     const toggleWeekday = (day: number) => {
-        setRecurringSettings(prev => ({
+        setRecurringSettings((prev) => ({
             ...prev,
-            weekdays: prev.weekdays?.includes(day) 
-                ? prev.weekdays.filter(d => d !== day)
-                : [...(prev.weekdays || []), day].sort()
+            weekdays: prev.weekdays?.includes(day)
+                ? prev.weekdays.filter((d) => d !== day)
+                : [...(prev.weekdays || []), day].sort(),
         }));
     };
 
     const handleApply = () => {
-        const startDate = selectedDate.toISOString().split("T")[0];
+        const startDate = getLocalDateString(selectedDate);
         const rrule = generateRRULE(recurringSettings);
-        
+
         const recurringData: CreateRecurringRuleDto = {
             rule: rrule,
             startDate,
             endDate: recurringSettings.endDate,
         };
-        
+
         onApply(recurringData);
     };
 
@@ -99,11 +164,7 @@ export default function RecurringScheduleModal({
             <div className="recurring-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h3>반복 설정</h3>
-                    <button 
-                        className="modal-close-btn" 
-                        onClick={onClose}
-                        aria-label="모달 닫기"
-                    >
+                    <button className="modal-close-btn" onClick={onClose} aria-label="모달 닫기">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <line x1="18" y1="6" x2="6" y2="18" />
                             <line x1="6" y1="6" x2="18" y2="18" />
@@ -114,8 +175,8 @@ export default function RecurringScheduleModal({
                 <div className="recurring-content">
                     <div className="form-group">
                         <label>반복 빈도</label>
-                        <select 
-                            value={recurringSettings.frequency} 
+                        <select
+                            value={recurringSettings.frequency}
                             onChange={(e) => updateRecurringSettings("frequency", e.target.value as RecurringFrequency)}
                         >
                             <option value="DAILY">매일</option>
@@ -152,7 +213,9 @@ export default function RecurringScheduleModal({
                                     <button
                                         key={index}
                                         type="button"
-                                        className={`weekday-btn ${recurringSettings.weekdays?.includes(index) ? "selected" : ""}`}
+                                        className={`weekday-btn ${
+                                            recurringSettings.weekdays?.includes(index) ? "selected" : ""
+                                        }`}
                                         onClick={() => toggleWeekday(index)}
                                     >
                                         {day}
@@ -168,7 +231,7 @@ export default function RecurringScheduleModal({
                             type="date"
                             value={recurringSettings.endDate || ""}
                             onChange={(e) => updateRecurringSettings("endDate", e.target.value || undefined)}
-                            min={selectedDate.toISOString().split("T")[0]}
+                            min={getLocalDateString(selectedDate)}
                         />
                     </div>
 

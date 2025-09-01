@@ -26,13 +26,21 @@ const COLOR_OPTIONS = [
 ];
 
 export default function CreateEventModal({ isOpen, onClose, onEventCreated, selectedDate }: CreateEventModalProps) {
+    // 로컬 시간대 기준으로 날짜 문자열 생성
+    const getLocalDateString = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         isAllDay: false,
-        startDate: selectedDate.toISOString().split("T")[0],
+        startDate: getLocalDateString(selectedDate),
         startTime: "10:00",
-        endDate: selectedDate.toISOString().split("T")[0],
+        endDate: getLocalDateString(selectedDate),
         endTime: "12:00",
         colorCode: COLOR_OPTIONS[0],
     });
@@ -45,7 +53,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
     // selectedDate가 변경될 때 날짜 필드 업데이트
     useEffect(() => {
         if (isOpen) {
-            const dateStr = selectedDate.toISOString().split("T")[0];
+            const dateStr = getLocalDateString(selectedDate);
             setFormData((prev) => ({
                 ...prev,
                 startDate: dateStr,
@@ -135,7 +143,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
     };
 
     const handleClose = () => {
-        const dateStr = selectedDate.toISOString().split("T")[0];
+        const dateStr = getLocalDateString(selectedDate);
         setFormData({
             title: "",
             description: "",
@@ -355,6 +363,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                 onClose={() => setShowRecurringModal(false)}
                 onApply={handleRecurringApply}
                 selectedDate={selectedDate}
+                existingRecurring={null}
             />
         </div>
     );

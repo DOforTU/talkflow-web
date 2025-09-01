@@ -8,6 +8,8 @@ import {
     CreateRecurringRuleDto,
     ResponseEventDto,
     UpdateEventDto,
+    ResponseRecurringDto,
+    ResponseLocationDto,
 } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
 import RecurringScheduleModal from "./RecurringScheduleModal";
@@ -33,11 +35,21 @@ const COLOR_OPTIONS = [
 ];
 
 export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, event }: UpdateEventModalProps) {
+    // 로컬 시간대 기준으로 날짜 문자열 생성
+    const getLocalDateString = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         isAllDay: false,
+        startDate: new Date().toISOString().split("T")[0],
         startTime: "10:00",
+        endDate: new Date().toISOString().split("T")[0],
         endTime: "12:00",
         colorCode: COLOR_OPTIONS[0],
     });
@@ -49,15 +61,18 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
 
     useEffect(() => {
         if (event && isOpen) {
-            const startDate = new Date(event.startTime.replace(" ", "T"));
-            const endDate = new Date(event.endTime.replace(" ", "T"));
+            // 시간대 변환 문제를 피하기 위해 문자열 직접 파싱
+            const [startDateStr, startTimeStr] = event.startTime.split(" ");
+            const [endDateStr, endTimeStr] = event.endTime.split(" ");
 
             setFormData({
                 title: event.title,
                 description: event.description || "",
                 isAllDay: event.isAllDay,
-                startTime: event.isAllDay ? "10:00" : startDate.toTimeString().slice(0, 5),
-                endTime: event.isAllDay ? "12:00" : endDate.toTimeString().slice(0, 5),
+                startDate: startDateStr, // 직접 날짜 문자열 사용
+                startTime: event.isAllDay ? "10:00" : startTimeStr,
+                endDate: endDateStr, // 직접 날짜 문자열 사용
+                endTime: event.isAllDay ? "12:00" : endTimeStr,
                 colorCode: event.colorCode,
             });
 
@@ -90,14 +105,15 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         setFormData((prev) => {
             const newData = { ...prev, [field]: value };
 
-            // 같은 날짜에서 끝나는 시간이 시작 시간보다 빠르지 않도록 조정
-            if (!newData.isAllDay && (field === "startTime" || field === "endTime")) {
-                const startTime = newData.startTime;
-                const endTime = newData.endTime;
+            // 끝나는 시간이 시작 시간보다 빠르지 않도록 조정
+            if (field === "startDate" || field === "startTime" || field === "endDate" || field === "endTime") {
+                const startDateTime = new Date(`${newData.startDate}T${newData.startTime}`);
+                const endDateTime = new Date(`${newData.endDate}T${newData.endTime}`);
 
-                if (endTime <= startTime) {
-                    // 끝 시간을 시작 시간과 동일하게 설정
-                    newData.endTime = startTime;
+                if (endDateTime <= startDateTime) {
+                    // 끝 시간이 시작 시간보다 빠르면, 끝 시간을 시작 시간과 같도록 설정
+                    newData.endDate = newData.startDate;
+                    newData.endTime = newData.startTime;
                 }
             }
 
@@ -149,15 +165,13 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         setIsSubmitting(true);
 
         try {
-            const eventDate = new Date(event.startTime).toISOString().split("T")[0];
-
             let startTime, endTime;
             if (formData.isAllDay) {
-                startTime = `${eventDate} 00:00`;
-                endTime = `${eventDate} 23:59`;
+                startTime = `${formData.startDate} 00:00`;
+                endTime = `${formData.endDate} 23:59`;
             } else {
-                startTime = `${eventDate} ${formData.startTime}`;
-                endTime = `${eventDate} ${formData.endTime}`;
+                startTime = `${formData.startDate} ${formData.startTime}`;
+                endTime = `${formData.endDate} ${formData.endTime}`;
             }
 
             // 변경된 필드만 포함하여 UpdateEventDto 생성
@@ -255,11 +269,14 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
     };
 
     const handleClose = () => {
+        const today = getLocalDateString(new Date());
         setFormData({
             title: "",
             description: "",
             isAllDay: false,
+            startDate: today,
             startTime: "10:00",
+            endDate: today,
             endTime: "12:00",
             colorCode: COLOR_OPTIONS[0],
         });
@@ -318,30 +335,56 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                         </label>
                     </div>
 
-                    {!formData.isAllDay && (
-                        <div className="form-group time-group">
-                            <div className="time-input-group">
-                                <label htmlFor="startTime">시작 시간</label>
+                    <div className="form-group datetime-group">
+                        <div className="datetime-row">
+                            <div className="datetime-input-group">
+                                <label htmlFor="startDate">시작 날짜</label>
                                 <input
-                                    id="startTime"
-                                    type="time"
-                                    value={formData.startTime}
-                                    onChange={(e) => updateFormData("startTime", e.target.value)}
-                                    required={!formData.isAllDay}
+                                    id="startDate"
+                                    type="date"
+                                    value={formData.startDate}
+                                    onChange={(e) => updateFormData("startDate", e.target.value)}
+                                    required
                                 />
                             </div>
-                            <div className="time-input-group">
-                                <label htmlFor="endTime">종료 시간</label>
-                                <input
-                                    id="endTime"
-                                    type="time"
-                                    value={formData.endTime}
-                                    onChange={(e) => updateFormData("endTime", e.target.value)}
-                                    required={!formData.isAllDay}
-                                />
-                            </div>
+                            {!formData.isAllDay && (
+                                <div className="datetime-input-group">
+                                    <label htmlFor="startTime">시작 시간</label>
+                                    <input
+                                        id="startTime"
+                                        type="time"
+                                        value={formData.startTime}
+                                        onChange={(e) => updateFormData("startTime", e.target.value)}
+                                        required={!formData.isAllDay}
+                                    />
+                                </div>
+                            )}
                         </div>
-                    )}
+                        <div className="datetime-row">
+                            <div className="datetime-input-group">
+                                <label htmlFor="endDate">종료 날짜</label>
+                                <input
+                                    id="endDate"
+                                    type="date"
+                                    value={formData.endDate}
+                                    onChange={(e) => updateFormData("endDate", e.target.value)}
+                                    required
+                                />
+                            </div>
+                            {!formData.isAllDay && (
+                                <div className="datetime-input-group">
+                                    <label htmlFor="endTime">종료 시간</label>
+                                    <input
+                                        id="endTime"
+                                        type="time"
+                                        value={formData.endTime}
+                                        onChange={(e) => updateFormData("endTime", e.target.value)}
+                                        required={!formData.isAllDay}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     <div className="form-group">
                         <label>색상</label>
@@ -461,7 +504,16 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                 isOpen={showRecurringModal}
                 onClose={() => setShowRecurringModal(false)}
                 onApply={handleRecurringApply}
-                selectedDate={new Date(event.startTime)}
+                selectedDate={new Date(formData.startDate + "T00:00:00")}
+                existingRecurring={
+                    recurring
+                        ? {
+                              rule: recurring.rule || "",
+                              startDate: recurring.startDate || "",
+                              endDate: recurring.endDate,
+                          }
+                        : null
+                }
             />
         </div>
     );
