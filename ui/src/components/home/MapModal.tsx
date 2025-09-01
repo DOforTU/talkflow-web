@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Script from "next/script";
 import { ResponseEvent } from "@/lib/types/event.interface";
+import "./MapModal.css";
 
 interface MapModalProps {
     isOpen: boolean;
@@ -56,9 +57,10 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
             const map = new google.maps.Map(mapRef.current, {
                 center: defaultLocation,
                 zoom: 13,
-                mapTypeControl: true,
-                streetViewControl: true,
-                fullscreenControl: true,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                zoomControl: false,
                 mapId: "DEMO_MAP_ID",
             });
             mapInstanceRef.current = map;
@@ -72,9 +74,10 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
         const map = new google.maps.Map(mapRef.current, {
             center: center,
             zoom: 13,
-            mapTypeControl: true,
-            streetViewControl: true,
-            fullscreenControl: true,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+            zoomControl: false,
             mapId: "DEMO_MAP_ID",
         });
 
@@ -87,7 +90,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
     const addMarkersAndRoute = (eventsWithLocation: ResponseEvent[]) => {
         if (!mapInstanceRef.current) return;
 
-        markersRef.current.forEach((marker) => marker.map = null);
+        markersRef.current.forEach((marker) => (marker.map = null));
         markersRef.current = [];
 
         if (polylineRef.current) {
@@ -102,7 +105,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
 
             path.push(new google.maps.LatLng(location.latitude, location.longitude));
 
-            const markerElement = document.createElement('div');
+            const markerElement = document.createElement("div");
             markerElement.style.cssText = `
                 width: 40px;
                 height: 40px;
@@ -189,7 +192,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                     mapInstanceRef.current?.setCenter(place.geometry.location);
                     mapInstanceRef.current?.setZoom(15);
 
-                    const searchMarkerElement = document.createElement('div');
+                    const searchMarkerElement = document.createElement("div");
                     searchMarkerElement.style.cssText = `
                         width: 40px;
                         height: 40px;
@@ -204,7 +207,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                         font-size: 16px;
                         box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                     `;
-                    searchMarkerElement.textContent = '🔍';
+                    searchMarkerElement.textContent = "🔍";
 
                     const marker = new google.maps.marker.AdvancedMarkerElement({
                         position: place.geometry.location,
@@ -275,7 +278,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
     if (!isOpen) return null;
 
     return (
-        <>
+        <div className="map-modal-container">
             <Script
                 src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,marker`}
                 onLoad={() => {
@@ -327,11 +330,11 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                                 <p>Google Maps 로딩 중...</p>
                             </div>
                         ) : (
-                            <div ref={mapRef} className="modal-google-map" style={{ width: "100%", height: "100%" }} />
+                            <div ref={mapRef} className="modal-google-map" />
                         )}
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

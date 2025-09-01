@@ -4,7 +4,7 @@
     background-color: var(--bg-primary);
     box-shadow: var(--card-shadow);
     backdrop-filter: blur(10px);
-    z-index: 100;
+    z-index: 1000;
     transition: all 0.3s ease;
 }
 

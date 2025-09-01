@@ -249,7 +249,8 @@ a:hover {
 @media (min-width: 769px) {
     /* Main content containers that need to avoid sidebar overlap */
     .home-page,
-    .page-container {
+    .page-container,
+    .modal {
         margin-left: 240px;
     }
 

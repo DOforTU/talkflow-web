@@ -1,3 +1,29 @@
+// ===== Create Event DTO =====
+export interface CreateEventDto {
+    title: string;
+    description?: string;
+    startTime: string;
+    endTime: string;
+    isAllDay: boolean;
+    colorCode: string;
+
+    // parts of relations
+    location?: CreateLocationDto;
+    recurring?: CreateRecurringRuleDto;
+}
+
+export interface CreateLocationDto {
+    nameEn?: string;
+    nameKo?: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+}
+
+export interface CreateRecurringRuleDto {
+    // TODO: 반복 일정 관련 필드들 추가 예정
+}
+
 // ===== Location Response DTO =====
 export interface ResponseLocationDto {
     id: number;
@@ -18,10 +44,6 @@ export interface ResponseEventDto {
     isAllDay: boolean;
     colorCode: string;
     version: number;
-
-    // floating time fields
-    isFloating: boolean; // 현지시간 기준 여부
-    timezone: string | null; // IANA 타임존
 
     // time columns: Date는 JSON으로 전송시 string으로 변환됨
     createdAt: string;

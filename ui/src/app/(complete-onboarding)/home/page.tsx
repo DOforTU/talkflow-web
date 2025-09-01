@@ -7,6 +7,7 @@ import { ResponseEvent } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
 import Calendar from "../../../components/home/Calendar";
 import MapModal from "../../../components/home/MapModal";
+import CreateEventModal from "../../../components/home/CreateEventModal";
 import "./HomePage.css";
 
 export default function HomePage() {
@@ -15,6 +16,7 @@ export default function HomePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [showMapModal, setShowMapModal] = useState(false);
+    const [showCreateEventModal, setShowCreateEventModal] = useState(false);
 
     const texts = homeTexts[currentLanguage];
 
@@ -70,6 +72,16 @@ export default function HomePage() {
         setSelectedDate(date);
     };
 
+    // 이벤트 생성 후 목록 새로고침
+    const handleEventCreated = async () => {
+        try {
+            const fetchedEvents = await eventApi.getMyEvents();
+            setEvents(fetchedEvents);
+        } catch (error) {
+            console.error("Failed to reload events:", error);
+        }
+    };
+
 
     // 두 지점 간 직선 거리 계산 (Haversine formula)
     const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -112,16 +124,28 @@ export default function HomePage() {
                                 day: "numeric",
                             })}
                         </h2>
-                        <button 
-                            className="map-view-btn" 
-                            onClick={() => setShowMapModal(true)}
-                            aria-label="지도 보기"
-                        >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                <circle cx="12" cy="10" r="3"/>
-                            </svg>
-                        </button>
+                        <div className="schedule-header-buttons">
+                            <button 
+                                className="create-event-btn" 
+                                onClick={() => setShowCreateEventModal(true)}
+                                aria-label="일정 생성"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <line x1="12" y1="5" x2="12" y2="19"/>
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                            </button>
+                            <button 
+                                className="map-view-btn" 
+                                onClick={() => setShowMapModal(true)}
+                                aria-label="지도 보기"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div className="schedule-list">
                         {isLoading ? (
@@ -232,6 +256,13 @@ export default function HomePage() {
                 isOpen={showMapModal}
                 onClose={() => setShowMapModal(false)}
                 events={events}
+                selectedDate={selectedDate}
+            />
+
+            <CreateEventModal
+                isOpen={showCreateEventModal}
+                onClose={() => setShowCreateEventModal(false)}
+                onEventCreated={handleEventCreated}
                 selectedDate={selectedDate}
             />
         </div>
