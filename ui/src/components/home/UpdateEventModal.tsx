@@ -87,10 +87,22 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
     }, [event, isOpen]);
 
     const updateFormData = (field: string, value: string | boolean) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
+        setFormData((prev) => {
+            const newData = { ...prev, [field]: value };
+
+            // 같은 날짜에서 끝나는 시간이 시작 시간보다 빠르지 않도록 조정
+            if (!newData.isAllDay && (field === "startTime" || field === "endTime")) {
+                const startTime = newData.startTime;
+                const endTime = newData.endTime;
+
+                if (endTime <= startTime) {
+                    // 끝 시간을 시작 시간과 동일하게 설정
+                    newData.endTime = startTime;
+                }
+            }
+
+            return newData;
+        });
     };
 
     const selectColor = (color: string) => {

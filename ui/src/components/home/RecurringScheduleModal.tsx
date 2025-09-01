@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CreateRecurringRuleDto } from "@/lib/types/event.interface";
 import "./RecurringScheduleModal.css";
 
@@ -26,11 +26,26 @@ export default function RecurringScheduleModal({
     onApply, 
     selectedDate 
 }: RecurringScheduleModalProps) {
+    // 선택된 날짜의 요일을 기본값으로 설정
+    const getDefaultWeekday = () => {
+        return [selectedDate.getDay()]; // 0=일요일, 1=월요일, ..., 6=토요일
+    };
+
     const [recurringSettings, setRecurringSettings] = useState<RecurringSettings>({
         frequency: "WEEKLY",
         interval: 1,
-        weekdays: [1],
+        weekdays: getDefaultWeekday(),
     });
+
+    // selectedDate가 변경될 때마다 기본 요일 업데이트
+    useEffect(() => {
+        if (isOpen) {
+            setRecurringSettings(prev => ({
+                ...prev,
+                weekdays: getDefaultWeekday(),
+            }));
+        }
+    }, [selectedDate, isOpen]);
 
     const generateRRULE = (settings: RecurringSettings): string => {
         let rrule = `FREQ=${settings.frequency};INTERVAL=${settings.interval}`;
