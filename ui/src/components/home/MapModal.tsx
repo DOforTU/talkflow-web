@@ -16,7 +16,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
     const [searchValue, setSearchValue] = useState("");
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<google.maps.Map | null>(null);
-    const markersRef = useRef<google.maps.Marker[]>([]);
+    const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
     const polylineRef = useRef<google.maps.Polyline | null>(null);
 
     // 선택된 날짜의 이벤트 가져기기
@@ -59,6 +59,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                 mapTypeControl: true,
                 streetViewControl: true,
                 fullscreenControl: true,
+                mapId: "DEMO_MAP_ID",
             });
             mapInstanceRef.current = map;
             console.log("Map initialized with default location");
@@ -74,6 +75,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
             mapTypeControl: true,
             streetViewControl: true,
             fullscreenControl: true,
+            mapId: "DEMO_MAP_ID",
         });
 
         mapInstanceRef.current = map;
@@ -85,7 +87,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
     const addMarkersAndRoute = (eventsWithLocation: ResponseEvent[]) => {
         if (!mapInstanceRef.current) return;
 
-        markersRef.current.forEach((marker) => marker.setMap(null));
+        markersRef.current.forEach((marker) => marker.map = null);
         markersRef.current = [];
 
         if (polylineRef.current) {
@@ -100,24 +102,28 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
 
             path.push(new google.maps.LatLng(location.latitude, location.longitude));
 
-            const marker = new google.maps.Marker({
+            const markerElement = document.createElement('div');
+            markerElement.style.cssText = `
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: ${event.colorCode};
+                border: 3px solid white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+                font-size: 14px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            `;
+            markerElement.textContent = (index + 1).toString();
+
+            const marker = new google.maps.marker.AdvancedMarkerElement({
                 position: position,
                 map: mapInstanceRef.current,
                 title: event.title,
-                label: {
-                    text: (index + 1).toString(),
-                    color: "white",
-                    fontWeight: "bold",
-                },
-                icon: {
-                    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-                            <circle cx="20" cy="20" r="18" fill="${event.colorCode}" stroke="white" stroke-width="3"/>
-                        </svg>
-                    `)}`,
-                    scaledSize: new google.maps.Size(40, 40),
-                    labelOrigin: new google.maps.Point(20, 20),
-                },
+                content: markerElement,
             });
 
             const infoWindow = new google.maps.InfoWindow({
@@ -139,7 +145,10 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
             });
 
             marker.addListener("click", () => {
-                infoWindow.open(mapInstanceRef.current, marker);
+                infoWindow.open({
+                    anchor: marker,
+                    map: mapInstanceRef.current,
+                });
             });
 
             markersRef.current.push(marker);
@@ -180,18 +189,28 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                     mapInstanceRef.current?.setCenter(place.geometry.location);
                     mapInstanceRef.current?.setZoom(15);
 
-                    const marker = new google.maps.Marker({
+                    const searchMarkerElement = document.createElement('div');
+                    searchMarkerElement.style.cssText = `
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background-color: #EF4444;
+                        border: 3px solid white;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        font-size: 16px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    `;
+                    searchMarkerElement.textContent = '🔍';
+
+                    const marker = new google.maps.marker.AdvancedMarkerElement({
                         position: place.geometry.location,
                         map: mapInstanceRef.current,
                         title: place.name,
-                        icon: {
-                            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#EF4444">
-                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                                </svg>
-                            `)}`,
-                            scaledSize: new google.maps.Size(40, 40),
-                        },
+                        content: searchMarkerElement,
                     });
 
                     const infoWindow = new google.maps.InfoWindow({
@@ -199,7 +218,10 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                     });
 
                     marker.addListener("click", () => {
-                        infoWindow.open(mapInstanceRef.current, marker);
+                        infoWindow.open({
+                            anchor: marker,
+                            map: mapInstanceRef.current,
+                        });
                     });
 
                     markersRef.current.push(marker);
@@ -255,7 +277,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
     return (
         <>
             <Script
-                src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+                src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,marker`}
                 onLoad={() => {
                     console.log("Google Maps API loaded successfully");
                     setIsGoogleMapsLoaded(true);
