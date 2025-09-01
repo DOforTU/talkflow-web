@@ -5,6 +5,9 @@ import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
 import { SupportedLanguage } from "@/lib/types/user.interface";
 import { ResponseEventDto } from "@/lib/types/event.interface";
+import { getEventsForDate } from "@/lib/utils/eventUtils";
+import { getDaysInMonth, getFirstDayOfMonth, formatMonth, isSelected, getDayNames } from "@/lib/utils/calendarUtils";
+import { isTodayInMonth } from "@/lib/utils/dateUtils";
 
 interface CalendarProps {
     events: ResponseEventDto[];
@@ -18,38 +21,6 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
 
     const texts = homeTexts[currentLanguage];
 
-    // 캘린더 관련 함수들
-    const getDaysInMonth = (date: Date) => {
-        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-    };
-
-    const getFirstDayOfMonth = (date: Date) => {
-        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    };
-
-    const formatMonth = (date: Date) => {
-        // 언어에 따라 다른 locale 사용
-        const locale = currentLanguage === SupportedLanguage.EN ? "en-US" : "ko-KR";
-        return date.toLocaleDateString(locale, { year: "numeric", month: "long" });
-    };
-
-    const isToday = (day: number) => {
-        const today = new Date();
-        return (
-            today.getDate() === day &&
-            today.getMonth() === currentDate.getMonth() &&
-            today.getFullYear() === currentDate.getFullYear()
-        );
-    };
-
-    const isSelected = (date: Date) => {
-        return (
-            selectedDate.getDate() === date.getDate() &&
-            selectedDate.getMonth() === date.getMonth() &&
-            selectedDate.getFullYear() === date.getFullYear()
-        );
-    };
-
     const goToPreviousMonth = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
     };
@@ -58,32 +29,22 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
     };
 
-    // 로컬 시간대 기준으로 날짜 문자열 생성
-    const getLocalDateString = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
+    const handleDateClick = (dateInfo: any) => {
+        // 다른 달의 날짜를 클릭했을 때 해당 달로 이동
+        if (!dateInfo.isCurrentMonth) {
+            setCurrentDate(new Date(dateInfo.date.getFullYear(), dateInfo.date.getMonth()));
+        }
+        setSelectedDate(dateInfo.date);
+        onDateSelect(dateInfo.date);
     };
 
-    // 특정 날짜의 이벤트 가져오기
-    const getEventsForDate = (date: Date) => {
-        return events.filter((event) => {
-            // "2025-09-01 19:30" -> "2025-09-01" 추출
-            const eventDateStr = event.startTime.split(" ")[0];
-            const targetDateStr = getLocalDateString(date);
-
-            // 년도, 월, 일이 모두 일치하는지 확인
-            return eventDateStr === targetDateStr;
-        });
-    };
-
-    const generateCalendarDays = () => {
+    // 유연한 캘린더 일수 생성 (필요한 주만큼만 표시)
+    const generateFlexibleCalendarDays = () => {
         const daysInMonth = getDaysInMonth(currentDate);
         const firstDay = getFirstDayOfMonth(currentDate);
         const days = [];
 
-        // 이전 달의 날짜들
+        // 이전 달의 날짜들 (첫 번째 주 채우기)
         const prevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1);
         const daysInPrevMonth = getDaysInMonth(prevMonth);
         for (let i = firstDay - 1; i >= 0; i--) {
@@ -103,9 +64,13 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
             });
         }
 
-        // 다음 달의 날짜들 (42개 채우기 위해)
+        // 다음 달의 날짜들 (마지막 주만 채우기)
         const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1);
-        const remainingDays = 42 - days.length;
+        const totalCells = days.length;
+        const weeksNeeded = Math.ceil(totalCells / 7);
+        const cellsNeeded = weeksNeeded * 7;
+        const remainingDays = cellsNeeded - totalCells;
+
         for (let day = 1; day <= remainingDays; day++) {
             days.push({
                 day,
@@ -117,21 +82,13 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
         return days;
     };
 
-    const calendarDays = generateCalendarDays();
-    const dayNames = [
-        texts.calendar.dayNames.sunday,
-        texts.calendar.dayNames.monday,
-        texts.calendar.dayNames.tuesday,
-        texts.calendar.dayNames.wednesday,
-        texts.calendar.dayNames.thursday,
-        texts.calendar.dayNames.friday,
-        texts.calendar.dayNames.saturday,
-    ];
+    const calendarDays = generateFlexibleCalendarDays();
+    const dayNames = getDayNames(texts);
 
     return (
         <section className="calendar-section">
             <div className="calendar-header">
-                <h2 className="calendar-title">{formatMonth(currentDate)}</h2>
+                <h2 className="calendar-title">{formatMonth(currentDate, currentLanguage)}</h2>
                 <div className="calendar-nav">
                     <button className="calendar-nav-btn" onClick={goToPreviousMonth}>
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,23 +114,18 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
                 {/* 날짜 */}
                 {calendarDays.map((dateInfo, index) => {
                     const dayOfWeek = index % 7; // 0=일요일, 1=월요일, ...
-                    const dayEvents = getEventsForDate(dateInfo.date);
+                    const dayEvents = getEventsForDate(events, dateInfo.date);
                     const hasEvents = dayEvents.length > 0;
 
                     return (
                         <div
                             key={index}
                             className={`calendar-day ${!dateInfo.isCurrentMonth ? "other-month" : ""} ${
-                                dateInfo.isCurrentMonth && isToday(dateInfo.day) ? "today" : ""
+                                dateInfo.isCurrentMonth && isTodayInMonth(dateInfo.day, currentDate) ? "today" : ""
                             } ${dayOfWeek === 0 ? "sunday" : ""} ${hasEvents ? "has-events" : ""} ${
-                                dateInfo.isCurrentMonth && isSelected(dateInfo.date) ? "selected" : ""
+                                dateInfo.isCurrentMonth && isSelected(dateInfo.date, selectedDate) ? "selected" : ""
                             }`}
-                            onClick={() => {
-                                if (dateInfo.isCurrentMonth) {
-                                    setSelectedDate(dateInfo.date);
-                                    onDateSelect(dateInfo.date);
-                                }
-                            }}
+                            onClick={() => handleDateClick(dateInfo)}
                         >
                             <div className="calendar-day-number">{dateInfo.day}</div>
                             {hasEvents && (

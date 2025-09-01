@@ -8,10 +8,15 @@ import {
     CreateRecurringRuleDto,
     ResponseEventDto,
     UpdateEventDto,
-    ResponseRecurringDto,
-    ResponseLocationDto,
 } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
+import { getLocalDateString } from "@/lib/utils/dateUtils";
+import {
+    COLOR_OPTIONS,
+    validateAndAdjustDateTime,
+    createDefaultFormData,
+    formatRecurringRule,
+} from "@/lib/utils/eventFormUtils";
 import RecurringScheduleModal from "./RecurringScheduleModal";
 import LocationSearchModal from "./LocationSearchModal";
 import "./UpdateEventModal.css";
@@ -23,26 +28,7 @@ interface UpdateEventModalProps {
     event: ResponseEventDto | null;
 }
 
-const COLOR_OPTIONS = [
-    "#EC4899", // Pink
-    "#3B82F6", // Blue
-    "#EF4444", // Red
-    "#10B981", // Emerald
-    "#F59E0B", // Amber
-    "#8B5CF6", // Violet
-    "#06B6D4", // Cyan
-    "#64748B", // Slate
-];
-
 export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, event }: UpdateEventModalProps) {
-    // 로컬 시간대 기준으로 날짜 문자열 생성
-    const getLocalDateString = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    };
-
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -517,13 +503,4 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
             />
         </div>
     );
-}
-
-function formatRecurringRule(rrule: string | undefined): string {
-    if (!rrule) return "사용자 지정";
-    if (rrule.includes("DAILY")) return "매일";
-    if (rrule.includes("WEEKLY")) return "매주";
-    if (rrule.includes("MONTHLY")) return "매월";
-    if (rrule.includes("YEARLY")) return "매년";
-    return "사용자 지정";
 }

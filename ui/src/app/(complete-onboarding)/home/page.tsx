@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
 import { eventApi } from "@/lib/api/event";
+import { getSelectedDateEvents, calculateDistance, formatDistance } from "@/lib/utils/eventUtils";
 import Calendar from "../../../components/home/Calendar";
 import MapModal from "../../../components/home/MapModal";
 import CreateEventModal from "../../../components/home/CreateEventModal";
@@ -40,33 +41,8 @@ export default function HomePage() {
         loadEvents();
     }, []);
 
-    // 로컬 시간대 기준으로 날짜 문자열 생성
-    const getLocalDateString = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    };
-
     // 선택된 날짜의 이벤트 가져기기
-    const getSelectedDateEvents = () => {
-        const selectedDateStr = getLocalDateString(selectedDate);
-
-        const filteredEvents = events.filter((event) => {
-            // "2025-09-01 19:30" -> "2025-09-01" 추출
-            const eventDateStr = event.startTime.split(" ")[0];
-            const matches = eventDateStr === selectedDateStr;
-
-            return matches;
-        });
-
-        return filteredEvents.sort((a, b) => {
-            // 하루종일 이벤트를 맨 위로, 나머지는 시간순
-            if (a.isAllDay && !b.isAllDay) return -1;
-            if (!a.isAllDay && b.isAllDay) return 1;
-            return a.startTime.localeCompare(b.startTime);
-        });
-    };
+    const selectedDateEvents = getSelectedDateEvents(events, selectedDate);
 
     // 날짜 선택 핸들러
     const handleDateSelect = (date: Date) => {
@@ -97,30 +73,6 @@ export default function HomePage() {
     const handleEventClick = (event: ResponseEventDto) => {
         setSelectedEvent(event);
         setShowUpdateEventModal(true);
-    };
-
-    // 두 지점 간 직선 거리 계산 (Haversine formula)
-    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-        const R = 6371000; // 지구 반지름 (미터)
-        const dLat = ((lat2 - lat1) * Math.PI) / 180;
-        const dLon = ((lon2 - lon1) * Math.PI) / 180;
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos((lat1 * Math.PI) / 180) *
-                Math.cos((lat2 * Math.PI) / 180) *
-                Math.sin(dLon / 2) *
-                Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // 미터 단위
-    };
-
-    // 거리를 적절한 단위로 포맷
-    const formatDistance = (distance: number): string => {
-        if (distance >= 1000) {
-            return `${(distance / 1000).toFixed(1)}km`;
-        } else {
-            return `${Math.round(distance)}m`;
-        }
     };
 
     return (
@@ -168,12 +120,11 @@ export default function HomePage() {
                             <div className="schedule-loading">Loading...</div>
                         ) : (
                             <>
-                                {getSelectedDateEvents().length > 0 ? (
+                                {selectedDateEvents.length > 0 ? (
                                     (() => {
                                         let timedEventIndex = 0;
-                                        const events = getSelectedDateEvents();
 
-                                        return events.map((event, index) => {
+                                        return selectedDateEvents.map((event, index) => {
                                             // 현재 이벤트가 시간 이벤트인 경우에만 번호 증가
                                             const currentEventNumber = event.isAllDay ? null : ++timedEventIndex;
 
@@ -184,8 +135,8 @@ export default function HomePage() {
                                             if (event.location) {
                                                 // 현재 이벤트보다 이전 이벤트 중에서 location이 있는 것 찾기
                                                 for (let i = index - 1; i >= 0; i--) {
-                                                    if (events[i].location) {
-                                                        prevLocationEvent = events[i];
+                                                    if (selectedDateEvents[i].location) {
+                                                        prevLocationEvent = selectedDateEvents[i];
                                                         distance = calculateDistance(
                                                             prevLocationEvent.location!.latitude,
                                                             prevLocationEvent.location!.longitude,

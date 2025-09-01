@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import { CreateEventDto, CreateLocationDto, CreateRecurringRuleDto } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
+import { getLocalDateString } from "@/lib/utils/dateUtils";
+import {
+    COLOR_OPTIONS,
+    validateAndAdjustDateTime,
+    createDefaultFormData,
+    formatRecurringRule,
+} from "@/lib/utils/eventFormUtils";
 import RecurringScheduleModal from "./RecurringScheduleModal";
 import LocationSearchModal from "./LocationSearchModal";
 import "./CreateEventModal.css";
@@ -14,26 +21,7 @@ interface CreateEventModalProps {
     selectedDate: Date;
 }
 
-const COLOR_OPTIONS = [
-    "#EC4899", // Pink
-    "#3B82F6", // Blue
-    "#EF4444", // Red
-    "#10B981", // Emerald
-    "#F59E0B", // Amber
-    "#8B5CF6", // Violet
-    "#06B6D4", // Cyan
-    "#64748B", // Slate
-];
-
 export default function CreateEventModal({ isOpen, onClose, onEventCreated, selectedDate }: CreateEventModalProps) {
-    // 로컬 시간대 기준으로 날짜 문자열 생성
-    const getLocalDateString = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    };
-
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -68,14 +56,14 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
 
             // 끝나는 시간이 시작 시간보다 빠르지 않도록 조정
             if (field === "startDate" || field === "startTime" || field === "endDate" || field === "endTime") {
-                const startDateTime = new Date(`${newData.startDate}T${newData.startTime}`);
-                const endDateTime = new Date(`${newData.endDate}T${newData.endTime}`);
-
-                if (endDateTime <= startDateTime) {
-                    // 끝 시간이 시작 시간보다 빠르면, 끝 시간을 시작 시간과 같도록 설정
-                    newData.endDate = newData.startDate;
-                    newData.endTime = newData.startTime;
-                }
+                const adjustment = validateAndAdjustDateTime({
+                    startDate: newData.startDate,
+                    startTime: newData.startTime,
+                    endDate: newData.endDate,
+                    endTime: newData.endTime,
+                });
+                newData.endDate = adjustment.endDate;
+                newData.endTime = adjustment.endTime;
             }
 
             return newData;
@@ -144,16 +132,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
 
     const handleClose = () => {
         const dateStr = getLocalDateString(selectedDate);
-        setFormData({
-            title: "",
-            description: "",
-            isAllDay: false,
-            startDate: dateStr,
-            startTime: "10:00",
-            endDate: dateStr,
-            endTime: "12:00",
-            colorCode: COLOR_OPTIONS[0],
-        });
+        setFormData(createDefaultFormData(dateStr));
         setLocation(null);
         setRecurring(null);
         onClose();
@@ -367,12 +346,4 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
             />
         </div>
     );
-}
-
-function formatRecurringRule(rrule: string): string {
-    if (rrule.includes("DAILY")) return "매일";
-    if (rrule.includes("WEEKLY")) return "매주";
-    if (rrule.includes("MONTHLY")) return "매월";
-    if (rrule.includes("YEARLY")) return "매년";
-    return "사용자 지정";
 }
