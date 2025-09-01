@@ -24,7 +24,7 @@ export default function BottomNav() {
                 </svg>
                 <span>홈</span>
             </Link>
-            <Link href="/map" className={`nav-item ${isActive("/map") ? "active" : ""}`}>
+            <Link href="/memoir" className={`nav-item ${isActive("/memoir") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                         strokeLinecap="round"
@@ -35,7 +35,7 @@ export default function BottomNav() {
                 </svg>
                 <span>메모아</span>
             </Link>
-            <Link href="/silhouette" className={`nav-item ${isActive("/silhouette") ? "active" : ""}`}>
+            <Link href="/silhouettes" className={`nav-item ${isActive("/silhouettes") ? "active" : ""}`}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" strokeWidth={2} />
                     <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none" />
