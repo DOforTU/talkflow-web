@@ -3,20 +3,23 @@
 import { useState, useEffect } from "react";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
-import { ResponseEvent } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
 import Calendar from "../../../components/home/Calendar";
 import MapModal from "../../../components/home/MapModal";
 import CreateEventModal from "../../../components/home/CreateEventModal";
+import UpdateEventModal from "../../../components/home/UpdateEventModal";
 import "./HomePage.css";
+import { ResponseEventDto } from "@/lib/types/event.interface";
 
 export default function HomePage() {
     const { currentLanguage } = useAuthLanguage();
-    const [events, setEvents] = useState<ResponseEvent[]>([]);
+    const [events, setEvents] = useState<ResponseEventDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [showMapModal, setShowMapModal] = useState(false);
     const [showCreateEventModal, setShowCreateEventModal] = useState(false);
+    const [showUpdateEventModal, setShowUpdateEventModal] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState<ResponseEventDto | null>(null);
 
     const texts = homeTexts[currentLanguage];
 
@@ -70,6 +73,22 @@ export default function HomePage() {
         } catch (error) {
             console.error("Failed to reload events:", error);
         }
+    };
+
+    // 이벤트 수정 후 목록 새로고침
+    const handleEventUpdated = async () => {
+        try {
+            const fetchedEvents = await eventApi.getMyEvents();
+            setEvents(fetchedEvents);
+        } catch (error) {
+            console.error("Failed to reload events:", error);
+        }
+    };
+
+    // 일정 아이템 클릭 핸들러
+    const handleEventClick = (event: ResponseEventDto) => {
+        setSelectedEvent(event);
+        setShowUpdateEventModal(true);
     };
 
     // 두 지점 간 직선 거리 계산 (Haversine formula)
@@ -181,7 +200,11 @@ export default function HomePage() {
                                                             </div>
                                                         </div>
                                                     )}
-                                                    <div className="schedule-item">
+                                                    <div
+                                                        className="schedule-item"
+                                                        onClick={() => handleEventClick(event)}
+                                                        style={{ cursor: "pointer" }}
+                                                    >
                                                         <div
                                                             className="schedule-color-dot"
                                                             style={{ backgroundColor: event.colorCode }}
@@ -257,6 +280,13 @@ export default function HomePage() {
                 onClose={() => setShowCreateEventModal(false)}
                 onEventCreated={handleEventCreated}
                 selectedDate={selectedDate}
+            />
+
+            <UpdateEventModal
+                isOpen={showUpdateEventModal}
+                onClose={() => setShowUpdateEventModal(false)}
+                onEventUpdated={handleEventUpdated}
+                event={selectedEvent}
             />
         </div>
     );

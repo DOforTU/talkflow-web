@@ -1,17 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { CreateEventDto, CreateLocationDto, CreateRecurringRuleDto } from "@/lib/types/event.interface";
+import { useState, useEffect } from "react";
+import {
+    UpdateLocationDto,
+    UpdateRecurringRuleDto,
+    CreateLocationDto,
+    CreateRecurringRuleDto,
+    ResponseEventDto,
+    UpdateEventDto,
+} from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
 import RecurringScheduleModal from "./RecurringScheduleModal";
 import LocationSearchModal from "./LocationSearchModal";
-import "./CreateEventModal.css";
+import "./UpdateEventModal.css";
 
-interface CreateEventModalProps {
+interface UpdateEventModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onEventCreated: () => void;
-    selectedDate: Date;
+    onEventUpdated: () => void;
+    event: ResponseEventDto | null;
 }
 
 const COLOR_OPTIONS = [
@@ -25,7 +32,7 @@ const COLOR_OPTIONS = [
     "#64748B", // Slate
 ];
 
-export default function CreateEventModal({ isOpen, onClose, onEventCreated, selectedDate }: CreateEventModalProps) {
+export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, event }: UpdateEventModalProps) {
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -34,11 +41,50 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
         endTime: "12:00",
         colorCode: COLOR_OPTIONS[0],
     });
-    const [location, setLocation] = useState<CreateLocationDto | null>(null);
-    const [recurring, setRecurring] = useState<CreateRecurringRuleDto | null>(null);
+    const [location, setLocation] = useState<UpdateLocationDto | null>(null);
+    const [recurring, setRecurring] = useState<UpdateRecurringRuleDto | null>(null);
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [showRecurringModal, setShowRecurringModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (event && isOpen) {
+            const startDate = new Date(event.startTime.replace(" ", "T"));
+            const endDate = new Date(event.endTime.replace(" ", "T"));
+
+            setFormData({
+                title: event.title,
+                description: event.description || "",
+                isAllDay: event.isAllDay,
+                startTime: event.isAllDay ? "10:00" : startDate.toTimeString().slice(0, 5),
+                endTime: event.isAllDay ? "12:00" : endDate.toTimeString().slice(0, 5),
+                colorCode: event.colorCode,
+            });
+
+            // 업데이트 요청을 보내기 위해서 Response Type -> Update DTO Type으로 변환
+            if (event.location) {
+                setLocation({
+                    nameEn: event.location.nameEn || undefined,
+                    nameKo: event.location.nameKo || undefined,
+                    address: event.location.address,
+                    latitude: event.location.latitude,
+                    longitude: event.location.longitude,
+                });
+            } else {
+                setLocation(null);
+            }
+
+            if (event.recurringEvent) {
+                setRecurring({
+                    rule: event.recurringEvent.rule,
+                    startDate: event.recurringEvent.startDate,
+                    endDate: event.recurringEvent.endDate || undefined, // null을 undefined로 변환
+                });
+            } else {
+                setRecurring(null);
+            }
+        }
+    }, [event, isOpen]);
 
     const updateFormData = (field: string, value: string | boolean) => {
         setFormData((prev) => ({
@@ -52,7 +98,15 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
     };
 
     const handleLocationAdd = (locationData: CreateLocationDto) => {
-        setLocation(locationData);
+        // CreateLocationDto를 UpdateLocationDto로 변환
+        const updateLocationData: UpdateLocationDto = {
+            nameEn: locationData.nameEn,
+            nameKo: locationData.nameKo,
+            address: locationData.address,
+            latitude: locationData.latitude,
+            longitude: locationData.longitude,
+        };
+        setLocation(updateLocationData);
         setShowLocationModal(false);
     };
 
@@ -61,7 +115,13 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
     };
 
     const handleRecurringApply = (recurringData: CreateRecurringRuleDto) => {
-        setRecurring(recurringData);
+        // CreateRecurringRuleDto를 UpdateRecurringRuleDto로 변환
+        const updateRecurringData: UpdateRecurringRuleDto = {
+            rule: recurringData.rule,
+            startDate: recurringData.startDate,
+            endDate: recurringData.endDate,
+        };
+        setRecurring(updateRecurringData);
         setShowRecurringModal(false);
     };
 
@@ -72,38 +132,111 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.title.trim()) return;
+        if (!formData.title.trim() || !event) return;
 
         setIsSubmitting(true);
 
         try {
-            const dateStr = selectedDate.toISOString().split("T")[0];
+            const eventDate = new Date(event.startTime).toISOString().split("T")[0];
 
             let startTime, endTime;
             if (formData.isAllDay) {
-                startTime = `${dateStr} 00:00`;
-                endTime = `${dateStr} 23:59`;
+                startTime = `${eventDate} 00:00`;
+                endTime = `${eventDate} 23:59`;
             } else {
-                startTime = `${dateStr} ${formData.startTime}`;
-                endTime = `${dateStr} ${formData.endTime}`;
+                startTime = `${eventDate} ${formData.startTime}`;
+                endTime = `${eventDate} ${formData.endTime}`;
             }
 
-            const createEventDto: CreateEventDto = {
-                title: formData.title.trim(),
-                description: formData.description.trim() || undefined,
-                startTime,
-                endTime,
-                isAllDay: formData.isAllDay,
-                colorCode: formData.colorCode,
-                location: location || undefined,
-                recurring: recurring || undefined,
+            // 변경된 필드만 포함하여 UpdateEventDto 생성
+            const updateEventDto: UpdateEventDto = {};
+
+            // 기본 필드 비교 및 추가
+            if (formData.title.trim() !== event.title) {
+                updateEventDto.title = formData.title.trim();
+            }
+
+            const newDescription = formData.description.trim() || undefined;
+            const oldDescription = event.description || undefined;
+            if (newDescription !== oldDescription) {
+                updateEventDto.description = newDescription;
+            }
+
+            if (startTime !== event.startTime) {
+                updateEventDto.startTime = startTime;
+            }
+
+            if (endTime !== event.endTime) {
+                updateEventDto.endTime = endTime;
+            }
+
+            if (formData.isAllDay !== event.isAllDay) {
+                updateEventDto.isAllDay = formData.isAllDay;
+            }
+
+            if (formData.colorCode !== event.colorCode) {
+                updateEventDto.colorCode = formData.colorCode;
+            }
+
+            // location 비교 (깊은 비교 필요)
+            const hasLocationChanged = () => {
+                if (!location && !event.location) return false;
+                if (!location || !event.location) return true;
+
+                return (
+                    location.nameEn !== (event.location.nameEn || undefined) ||
+                    location.nameKo !== (event.location.nameKo || undefined) ||
+                    location.address !== event.location.address ||
+                    location.latitude !== event.location.latitude ||
+                    location.longitude !== event.location.longitude
+                );
             };
 
-            await eventApi.createEvent(createEventDto);
-            onEventCreated();
+            if (hasLocationChanged()) {
+                updateEventDto.location = location || undefined;
+            }
+
+            // recurring 비교
+            const hasRecurringChanged = () => {
+                if (!recurring && !event.recurringEvent) return false;
+                if (!recurring || !event.recurringEvent) return true;
+
+                return (
+                    recurring.rule !== event.recurringEvent.rule ||
+                    recurring.startDate !== event.recurringEvent.startDate ||
+                    recurring.endDate !== (event.recurringEvent.endDate || undefined)
+                );
+            };
+
+            if (hasRecurringChanged()) {
+                updateEventDto.recurring = recurring || undefined;
+            }
+
+            // 변경사항이 있을 때만 API 호출
+            if (Object.keys(updateEventDto).length > 0) {
+                await eventApi.updateEvent(event.id, updateEventDto);
+                onEventUpdated();
+            }
+
             handleClose();
         } catch (error) {
-            console.error("Failed to create event:", error);
+            console.error("Failed to update event:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!event || !window.confirm("정말로 이 일정을 삭제하시겠습니까?")) return;
+
+        setIsSubmitting(true);
+
+        try {
+            await eventApi.deleteEvent(event.id);
+            onEventUpdated();
+            handleClose();
+        } catch (error) {
+            console.error("Failed to delete event:", error);
         } finally {
             setIsSubmitting(false);
         }
@@ -123,13 +256,13 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
         onClose();
     };
 
-    if (!isOpen) return null;
+    if (!isOpen || !event) return null;
 
     return (
-        <div className="create-event-modal-overlay" onClick={handleClose}>
-            <div className="create-event-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="update-event-modal-overlay" onClick={handleClose}>
+            <div className="update-event-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>일정 생성</h2>
+                    <h2>일정 수정</h2>
                     <button className="modal-close-btn" onClick={handleClose} aria-label="모달 닫기">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -253,11 +386,24 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                     <div className="form-group">
                         <label>반복</label>
                         {recurring ? (
-                            <div className="recurring-display">
+                            <div
+                                className="recurring-display"
+                                onClick={() => setShowRecurringModal(true)}
+                                style={{ cursor: "pointer" }}
+                            >
                                 <div className="recurring-info">
-                                    <span className="recurring-rule">{formatRecurringRule(recurring.rule)}</span>
+                                    <span className="recurring-rule">
+                                        {formatRecurringRule(recurring.rule || undefined)}
+                                    </span>
                                 </div>
-                                <button type="button" className="recurring-remove-btn" onClick={handleRecurringRemove}>
+                                <button
+                                    type="button"
+                                    className="recurring-remove-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRecurringRemove();
+                                    }}
+                                >
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <line x1="18" y1="6" x2="6" y2="18" />
                                         <line x1="6" y1="6" x2="18" y2="18" />
@@ -280,11 +426,14 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                     </div>
 
                     <div className="form-buttons">
+                        <button type="button" className="delete-btn" onClick={handleDelete} disabled={isSubmitting}>
+                            삭제
+                        </button>
                         <button type="button" className="cancel-btn" onClick={handleClose}>
                             취소
                         </button>
                         <button type="submit" className="submit-btn" disabled={isSubmitting || !formData.title.trim()}>
-                            {isSubmitting ? "생성 중..." : "생성"}
+                            {isSubmitting ? "수정 중..." : "수정"}
                         </button>
                     </div>
                 </form>
@@ -300,13 +449,14 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                 isOpen={showRecurringModal}
                 onClose={() => setShowRecurringModal(false)}
                 onApply={handleRecurringApply}
-                selectedDate={selectedDate}
+                selectedDate={new Date(event.startTime)}
             />
         </div>
     );
 }
 
-function formatRecurringRule(rrule: string): string {
+function formatRecurringRule(rrule: string | undefined): string {
+    if (!rrule) return "사용자 지정";
     if (rrule.includes("DAILY")) return "매일";
     if (rrule.includes("WEEKLY")) return "매주";
     if (rrule.includes("MONTHLY")) return "매월";

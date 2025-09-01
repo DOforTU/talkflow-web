@@ -1,0 +1,412 @@
+/* Update Event Modal */
+.update-event-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.update-event-modal {
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--card-shadow-strong);
+}
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-1);
+    margin: 0;
+}
+
+.modal-close-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-1);
+}
+
+.modal-close-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+/* Event Form */
+.event-form {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 0.5rem;
+}
+
+/* Form Inputs */
+.form-group input[type="text"],
+.form-group textarea,
+.form-group input[type="time"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--text-1);
+    background-color: var(--bg-primary);
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Checkbox */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 0 !important;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 0.5rem;
+    accent-color: var(--primary);
+}
+
+.checkbox-text {
+    font-size: 0.875rem;
+    color: var(--text-1);
+}
+
+/* Time Input Group */
+.time-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.time-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-input-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 0.5rem;
+}
+
+/* Color Picker */
+.color-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: white;
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.color-option svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+}
+
+/* Location */
+.location-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg-secondary);
+}
+
+.location-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.location-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-1);
+}
+
+.location-address {
+    font-size: 0.75rem;
+    color: var(--text-2);
+}
+
+.location-remove-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.location-remove-btn:hover {
+    background-color: var(--error);
+    color: white;
+}
+
+.location-remove-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+}
+
+.location-add-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: none;
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.location-add-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.location-add-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+/* Recurring */
+.recurring-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg-secondary);
+}
+
+.recurring-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.recurring-rule {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-1);
+}
+
+.recurring-dates {
+    font-size: 0.75rem;
+    color: var(--text-2);
+}
+
+.recurring-remove-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.recurring-remove-btn:hover {
+    background-color: var(--error);
+    color: white;
+}
+
+.recurring-remove-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+}
+
+.recurring-add-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: none;
+    color: var(--text-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.recurring-add-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.recurring-add-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+/* Form Buttons */
+.form-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.delete-btn,
+.cancel-btn,
+.submit-btn {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-btn {
+    border: 1px solid var(--error);
+    background: var(--bg-primary);
+    color: var(--error);
+}
+
+.delete-btn:hover:not(:disabled) {
+    background: var(--error);
+    color: white;
+}
+
+.cancel-btn {
+    border: 1px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-2);
+}
+
+.cancel-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-1);
+}
+
+.submit-btn {
+    border: none;
+    background: var(--primary);
+    color: white;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: var(--primary-light);
+}
+
+.submit-btn:disabled,
+.delete-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .update-event-modal {
+        margin: 1rem;
+        max-height: calc(100vh - 2rem);
+    }
+    
+    .time-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .color-picker {
+        justify-content: center;
+    }
+}

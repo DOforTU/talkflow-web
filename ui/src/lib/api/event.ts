@@ -1,39 +1,24 @@
-import { CreateEventDto, ResponseEvent, ResponseEventDto } from "../types/event.interface";
+import { CreateEventDto, ResponseEventDto, UpdateEventDto } from "../types/event.interface";
 import apiClient from "./client";
 
 export const eventApi = {
     // 본인 이벤트 조회
-    getMyEvents: async (): Promise<ResponseEvent[]> => {
+    getMyEvents: async (): Promise<ResponseEventDto[]> => {
         const response = await apiClient.get(`api/events`);
-        const responseEventsDto: ResponseEventDto[] = response.data.data;
-
-        // 여기서 ResponseEvent[]로 변환
-        const responseEvents: ResponseEvent[] = responseEventsDto.map((event) => ({
-            ...event,
-            startTime: event.startTime, // 이제 문자열 그대로 사용
-            endTime: event.endTime, // 이제 문자열 그대로 사용
-            createdAt: new Date(event.createdAt),
-            updatedAt: new Date(event.updatedAt),
-            deletedAt: event.deletedAt ? new Date(event.deletedAt) : null,
-        }));
-
-        return responseEvents;
+        return response.data.data;
     },
 
-    createEvent: async (eventData: CreateEventDto): Promise<ResponseEvent> => {
+    createEvent: async (eventData: CreateEventDto): Promise<ResponseEventDto> => {
         const response = await apiClient.post(`api/events`, eventData);
-        const responseEventDto: ResponseEventDto = response.data.data;
+        return response.data.data;
+    },
 
-        // 여기서 ResponseEvent로 변환
-        const responseEvent: ResponseEvent = {
-            ...responseEventDto,
-            startTime: responseEventDto.startTime,
-            endTime: responseEventDto.endTime,
-            createdAt: new Date(responseEventDto.createdAt),
-            updatedAt: new Date(responseEventDto.updatedAt),
-            deletedAt: responseEventDto.deletedAt ? new Date(responseEventDto.deletedAt) : null,
-        };
+    updateEvent: async (eventId: number, eventData: UpdateEventDto): Promise<ResponseEventDto> => {
+        const response = await apiClient.patch(`api/events/${eventId}`, eventData);
+        return response.data.data;
+    },
 
-        return responseEvent;
+    deleteEvent: async (eventId: number): Promise<void> => {
+        await apiClient.delete(`api/events/${eventId}`);
     },
 };
