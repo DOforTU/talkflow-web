@@ -40,9 +40,17 @@ export default function HomePage() {
         loadEvents();
     }, []);
 
+    // 로컬 시간대 기준으로 날짜 문자열 생성
+    const getLocalDateString = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
     // 선택된 날짜의 이벤트 가져기기
     const getSelectedDateEvents = () => {
-        const selectedDateStr = selectedDate.toISOString().split("T")[0];
+        const selectedDateStr = getLocalDateString(selectedDate);
 
         const filteredEvents = events.filter((event) => {
             // "2025-09-01 19:30" -> "2025-09-01" 추출

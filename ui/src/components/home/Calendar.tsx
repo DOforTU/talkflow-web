@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
 import { SupportedLanguage } from "@/lib/types/user.interface";
-import { ResponseEvent } from "@/lib/types/event.interface";
+import { ResponseEventDto } from "@/lib/types/event.interface";
 
 interface CalendarProps {
-    events: ResponseEvent[];
+    events: ResponseEventDto[];
     onDateSelect: (date: Date) => void;
 }
 
@@ -58,13 +58,21 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
     };
 
+    // 로컬 시간대 기준으로 날짜 문자열 생성
+    const getLocalDateString = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
     // 특정 날짜의 이벤트 가져오기
     const getEventsForDate = (date: Date) => {
         return events.filter((event) => {
             // "2025-09-01 19:30" -> "2025-09-01" 추출
-            const eventDateStr = event.startTime.split(' ')[0];
-            const targetDateStr = date.toISOString().split('T')[0];
-            
+            const eventDateStr = event.startTime.split(" ")[0];
+            const targetDateStr = getLocalDateString(date);
+
             // 년도, 월, 일이 모두 일치하는지 확인
             return eventDateStr === targetDateStr;
         });
@@ -127,22 +135,12 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
                 <div className="calendar-nav">
                     <button className="calendar-nav-btn" onClick={goToPreviousMonth}>
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={3}
-                                d="M15 19l-7-7 7-7"
-                            />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
                     <button className="calendar-nav-btn" onClick={goToNextMonth}>
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={3}
-                                d="M9 5l7 7-7 7"
-                            />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
                         </svg>
                     </button>
                 </div>
