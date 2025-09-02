@@ -1,4 +1,3 @@
-import AppHeader from "@/components/headers/AppHeader";
 import BottomNav from "@/components/navigation/BottomNav";
 
 export default function ProtectedLayout({
@@ -8,7 +7,6 @@ export default function ProtectedLayout({
 }>) {
     return (
         <div className="page-container">
-            <AppHeader />
             {children}
             <BottomNav />
         </div>
