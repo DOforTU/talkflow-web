@@ -11,7 +11,11 @@ export default function SilhouettePage() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [translateY, setTranslateY] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(true);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
+    const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
     const startY = useRef<number>(0);
     const currentY = useRef<number>(0);
     const isDragging = useRef<boolean>(false);
@@ -62,6 +66,31 @@ export default function SilhouettePage() {
         }
     }, [currentIndex]);
 
+    // Handle video playback when currentIndex changes
+    useEffect(() => {
+        if (silhouettes.length === 0) return;
+
+        const currentSilhouette = silhouettes[currentIndex];
+        
+        // Pause all videos first
+        Object.values(videoRefs.current).forEach(video => {
+            if (video) {
+                video.pause();
+            }
+        });
+
+        // If current slide is a video, play it and reset states
+        if (currentSilhouette?.type === SilhouetteType.VIDEO) {
+            const currentVideoElement = videoRefs.current[currentSilhouette.id];
+            if (currentVideoElement) {
+                setIsPlaying(true);
+                setCurrentTime(0);
+                currentVideoElement.currentTime = 0;
+                currentVideoElement.play().catch(console.error);
+            }
+        }
+    }, [currentIndex, silhouettes]);
+
     const goToSlide = (newIndex: number) => {
         if (isTransitioning || newIndex === currentIndex || newIndex < 0 || newIndex >= silhouettes.length) {
             return;
@@ -72,7 +101,7 @@ export default function SilhouettePage() {
 
         setTimeout(() => {
             setIsTransitioning(false);
-        }, 400);
+        }, 500);
     };
 
     const handleNext = () => {
@@ -83,6 +112,38 @@ export default function SilhouettePage() {
     const handlePrev = () => {
         const prevIndex = (currentIndex - 1 + silhouettes.length) % silhouettes.length;
         goToSlide(prevIndex);
+    };
+
+    const handleVideoClick = () => {
+        const currentSilhouette = silhouettes[currentIndex];
+        if (currentSilhouette?.type === SilhouetteType.VIDEO) {
+            const videoElement = videoRefs.current[currentSilhouette.id];
+            if (videoElement) {
+                if (isPlaying) {
+                    videoElement.pause();
+                    setIsPlaying(false);
+                } else {
+                    videoElement.play();
+                    setIsPlaying(true);
+                }
+            }
+        }
+    };
+
+    const handleVideoTimeUpdate = (videoElement: HTMLVideoElement) => {
+        setCurrentTime(videoElement.currentTime);
+        setDuration(videoElement.duration || 0);
+    };
+
+    const handleSeekBarChange = (newTime: number) => {
+        const currentSilhouette = silhouettes[currentIndex];
+        if (currentSilhouette?.type === SilhouetteType.VIDEO) {
+            const videoElement = videoRefs.current[currentSilhouette.id];
+            if (videoElement) {
+                videoElement.currentTime = newTime;
+                setCurrentTime(newTime);
+            }
+        }
     };
 
     // Touch/Mouse event handlers for vertical swipe
@@ -145,7 +206,7 @@ export default function SilhouettePage() {
 
             const now = Date.now();
             // Debounce to prevent multiple slides
-            if (now - lastWheelTime.current < 600) return;
+            if (now - lastWheelTime.current < 800) return;
 
             lastWheelTime.current = now;
 
@@ -213,7 +274,7 @@ export default function SilhouettePage() {
                     className="slides-wrapper"
                     style={{
                         transform: `translateY(${translateY}px)`,
-                        transition: isTransitioning ? "transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
+                        transition: isTransitioning ? "transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)" : "none",
                     }}
                 >
                     {silhouettes.map((silhouette, index) => {
@@ -234,19 +295,32 @@ export default function SilhouettePage() {
                                 key={silhouette.id}
                                 className="slide"
                                 style={{
-                                    opacity: index === currentIndex ? 1 : 0.3,
-                                    transition: "opacity 0.4s ease",
+                                    opacity: index === currentIndex ? 1 : 0,
+                                    transition: "opacity 0.3s ease-out",
                                 }}
                             >
-                                <div className="silhouette-video-container">
+                                <div
+                                    className="silhouette-video-container"
+                                    onClick={silhouette.type === SilhouetteType.VIDEO ? handleVideoClick : undefined}
+                                >
                                     {silhouette.type === SilhouetteType.VIDEO ? (
                                         <video
+                                            ref={(el) => {
+                                                if (el) {
+                                                    videoRefs.current[silhouette.id] = el;
+                                                }
+                                            }}
                                             src={silhouette.contentUrl}
                                             className="silhouette-video"
-                                            controls={currentIndex === index}
                                             loop
                                             muted
-                                            autoPlay={currentIndex === index}
+                                            autoPlay={currentIndex === index && isPlaying}
+                                            onTimeUpdate={(e) =>
+                                                currentIndex === index && handleVideoTimeUpdate(e.currentTarget)
+                                            }
+                                            onLoadedMetadata={(e) =>
+                                                currentIndex === index && setDuration(e.currentTarget.duration)
+                                            }
                                         />
                                     ) : (
                                         <img
@@ -255,6 +329,19 @@ export default function SilhouettePage() {
                                             className="silhouette-image"
                                         />
                                     )}
+
+                                    {/* Play/Pause Indicator */}
+                                    {silhouette.type === SilhouetteType.VIDEO &&
+                                        currentIndex === index &&
+                                        !isPlaying && (
+                                            <div className="play-pause-overlay">
+                                                <div className="play-icon">
+                                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M8 5v14l11-7z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        )}
                                 </div>
 
                                 {/* Slide overlay */}
@@ -276,15 +363,6 @@ export default function SilhouettePage() {
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                                                 </svg>
-                                                <span className="action-count">0</span>
-                                            </button>
-
-                                            <button className="action-btn view-btn">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                                    <circle cx="12" cy="12" r="3" />
-                                                </svg>
-                                                <span className="action-count">0</span>
                                             </button>
 
                                             <button className="action-btn share-btn">
@@ -299,20 +377,29 @@ export default function SilhouettePage() {
                                         </div>
                                     </div>
                                 </div>
+                                {/* Custom Video Seek Bar - Only show for video content */}
+                                {silhouettes[currentIndex]?.type === SilhouetteType.VIDEO && (
+                                    <div className="video-seek-bar">
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max={duration || 0}
+                                            value={currentTime}
+                                            onChange={(e) => handleSeekBarChange(parseFloat(e.target.value))}
+                                            className="seek-slider"
+                                            style={
+                                                {
+                                                    "--progress": `${
+                                                        duration > 0 ? (currentTime / duration) * 100 : 0
+                                                    }%`,
+                                                } as React.CSSProperties
+                                            }
+                                        />
+                                    </div>
+                                )}
                             </div>
                         );
                     })}
-                </div>
-
-                {/* Progress Indicator */}
-                <div className="progress-indicator">
-                    {silhouettes.map((_, index) => (
-                        <div
-                            key={index}
-                            className={`progress-dot ${index === currentIndex ? "active" : ""}`}
-                            onClick={() => goToSlide(index)}
-                        />
-                    ))}
                 </div>
             </div>
         </div>

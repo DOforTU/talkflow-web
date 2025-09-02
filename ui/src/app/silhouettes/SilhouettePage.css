@@ -41,7 +41,7 @@
     width: 99%;
     height: 94vh;
     will-change: transform;
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .slide {
@@ -88,6 +88,7 @@
     border-radius: 12px;
     padding: 1rem;
     pointer-events: none;
+    z-index: 1;
 }
 
 .silhouette-overlay > * {
@@ -342,6 +343,130 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+/* Play/Pause Overlay */
+.play-pause-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.play-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.play-icon svg {
+    width: 32px;
+    height: 32px;
+    margin-left: 4px; /* Slight offset to center play triangle */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Custom Video Seek Bar */
+.video-seek-bar {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    z-index: 25;
+    height: 4px;
+    background: var(--text-3);
+    border-radius: 2px;
+    padding: 2px 0;
+}
+
+.seek-slider {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--text-3);
+    outline: none;
+    border-radius: 2px;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.seek-slider::-webkit-slider-track {
+    height: 4px;
+    background: var(--text-3);
+    border-radius: 2px;
+}
+
+.seek-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.seek-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.3);
+}
+
+.seek-slider::-moz-range-track {
+    height: 4px;
+    background: var(--text-3);
+    border-radius: 2px;
+    border: none;
+}
+
+.seek-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: all 0.2s ease;
+    -moz-appearance: none;
+}
+
+.seek-slider::-moz-range-thumb:hover {
+    transform: scale(1.3);
+}
+
+/* Progress Bar Visual Enhancement */
+.seek-slider::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+    width: var(--progress, 0%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* Mobile Responsiveness */
