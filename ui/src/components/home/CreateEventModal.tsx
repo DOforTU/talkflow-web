@@ -102,6 +102,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
         try {
             let startTime, endTime;
             if (formData.isAllDay) {
+                // 하루 종일
                 startTime = `${formData.startDate} 00:00`;
                 endTime = `${formData.endDate} 23:59`;
             } else {
