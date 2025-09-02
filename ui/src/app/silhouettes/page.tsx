@@ -40,13 +40,10 @@ export default function SilhouettePage() {
         const updateSlideHeight = () => {
             // Use viewport height calculation for consistent sizing
             const vh = window.innerHeight * 0.94; // 94vh for slide height
-            const marginTop = 8; // 1rem = 16px
-            const marginBottom = 8; // 1rem = 16px
-            const totalSlideHeight = vh + marginTop + marginBottom; // Total height including margins
 
-            slideHeight.current = totalSlideHeight;
+            slideHeight.current = vh;
             // Initial translateY calculation
-            setTranslateY(-currentIndex * totalSlideHeight);
+            setTranslateY(-currentIndex * vh);
         };
 
         updateSlideHeight();
@@ -219,71 +216,92 @@ export default function SilhouettePage() {
                         transition: isTransitioning ? "transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
                     }}
                 >
-                    {silhouettes.map((silhouette, index) => (
-                        <div key={silhouette.id} className="slide">
-                            <div className="silhouette-video-container">
-                                {silhouette.type === SilhouetteType.VIDEO ? (
-                                    <video
-                                        src={silhouette.contentUrl}
-                                        className="silhouette-video"
-                                        controls={currentIndex === index}
-                                        loop
-                                        muted
-                                        autoPlay={currentIndex === index}
-                                    />
-                                ) : (
-                                    <img
-                                        src={silhouette.contentUrl}
-                                        alt={silhouette.title}
-                                        className="silhouette-image"
-                                    />
-                                )}
-                            </div>
+                    {silhouettes.map((silhouette, index) => {
+                        // Only render slides that are visible (current, previous, next)
+                        const isVisible = Math.abs(index - currentIndex) <= 1;
+                        if (!isVisible) {
+                            return (
+                                <div
+                                    key={silhouette.id}
+                                    className="slide"
+                                    style={{ opacity: 0, pointerEvents: "none" }}
+                                ></div>
+                            );
+                        }
 
-                            {/* Slide overlay */}
-                            <div className="silhouette-overlay">
-                                <div className="user-info">
-                                    <div className="user-profile">
-                                        <img
-                                            src={silhouette.profile.avatarUrl || "/default-avatar.png"}
-                                            alt={silhouette.profile.nickname}
-                                            className="user-avatar"
+                        return (
+                            <div
+                                key={silhouette.id}
+                                className="slide"
+                                style={{
+                                    opacity: index === currentIndex ? 1 : 0.3,
+                                    transition: "opacity 0.4s ease",
+                                }}
+                            >
+                                <div className="silhouette-video-container">
+                                    {silhouette.type === SilhouetteType.VIDEO ? (
+                                        <video
+                                            src={silhouette.contentUrl}
+                                            className="silhouette-video"
+                                            controls={currentIndex === index}
+                                            loop
+                                            muted
+                                            autoPlay={currentIndex === index}
                                         />
-                                        <div className="user-details">
-                                            <p className="user-nickname">@{silhouette.profile.nickname}</p>
-                                            <p className="silhouette-title">{silhouette.title}</p>
+                                    ) : (
+                                        <img
+                                            src={silhouette.contentUrl}
+                                            alt={silhouette.title}
+                                            className="silhouette-image"
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Slide overlay */}
+                                <div className="silhouette-overlay">
+                                    <div className="user-info">
+                                        <div className="user-profile">
+                                            <img
+                                                src={silhouette.profile.avatarUrl || "/default-avatar.png"}
+                                                alt={silhouette.profile.nickname}
+                                                className="user-avatar"
+                                            />
+                                            <div className="user-details">
+                                                <p className="user-nickname">@{silhouette.profile.nickname}</p>
+                                                <p className="silhouette-title">{silhouette.title}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="action-buttons">
-                                        <button className="action-btn like-btn">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                                            </svg>
-                                            <span className="action-count">0</span>
-                                        </button>
+                                        <div className="action-buttons">
+                                            <button className="action-btn like-btn">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                                </svg>
+                                                <span className="action-count">0</span>
+                                            </button>
 
-                                        <button className="action-btn view-btn">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                                <circle cx="12" cy="12" r="3" />
-                                            </svg>
-                                            <span className="action-count">0</span>
-                                        </button>
+                                            <button className="action-btn view-btn">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                    <circle cx="12" cy="12" r="3" />
+                                                </svg>
+                                                <span className="action-count">0</span>
+                                            </button>
 
-                                        <button className="action-btn share-btn">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                <circle cx="18" cy="5" r="3" />
-                                                <circle cx="6" cy="12" r="3" />
-                                                <circle cx="18" cy="19" r="3" />
-                                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                                            </svg>
-                                        </button>
+                                            <button className="action-btn share-btn">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <circle cx="18" cy="5" r="3" />
+                                                    <circle cx="6" cy="12" r="3" />
+                                                    <circle cx="18" cy="19" r="3" />
+                                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* Progress Indicator */}
