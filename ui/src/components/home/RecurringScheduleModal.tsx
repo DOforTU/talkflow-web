@@ -233,6 +233,24 @@ export default function RecurringScheduleModal({
                             onChange={(e) => updateRecurringSettings("endDate", e.target.value || undefined)}
                             min={getLocalDateString(selectedDate)}
                         />
+                        {!recurringSettings.endDate && (
+                            <div className="end-date-info">
+                                <div className="info-text">
+                                    {recurringSettings.frequency === "YEARLY" && 
+                                        "⚠️ 종료일을 선택하지 않으면 5년간 총 5개의 일정이 생성됩니다."
+                                    }
+                                    {recurringSettings.frequency === "MONTHLY" && 
+                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 12개의 일정이 생성됩니다."
+                                    }
+                                    {recurringSettings.frequency === "WEEKLY" && 
+                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 52개의 일정이 생성됩니다."
+                                    }
+                                    {recurringSettings.frequency === "DAILY" && 
+                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 365개의 일정이 생성됩니다."
+                                    }
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="recurring-buttons">
