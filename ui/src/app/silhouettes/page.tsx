@@ -71,9 +71,9 @@ export default function SilhouettePage() {
         if (silhouettes.length === 0) return;
 
         const currentSilhouette = silhouettes[currentIndex];
-        
+
         // Pause all videos first
-        Object.values(videoRefs.current).forEach(video => {
+        Object.values(videoRefs.current).forEach((video) => {
             if (video) {
                 video.pause();
             }
