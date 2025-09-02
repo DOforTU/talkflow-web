@@ -50,7 +50,7 @@
     height: 94vh;
     border-radius: 20px;
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-    margin-bottom: 0;
+    margin: 1rem 0;
     flex-shrink: 0;
 }
 
@@ -65,21 +65,6 @@
     overflow: hidden;
     border-radius: 20px;
 }
-
-/* TEMPORARY - Index display for testing scroll functionality */
-.slide-index {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: bold;
-    z-index: 10;
-}
-/* END TEMPORARY */
 
 .silhouette-video,
 .silhouette-image {

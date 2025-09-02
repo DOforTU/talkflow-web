@@ -39,11 +39,14 @@ export default function SilhouettePage() {
     useEffect(() => {
         const updateSlideHeight = () => {
             // Use viewport height calculation for consistent sizing
-            const vh = window.innerHeight * 0.94; // 94vh
-            slideHeight.current = vh;
-            console.log("Slide height updated:", vh);
+            const vh = window.innerHeight * 0.94; // 94vh for slide height
+            const marginTop = 8; // 1rem = 16px
+            const marginBottom = 8; // 1rem = 16px
+            const totalSlideHeight = vh + marginTop + marginBottom; // Total height including margins
+
+            slideHeight.current = totalSlideHeight;
             // Initial translateY calculation
-            setTranslateY(-currentIndex * vh);
+            setTranslateY(-currentIndex * totalSlideHeight);
         };
 
         updateSlideHeight();
@@ -58,9 +61,6 @@ export default function SilhouettePage() {
     useEffect(() => {
         if (slideHeight.current > 0) {
             const newTranslateY = -currentIndex * slideHeight.current;
-            console.log(
-                `Setting translateY: ${newTranslateY}, currentIndex: ${currentIndex}, slideHeight: ${slideHeight.current}`
-            );
             setTranslateY(newTranslateY);
         }
     }, [currentIndex]);
@@ -222,9 +222,6 @@ export default function SilhouettePage() {
                     {silhouettes.map((silhouette, index) => (
                         <div key={silhouette.id} className="slide">
                             <div className="silhouette-video-container">
-                                {/* TEMPORARY - Index display for testing */}
-                                <div className="slide-index">{index}</div>
-                                {/* END TEMPORARY */}
                                 {silhouette.type === SilhouetteType.VIDEO ? (
                                     <video
                                         src={silhouette.contentUrl}
