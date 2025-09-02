@@ -10,12 +10,13 @@ export default function SilhouettePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [direction, setDirection] = useState<"up" | "down">("up");
+    const [translateY, setTranslateY] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
     const startY = useRef<number>(0);
     const currentY = useRef<number>(0);
     const isDragging = useRef<boolean>(false);
     const lastWheelTime = useRef<number>(0);
+    const slideHeight = useRef<number>(0);
 
     useEffect(() => {
         const loadSilhouettes = async () => {
@@ -34,26 +35,63 @@ export default function SilhouettePage() {
         loadSilhouettes();
     }, []);
 
-    const handleNext = () => {
-        if (isTransitioning) return;
+    // Initialize slide height and handle resize
+    useEffect(() => {
+        const updateSlideHeight = () => {
+            // Use viewport height calculation for consistent sizing
+            const vh = window.innerHeight * 0.94; // 94vh
+            slideHeight.current = vh;
+            console.log("Slide height updated:", vh);
+            // Initial translateY calculation
+            setTranslateY(-currentIndex * vh);
+        };
+
+        updateSlideHeight();
+        window.addEventListener("resize", updateSlideHeight);
+
+        return () => {
+            window.removeEventListener("resize", updateSlideHeight);
+        };
+    }, [currentIndex]);
+
+    // Update translateY when currentIndex changes
+    useEffect(() => {
+        if (slideHeight.current > 0) {
+            const newTranslateY = -currentIndex * slideHeight.current;
+            console.log(
+                `Setting translateY: ${newTranslateY}, currentIndex: ${currentIndex}, slideHeight: ${slideHeight.current}`
+            );
+            setTranslateY(newTranslateY);
+        }
+    }, [currentIndex]);
+
+    const goToSlide = (newIndex: number) => {
+        if (isTransitioning || newIndex === currentIndex || newIndex < 0 || newIndex >= silhouettes.length) {
+            return;
+        }
+
         setIsTransitioning(true);
-        setCurrentIndex((prev) => (prev + 1) % silhouettes.length);
+        setCurrentIndex(newIndex);
+
         setTimeout(() => {
             setIsTransitioning(false);
-        }, 300);
+        }, 400);
+    };
+
+    const handleNext = () => {
+        const nextIndex = (currentIndex + 1) % silhouettes.length;
+        goToSlide(nextIndex);
     };
 
     const handlePrev = () => {
-        if (isTransitioning) return;
-        setIsTransitioning(true);
-        setCurrentIndex((prev) => (prev - 1 + silhouettes.length) % silhouettes.length);
-        setTimeout(() => {
-            setIsTransitioning(false);
-        }, 300);
+        const prevIndex = (currentIndex - 1 + silhouettes.length) % silhouettes.length;
+        goToSlide(prevIndex);
     };
 
     // Touch/Mouse event handlers for vertical swipe
     const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+        if (isTransitioning) return;
+
         isDragging.current = true;
         const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
         startY.current = clientY;
@@ -61,7 +99,7 @@ export default function SilhouettePage() {
     };
 
     const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
-        if (!isDragging.current) return;
+        if (!isDragging.current || isTransitioning) return;
 
         e.preventDefault();
         const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
@@ -69,23 +107,20 @@ export default function SilhouettePage() {
     };
 
     const handleTouchEnd = () => {
-        if (!isDragging.current) return;
-
-        // Block touch navigation during transition
-        if (isTransitioning) {
+        if (!isDragging.current || isTransitioning) {
             isDragging.current = false;
             return;
         }
 
         const deltaY = currentY.current - startY.current;
-        const threshold = 30; // Even more sensitive for touch
+        const threshold = 50; // Minimum swipe distance
 
         if (Math.abs(deltaY) > threshold) {
             if (deltaY > 0) {
-                // Swipe down - go to previous
+                // Swipe down - go to previous (scroll up)
                 handlePrev();
             } else {
-                // Swipe up - go to next
+                // Swipe up - go to next (scroll down)
                 handleNext();
             }
         }
@@ -112,18 +147,18 @@ export default function SilhouettePage() {
             if (isTransitioning) return;
 
             const now = Date.now();
-            // Much longer debounce to prevent multiple slides
-            if (now - lastWheelTime.current < 500) return;
+            // Debounce to prevent multiple slides
+            if (now - lastWheelTime.current < 600) return;
 
             lastWheelTime.current = now;
 
-            // Single scroll triggers navigation
+            // Scroll threshold
             if (Math.abs(e.deltaY) > 10) {
                 if (e.deltaY > 0) {
-                    // Scroll down - go to next
+                    // Scroll down - go to next slide
                     handleNext();
                 } else {
-                    // Scroll up - go to previous
+                    // Scroll up - go to previous slide
                     handlePrev();
                 }
             }
@@ -136,7 +171,7 @@ export default function SilhouettePage() {
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("wheel", handleWheel);
         };
-    }, [silhouettes.length]);
+    }, [silhouettes.length, isTransitioning, currentIndex]);
 
     if (isLoading) {
         return (
@@ -163,10 +198,6 @@ export default function SilhouettePage() {
         );
     }
 
-    const currentSilhouette = silhouettes[currentIndex];
-    const nextSilhouette = silhouettes[(currentIndex + 1) % silhouettes.length];
-    const prevSilhouette = silhouettes[(currentIndex - 1 + silhouettes.length) % silhouettes.length];
-
     return (
         <div className="silhouette-page">
             <div
@@ -180,148 +211,82 @@ export default function SilhouettePage() {
                 onMouseUp={handleTouchEnd}
                 onMouseLeave={handleTouchEnd}
             >
-                {/* Multiple slides for smooth transition */}
-                <div className={`slide-container ${isTransitioning ? `transitioning-${direction}` : ""}`}>
-                    {/* Previous slide */}
-                    <div className="slide slide-prev">
-                        <div className="silhouette-video-container">
-                            {/* TEMPORARY - Index display for testing */}
-                            <div className="slide-index">
-                                {(currentIndex - 1 + silhouettes.length) % silhouettes.length}
-                            </div>
-                            {/* END TEMPORARY */}
-                            {prevSilhouette && prevSilhouette.type === SilhouetteType.VIDEO ? (
-                                <video src={prevSilhouette.contentUrl} className="silhouette-video" muted />
-                            ) : prevSilhouette ? (
-                                <img
-                                    src={prevSilhouette.contentUrl}
-                                    alt={prevSilhouette.title}
-                                    className="silhouette-image"
-                                />
-                            ) : null}
-                        </div>
-                        {/* Previous slide overlay */}
-                        <div className="silhouette-overlay">
-                            <div className="user-info">
-                                <div className="user-profile">
-                                    <img
-                                        src={prevSilhouette?.profile.avatarUrl || "/default-avatar.png"}
-                                        alt={prevSilhouette?.profile.nickname}
-                                        className="user-avatar"
+                {/* Slides Wrapper with Transform */}
+                <div
+                    className="slides-wrapper"
+                    style={{
+                        transform: `translateY(${translateY}px)`,
+                        transition: isTransitioning ? "transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)" : "none",
+                    }}
+                >
+                    {silhouettes.map((silhouette, index) => (
+                        <div key={silhouette.id} className="slide">
+                            <div className="silhouette-video-container">
+                                {/* TEMPORARY - Index display for testing */}
+                                <div className="slide-index">{index}</div>
+                                {/* END TEMPORARY */}
+                                {silhouette.type === SilhouetteType.VIDEO ? (
+                                    <video
+                                        src={silhouette.contentUrl}
+                                        className="silhouette-video"
+                                        controls={currentIndex === index}
+                                        loop
+                                        muted
+                                        autoPlay={currentIndex === index}
                                     />
-                                    <div className="user-details">
-                                        <p className="user-nickname">@{prevSilhouette?.profile.nickname}</p>
-                                    </div>
-                                </div>
-                                <div className="action-buttons">
-                                    <button className="action-btn share-btn">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <circle cx="18" cy="5" r="3" />
-                                            <circle cx="6" cy="12" r="3" />
-                                            <circle cx="18" cy="19" r="3" />
-                                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                                        </svg>
-                                    </button>
-                                </div>
+                                ) : (
+                                    <img
+                                        src={silhouette.contentUrl}
+                                        alt={silhouette.title}
+                                        className="silhouette-image"
+                                    />
+                                )}
                             </div>
-                        </div>
-                    </div>
 
-                    {/* Current slide */}
-                    <div className="slide slide-current">
-                        <div className="silhouette-video-container">
-                            {/* TEMPORARY - Index display for testing */}
-                            <div className="slide-index">{currentIndex}</div>
-                            {/* END TEMPORARY */}
-                            {currentSilhouette.type === SilhouetteType.VIDEO ? (
-                                <video
-                                    src={currentSilhouette.contentUrl}
-                                    className="silhouette-video"
-                                    controls
-                                    loop
-                                    muted
-                                    autoPlay
-                                />
-                            ) : (
-                                <img
-                                    src={currentSilhouette.contentUrl}
-                                    alt={currentSilhouette.title}
-                                    className="silhouette-image"
-                                />
-                            )}
-                        </div>
-                        {/* Current slide overlay */}
-                        <div className="silhouette-overlay">
-                            <div className="user-info">
-                                <div className="user-profile">
-                                    <img
-                                        src={currentSilhouette.profile.avatarUrl || "/default-avatar.png"}
-                                        alt={currentSilhouette.profile.nickname}
-                                        className="user-avatar"
-                                    />
-                                    <div className="user-details">
-                                        <p className="user-nickname">@{currentSilhouette.profile.nickname}</p>
+                            {/* Slide overlay */}
+                            <div className="silhouette-overlay">
+                                <div className="user-info">
+                                    <div className="user-profile">
+                                        <img
+                                            src={silhouette.profile.avatarUrl || "/default-avatar.png"}
+                                            alt={silhouette.profile.nickname}
+                                            className="user-avatar"
+                                        />
+                                        <div className="user-details">
+                                            <p className="user-nickname">@{silhouette.profile.nickname}</p>
+                                            <p className="silhouette-title">{silhouette.title}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="action-buttons">
-                                    <button className="action-btn share-btn">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <circle cx="18" cy="5" r="3" />
-                                            <circle cx="6" cy="12" r="3" />
-                                            <circle cx="18" cy="19" r="3" />
-                                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                    <div className="action-buttons">
+                                        <button className="action-btn like-btn">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                            </svg>
+                                            <span className="action-count">0</span>
+                                        </button>
 
-                    {/* Next slide */}
-                    <div className="slide slide-next">
-                        <div className="silhouette-video-container">
-                            {/* TEMPORARY - Index display for testing */}
-                            <div className="slide-index">{(currentIndex + 1) % silhouettes.length}</div>
-                            {/* END TEMPORARY */}
-                            {nextSilhouette && nextSilhouette.type === SilhouetteType.VIDEO ? (
-                                <video src={nextSilhouette.contentUrl} className="silhouette-video" muted />
-                            ) : nextSilhouette ? (
-                                <img
-                                    src={nextSilhouette.contentUrl}
-                                    alt={nextSilhouette.title}
-                                    className="silhouette-image"
-                                />
-                            ) : null}
-                        </div>
-                        {/* Next slide overlay */}
-                        <div className="silhouette-overlay">
-                            <div className="user-info">
-                                <div className="user-profile">
-                                    <img
-                                        src={nextSilhouette?.profile.avatarUrl || "/default-avatar.png"}
-                                        alt={nextSilhouette?.profile.nickname}
-                                        className="user-avatar"
-                                    />
-                                    <div className="user-details">
-                                        <p className="user-nickname">@{nextSilhouette?.profile.nickname}</p>
+                                        <button className="action-btn view-btn">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                            <span className="action-count">0</span>
+                                        </button>
+
+                                        <button className="action-btn share-btn">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <circle cx="18" cy="5" r="3" />
+                                                <circle cx="6" cy="12" r="3" />
+                                                <circle cx="18" cy="19" r="3" />
+                                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                                            </svg>
+                                        </button>
                                     </div>
-                                </div>
-                                <div className="action-buttons">
-                                    <button className="action-btn share-btn">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <circle cx="18" cy="5" r="3" />
-                                            <circle cx="6" cy="12" r="3" />
-                                            <circle cx="18" cy="19" r="3" />
-                                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                                        </svg>
-                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    ))}
                 </div>
 
                 {/* Progress Indicator */}
@@ -330,7 +295,7 @@ export default function SilhouettePage() {
                         <div
                             key={index}
                             className={`progress-dot ${index === currentIndex ? "active" : ""}`}
-                            onClick={() => setCurrentIndex(index)}
+                            onClick={() => goToSlide(index)}
                         />
                     ))}
                 </div>
