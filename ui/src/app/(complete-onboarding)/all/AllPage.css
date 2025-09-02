@@ -32,8 +32,9 @@
 }
 
 .user-avatar {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
+    padding: 2px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;

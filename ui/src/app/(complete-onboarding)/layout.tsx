@@ -42,9 +42,7 @@ export default function ProtectedLayout({
 
     return (
         <div className="page-container">
-            <SmartHeader>
-                <AppHeader />
-            </SmartHeader>
+            <AppHeader />
 
             {children}
             <BottomNav />

@@ -2,8 +2,6 @@
 .bottom-nav {
     position: fixed;
     background-color: var(--bg-primary);
-    box-shadow: var(--card-shadow);
-    backdrop-filter: blur(10px);
     z-index: 1000;
     transition: all 0.3s ease;
 }
