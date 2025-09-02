@@ -36,22 +36,20 @@ export default function SilhouettePage() {
 
     const handleNext = () => {
         if (isTransitioning) return;
-        setDirection("up");
         setIsTransitioning(true);
+        setCurrentIndex((prev) => (prev + 1) % silhouettes.length);
         setTimeout(() => {
-            setCurrentIndex((prev) => (prev + 1) % silhouettes.length);
             setIsTransitioning(false);
-        }, 200);
+        }, 300);
     };
 
     const handlePrev = () => {
         if (isTransitioning) return;
-        setDirection("down");
         setIsTransitioning(true);
+        setCurrentIndex((prev) => (prev - 1 + silhouettes.length) % silhouettes.length);
         setTimeout(() => {
-            setCurrentIndex((prev) => (prev - 1 + silhouettes.length) % silhouettes.length);
             setIsTransitioning(false);
-        }, 200);
+        }, 300);
     };
 
     // Touch/Mouse event handlers for vertical swipe
@@ -72,7 +70,7 @@ export default function SilhouettePage() {
 
     const handleTouchEnd = () => {
         if (!isDragging.current) return;
-        
+
         // Block touch navigation during transition
         if (isTransitioning) {
             isDragging.current = false;
@@ -114,12 +112,13 @@ export default function SilhouettePage() {
             if (isTransitioning) return;
 
             const now = Date.now();
-            if (now - lastWheelTime.current < 100) return; // Prevent rapid scrolling
+            // Much longer debounce to prevent multiple slides
+            if (now - lastWheelTime.current < 500) return;
 
             lastWheelTime.current = now;
 
-            // Single scroll triggers navigation - very sensitive
-            if (Math.abs(e.deltaY) > 1) {
+            // Single scroll triggers navigation
+            if (Math.abs(e.deltaY) > 10) {
                 if (e.deltaY > 0) {
                     // Scroll down - go to next
                     handleNext();
@@ -233,9 +232,7 @@ export default function SilhouettePage() {
                     <div className="slide slide-current">
                         <div className="silhouette-video-container">
                             {/* TEMPORARY - Index display for testing */}
-                            <div className="slide-index">
-                                {currentIndex}
-                            </div>
+                            <div className="slide-index">{currentIndex}</div>
                             {/* END TEMPORARY */}
                             {currentSilhouette.type === SilhouetteType.VIDEO ? (
                                 <video
@@ -286,9 +283,7 @@ export default function SilhouettePage() {
                     <div className="slide slide-next">
                         <div className="silhouette-video-container">
                             {/* TEMPORARY - Index display for testing */}
-                            <div className="slide-index">
-                                {(currentIndex + 1) % silhouettes.length}
-                            </div>
+                            <div className="slide-index">{(currentIndex + 1) % silhouettes.length}</div>
                             {/* END TEMPORARY */}
                             {nextSilhouette && nextSilhouette.type === SilhouetteType.VIDEO ? (
                                 <video src={nextSilhouette.contentUrl} className="silhouette-video" muted />
