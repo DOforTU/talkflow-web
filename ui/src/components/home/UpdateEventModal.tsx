@@ -76,8 +76,9 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
 
             // recurringEventId가 있는 경우에만 반복 일정 데이터 조회
             if (event.recurringEventId) {
-                eventApi.getRecurringEventById(event.recurringEventId)
-                    .then(data => {
+                eventApi
+                    .getRecurringEventById(event.recurringEventId)
+                    .then((data) => {
                         setRecurringEventData(data);
                         setRecurring({
                             rule: data.rule,
@@ -85,7 +86,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                             endDate: data.endDate || undefined,
                         });
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         console.error("Failed to fetch recurring event:", error);
                         setRecurringEventData(null);
                         setRecurring(null);
@@ -421,12 +422,19 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                     <div className="form-group">
                         <label>위치</label>
                         {location ? (
-                            <div className="location-display">
+                            <div className="location-display" onClick={() => setShowLocationModal(true)}>
                                 <div className="location-info">
                                     <span className="location-name">{location.nameKo || location.nameEn}</span>
                                     <span className="location-address">{location.address}</span>
                                 </div>
-                                <button type="button" className="location-remove-btn" onClick={handleLocationRemove}>
+                                <button
+                                    type="button"
+                                    className="location-remove-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLocationRemove();
+                                    }}
+                                >
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <line x1="18" y1="6" x2="6" y2="18" />
                                         <line x1="6" y1="6" x2="18" y2="18" />
