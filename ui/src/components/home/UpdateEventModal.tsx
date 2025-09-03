@@ -508,6 +508,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                 isOpen={showLocationModal}
                 onClose={() => setShowLocationModal(false)}
                 onLocationSelect={handleLocationAdd}
+                existingLocation={location}
             />
 
             <RecurringScheduleModal
