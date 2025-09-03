@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import Script from "next/script";
-import { ResponseEvent } from "@/lib/types/event.interface";
 import "./MapModal.css";
+import { ResponseEventDto } from "@/lib/types/event.interface";
 
 interface MapModalProps {
     isOpen: boolean;
     onClose: () => void;
-    events: ResponseEvent[];
+    events: ResponseEventDto[];
     selectedDate: Date;
 }
 
@@ -87,7 +87,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
     };
 
     // 마커 추가 및 경로 표시
-    const addMarkersAndRoute = (eventsWithLocation: ResponseEvent[]) => {
+    const addMarkersAndRoute = (eventsWithLocation: ResponseEventDto[]) => {
         if (!mapInstanceRef.current) return;
 
         markersRef.current.forEach((marker) => (marker.map = null));

@@ -18,20 +18,20 @@ declare global {
     }
 }
 
-export default function LocationSearchModal({ 
-    isOpen, 
-    onClose, 
+export default function LocationSearchModal({
+    isOpen,
+    onClose,
     onLocationSelect,
-    existingLocation
+    existingLocation,
 }: LocationSearchModalProps) {
     const [searchValue, setSearchValue] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [selectedLocation, setSelectedLocation] = useState<CreateLocationDto | null>(null);
-    
+
     const mapRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const mapInstanceRef = useRef<google.maps.Map | null>(null);
-    const markerRef = useRef<google.maps.Marker | null>(null);
+    const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
     const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
     useEffect(() => {
@@ -57,7 +57,7 @@ export default function LocationSearchModal({
 
             // Google Maps API 스크립트 로드
             const script = document.createElement("script");
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,marker`;
             script.async = true;
             script.defer = true;
             script.onload = initializeMap;
@@ -68,10 +68,18 @@ export default function LocationSearchModal({
             if (!mapRef.current) return;
 
             const mapOptions: google.maps.MapOptions = {
-                center: existingLocation 
-                    ? { lat: existingLocation.latitude, lng: existingLocation.longitude }
-                    : { lat: 37.5665, lng: 126.9780 }, // 서울시청
-                zoom: existingLocation ? 15 : 12,
+                center:
+                    existingLocation &&
+                    existingLocation.latitude !== undefined &&
+                    existingLocation.longitude !== undefined
+                        ? { lat: existingLocation.latitude, lng: existingLocation.longitude }
+                        : { lat: 37.5665, lng: 126.978 }, // 서울시청
+                zoom:
+                    existingLocation &&
+                    existingLocation.latitude !== undefined &&
+                    existingLocation.longitude !== undefined
+                        ? 15
+                        : 12,
                 mapTypeControl: false,
                 streetViewControl: false,
                 fullscreenControl: false,
@@ -80,7 +88,11 @@ export default function LocationSearchModal({
             mapInstanceRef.current = new google.maps.Map(mapRef.current, mapOptions);
 
             // 기존 위치가 있으면 마커 표시
-            if (existingLocation) {
+            if (
+                existingLocation &&
+                existingLocation.latitude !== undefined &&
+                existingLocation.longitude !== undefined
+            ) {
                 addMarker(
                     existingLocation.latitude,
                     existingLocation.longitude,
@@ -89,7 +101,7 @@ export default function LocationSearchModal({
                 setSelectedLocation({
                     nameEn: existingLocation.nameEn,
                     nameKo: existingLocation.nameKo,
-                    address: existingLocation.address,
+                    address: existingLocation.address || "",
                     latitude: existingLocation.latitude,
                     longitude: existingLocation.longitude,
                 });
@@ -98,14 +110,14 @@ export default function LocationSearchModal({
             // 검색 자동완성 설정
             if (searchInputRef.current) {
                 autocompleteRef.current = new google.maps.places.Autocomplete(searchInputRef.current, {
-                    fields: ['place_id', 'name', 'formatted_address', 'geometry'],
+                    fields: ["place_id", "name", "formatted_address", "geometry"],
                 });
 
-                autocompleteRef.current.addListener('place_changed', handlePlaceSelect);
+                autocompleteRef.current.addListener("place_changed", handlePlaceSelect);
             }
 
             // 지도 클릭 이벤트
-            mapInstanceRef.current.addListener('click', (event: google.maps.MapMouseEvent) => {
+            mapInstanceRef.current.addListener("click", (event: google.maps.MapMouseEvent) => {
                 if (event.latLng) {
                     const lat = event.latLng.lat();
                     const lng = event.latLng.lng();
@@ -124,11 +136,11 @@ export default function LocationSearchModal({
 
         // 기존 마커 제거
         if (markerRef.current) {
-            markerRef.current.setMap(null);
+            markerRef.current.map = null;
         }
 
         // 새 마커 생성
-        markerRef.current = new google.maps.Marker({
+        markerRef.current = new google.maps.marker.AdvancedMarkerElement({
             position: { lat, lng },
             map: mapInstanceRef.current,
             title,
@@ -161,22 +173,21 @@ export default function LocationSearchModal({
     const reverseGeocode = (lat: number, lng: number) => {
         const geocoder = new google.maps.Geocoder();
         geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-            if (status === 'OK' && results && results[0]) {
+            if (status === "OK" && results && results[0]) {
                 const result = results[0];
                 const address = result.formatted_address;
                 let name = "";
 
                 // POI 이름 찾기
                 for (const component of result.address_components) {
-                    if (component.types.includes('establishment') || 
-                        component.types.includes('point_of_interest')) {
+                    if (component.types.includes("establishment") || component.types.includes("point_of_interest")) {
                         name = component.long_name;
                         break;
                     }
                 }
 
                 if (!name) {
-                    name = address.split(',')[0]; // 첫 번째 주소 부분을 이름으로 사용
+                    name = address.split(",")[0]; // 첫 번째 주소 부분을 이름으로 사용
                 }
 
                 addMarker(lat, lng, name);
@@ -213,11 +224,7 @@ export default function LocationSearchModal({
             <div className="location-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h3>위치 검색</h3>
-                    <button 
-                        className="modal-close-btn" 
-                        onClick={handleClose}
-                        aria-label="모달 닫기"
-                    >
+                    <button className="modal-close-btn" onClick={handleClose} aria-label="모달 닫기">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <line x1="18" y1="6" x2="6" y2="18" />
                             <line x1="6" y1="6" x2="18" y2="18" />
@@ -261,11 +268,7 @@ export default function LocationSearchModal({
                         <button onClick={handleClose} className="cancel-btn">
                             취소
                         </button>
-                        <button 
-                            onClick={handleConfirm} 
-                            className="confirm-btn"
-                            disabled={!selectedLocation}
-                        >
+                        <button onClick={handleConfirm} className="confirm-btn" disabled={!selectedLocation}>
                             선택
                         </button>
                     </div>
