@@ -497,7 +497,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
      *      - "관련 일정 모두/이 일정 이후" 2개만 보여줌
      *          - 관련 일정 모두 수정인 경우: 관련 일정 모두 삭제 후, 업데이트 DTO -> CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성
      *          - 이 일정 이후 수정인 경우: 이 일정 이후 삭제 후, CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성
-     * - 반복 rule은 수정하지 않았지만, startDate 또는 endDate를 수정한 경우:
+     * - 반복 rule은 수정하지 않았지만, endDate를 수정한 경우:
      *      - "관련 일정 모두/이 일정 이후" 2개만 보여줌
      *          - 관련 일정 모두 수정인 경우: 관련 일정 모두 삭제 후, 업데이트 DTO -> CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성
      *          - 이 일정 이후 수정인 경우: 이 일정 이후 삭제 후, CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성 + 이 이전의 일정의 recurringEventId => null로 변경
