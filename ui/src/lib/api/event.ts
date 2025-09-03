@@ -1,4 +1,4 @@
-import { CreateEventDto, ResponseEventDto, UpdateEventDto } from "../types/event.interface";
+import { CreateEventDto, ResponseEventDto, UpdateEventDto, ResponseRecurringEventDto } from "../types/event.interface";
 import apiClient from "./client";
 
 export const eventApi = {
@@ -24,5 +24,10 @@ export const eventApi = {
 
     deleteRecurringEvents: async (eventId: number): Promise<void> => {
         await apiClient.delete(`api/events/${eventId}/recurring/all`);
+    },
+
+    getRecurringEventById: async (recurringEventId: number): Promise<ResponseRecurringEventDto> => {
+        const response = await apiClient.get(`api/recurring-event/${recurringEventId}`);
+        return response.data;
     },
 };

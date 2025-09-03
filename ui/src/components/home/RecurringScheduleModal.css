@@ -153,6 +153,23 @@
     color: white;
 }
 
+/* End Date Info */
+.end-date-info {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    border-left: 4px solid var(--warning, #f59e0b);
+}
+
+.info-text {
+    font-size: 0.875rem;
+    color: var(--text-2);
+    line-height: 1.4;
+    margin: 0;
+}
+
 .recurring-buttons {
     display: flex;
     gap: 0.75rem;

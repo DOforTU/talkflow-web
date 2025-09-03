@@ -102,6 +102,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
         try {
             let startTime, endTime;
             if (formData.isAllDay) {
+                // 하루 종일
                 startTime = `${formData.startDate} 00:00`;
                 endTime = `${formData.endDate} 23:59`;
             } else {
@@ -264,12 +265,19 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                     <div className="form-group">
                         <label>위치</label>
                         {location ? (
-                            <div className="location-display">
+                            <div className="location-display" onClick={() => setShowLocationModal(true)}>
                                 <div className="location-info">
                                     <span className="location-name">{location.nameKo || location.nameEn}</span>
                                     <span className="location-address">{location.address}</span>
                                 </div>
-                                <button type="button" className="location-remove-btn" onClick={handleLocationRemove}>
+                                <button
+                                    type="button"
+                                    className="location-remove-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLocationRemove();
+                                    }}
+                                >
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <line x1="18" y1="6" x2="6" y2="18" />
                                         <line x1="6" y1="6" x2="18" y2="18" />
@@ -294,11 +302,22 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                     <div className="form-group">
                         <label>반복</label>
                         {recurring ? (
-                            <div className="recurring-display">
+                            <div
+                                className="recurring-display"
+                                onClick={() => setShowRecurringModal(true)}
+                                style={{ cursor: "pointer" }}
+                            >
                                 <div className="recurring-info">
                                     <span className="recurring-rule">{formatRecurringRule(recurring.rule)}</span>
                                 </div>
-                                <button type="button" className="recurring-remove-btn" onClick={handleRecurringRemove}>
+                                <button
+                                    type="button"
+                                    className="recurring-remove-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRecurringRemove();
+                                    }}
+                                >
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                         <line x1="18" y1="6" x2="6" y2="18" />
                                         <line x1="6" y1="6" x2="18" y2="18" />
@@ -335,6 +354,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                 isOpen={showLocationModal}
                 onClose={() => setShowLocationModal(false)}
                 onLocationSelect={handleLocationAdd}
+                existingLocation={location}
             />
 
             <RecurringScheduleModal
@@ -342,7 +362,15 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                 onClose={() => setShowRecurringModal(false)}
                 onApply={handleRecurringApply}
                 selectedDate={selectedDate}
-                existingRecurring={null}
+                existingRecurring={
+                    recurring
+                        ? {
+                              rule: recurring.rule || "",
+                              startDate: recurring.startDate || "",
+                              endDate: recurring.endDate,
+                          }
+                        : null
+                }
             />
         </div>
     );

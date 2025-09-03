@@ -190,6 +190,7 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     background-color: var(--bg-secondary);
+    cursor: pointer;
 }
 
 .location-info {
@@ -401,11 +402,11 @@
         margin: 1rem;
         max-height: calc(100vh - 2rem);
     }
-    
+
     .time-group {
         grid-template-columns: 1fr;
     }
-    
+
     .color-picker {
         justify-content: center;
     }

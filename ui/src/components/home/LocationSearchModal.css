@@ -17,7 +17,7 @@
     background-color: var(--bg-primary);
     border-radius: 12px;
     width: 100%;
-    max-width: 500px;
+    max-width: 700px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--card-shadow-strong);
@@ -69,19 +69,107 @@
     padding: 1.5rem;
 }
 
-/* Placeholder styling */
-.location-modal-placeholder {
-    text-align: center;
-    padding: 2rem;
+/* Search Section */
+.search-section {
+    margin-bottom: 1rem;
 }
 
-.location-modal-placeholder p {
+.location-search-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
     font-size: 1rem;
-    color: var(--text-2);
-    margin-bottom: 1.5rem;
+    background: var(--bg-primary);
+    color: var(--text-1);
+    transition: border-color 0.2s ease;
 }
 
-.placeholder-close-btn {
+.location-search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.search-hint {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.875rem;
+    color: var(--text-3);
+}
+
+/* Map Container */
+.map-container {
+    position: relative;
+    height: 300px;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.google-map {
+    width: 100%;
+    height: 100%;
+}
+
+.map-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-secondary);
+    z-index: 1;
+}
+
+.map-loading p {
+    color: var(--text-2);
+    font-size: 0.875rem;
+}
+
+/* Selected Location */
+.selected-location {
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    margin-bottom: 1rem;
+}
+
+.selected-location h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.location-details .location-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.location-details .location-address {
+    font-size: 0.875rem;
+    color: var(--text-2);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Actions */
+.location-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.location-actions .cancel-btn {
     padding: 0.75rem 1.5rem;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -92,9 +180,29 @@
     transition: all 0.2s ease;
 }
 
-.placeholder-close-btn:hover {
+.location-actions .cancel-btn:hover {
     background: var(--bg-secondary);
     color: var(--text-1);
+}
+
+.location-actions .confirm-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.location-actions .confirm-btn:hover:not(:disabled) {
+    background: var(--primary-hover);
+}
+
+.location-actions .confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Responsive */
@@ -102,5 +210,19 @@
     .location-modal {
         margin: 1rem;
         max-height: calc(100vh - 2rem);
+    }
+    
+    .map-container {
+        height: 250px;
+    }
+    
+    .location-actions {
+        flex-direction: column;
+    }
+    
+    .location-actions .cancel-btn,
+    .location-actions .confirm-btn {
+        width: 100%;
+        justify-content: center;
     }
 }
