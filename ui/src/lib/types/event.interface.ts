@@ -97,5 +97,19 @@ export interface ResponseEventDto {
     // parts of relations
     userId: number;
     location: ResponseLocationDto | null;
-    recurringEvent: ResponseRecurringDto | null;
+    recurringEventId: number | null;
+}
+
+export interface ResponseRecurringEventDto {
+    id: number;
+    userId: number;
+    rule: string;
+    startDate: string;
+    endDate: string | null;
+    title: string;
+    description: string | null;
+    colorCode: string;
+    startTime: string;
+    endTime: string;
+    version: number;
 }

@@ -8,6 +8,7 @@ import {
     CreateRecurringRuleDto,
     ResponseEventDto,
     UpdateEventDto,
+    ResponseRecurringEventDto,
 } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
 import { getLocalDateString } from "@/lib/utils/dateUtils";
@@ -37,6 +38,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
     });
     const [location, setLocation] = useState<UpdateLocationDto | null>(null);
     const [recurring, setRecurring] = useState<UpdateRecurringRuleDto | null>(null);
+    const [recurringEventData, setRecurringEventData] = useState<ResponseRecurringEventDto | null>(null);
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [showRecurringModal, setShowRecurringModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -72,13 +74,24 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                 setLocation(null);
             }
 
-            if (event.recurringEvent) {
-                setRecurring({
-                    rule: event.recurringEvent.rule,
-                    startDate: event.recurringEvent.startDate,
-                    endDate: event.recurringEvent.endDate || undefined, // null을 undefined로 변환
-                });
+            // recurringEventId가 있는 경우에만 반복 일정 데이터 조회
+            if (event.recurringEventId) {
+                eventApi.getRecurringEventById(event.recurringEventId)
+                    .then(data => {
+                        setRecurringEventData(data);
+                        setRecurring({
+                            rule: data.rule,
+                            startDate: data.startDate,
+                            endDate: data.endDate || undefined,
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Failed to fetch recurring event:", error);
+                        setRecurringEventData(null);
+                        setRecurring(null);
+                    });
             } else {
+                setRecurringEventData(null);
                 setRecurring(null);
             }
         }
@@ -207,13 +220,13 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
 
             // recurring 비교
             const hasRecurringChanged = () => {
-                if (!recurring && !event.recurringEvent) return false;
-                if (!recurring || !event.recurringEvent) return true;
+                if (!recurring && !recurringEventData) return false;
+                if (!recurring || !recurringEventData) return true;
 
                 return (
-                    recurring.rule !== event.recurringEvent.rule ||
-                    recurring.startDate !== event.recurringEvent.startDate ||
-                    recurring.endDate !== (event.recurringEvent.endDate || undefined)
+                    recurring.rule !== recurringEventData.rule ||
+                    recurring.startDate !== recurringEventData.startDate ||
+                    recurring.endDate !== (recurringEventData.endDate || undefined)
                 );
             };
 
@@ -518,7 +531,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                 onClose={() => setShowDeleteModal(false)}
                 onDeleteSingle={handleDeleteSingle}
                 onDeleteRecurring={handleDeleteRecurring}
-                isRecurring={!!event?.recurringEvent}
+                isRecurring={!!event?.recurringEventId}
                 eventTitle={event?.title || ""}
             />
         </div>
