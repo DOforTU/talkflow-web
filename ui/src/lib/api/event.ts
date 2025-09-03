@@ -32,6 +32,6 @@ export const eventApi = {
 
     getRecurringEventById: async (recurringEventId: number): Promise<ResponseRecurringEventDto> => {
         const response = await apiClient.get(`api/recurring-event/${recurringEventId}`);
-        return response.data;
+        return response.data.data;
     },
 };

@@ -20,12 +20,58 @@ export const COLOR_OPTIONS = [
  * 반복 규칙을 사용자 친화적인 문자열로 변환
  */
 export const formatRecurringRule = (rrule: string | undefined): string => {
+    console.log('formatRecurringRule - input rrule:', rrule);
     if (!rrule) return "사용자 지정";
-    if (rrule.includes("DAILY")) return "매일";
-    if (rrule.includes("WEEKLY")) return "매주";
-    if (rrule.includes("MONTHLY")) return "매월";
-    if (rrule.includes("YEARLY")) return "매년";
-    return "사용자 지정";
+    
+    // 기본 패턴 확인
+    let basePattern = "";
+    if (rrule.includes("FREQ=DAILY")) {
+        basePattern = "매일";
+    } else if (rrule.includes("FREQ=WEEKLY")) {
+        // BYDAY가 있는지 확인
+        const bydayMatch = rrule.match(/BYDAY=([^;]+)/);
+        if (bydayMatch) {
+            const days = bydayMatch[1].split(',');
+            const dayMap: { [key: string]: string } = {
+                'SU': '일', 'MO': '월', 'TU': '화', 'WE': '수', 
+                'TH': '목', 'FR': '금', 'SA': '토'
+            };
+            
+            // 모든 요일이 포함된 경우 "매일"
+            if (days.length === 7) {
+                basePattern = "매일";
+            } else if (days.length === 1) {
+                // 단일 요일
+                const dayName = dayMap[days[0].trim()];
+                basePattern = `매주 ${dayName}요일`;
+            } else {
+                // 여러 요일
+                const dayNames = days.map(day => dayMap[day.trim()]).join(', ');
+                basePattern = `매주 ${dayNames}요일`;
+            }
+        } else {
+            basePattern = "매주";
+        }
+    } else if (rrule.includes("FREQ=MONTHLY")) {
+        basePattern = "매월";
+    } else if (rrule.includes("FREQ=YEARLY")) {
+        basePattern = "매년";
+    }
+    
+    // 기본 패턴이 없으면 사용자 지정
+    if (!basePattern) return "사용자 지정";
+    
+    // UNTIL 날짜가 있으면 종료일 표시
+    const untilMatch = rrule.match(/UNTIL=(\d{8})/);
+    if (untilMatch) {
+        const untilDateStr = untilMatch[1];
+        const year = untilDateStr.substring(0, 4);
+        const month = untilDateStr.substring(4, 6);
+        const day = untilDateStr.substring(6, 8);
+        return `${basePattern} (${year}.${month}.${day}까지)`;
+    }
+    
+    return basePattern;
 };
 
 /**

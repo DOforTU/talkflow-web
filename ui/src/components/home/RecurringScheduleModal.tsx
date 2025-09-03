@@ -148,10 +148,24 @@ export default function RecurringScheduleModal({
         const startDate = getLocalDateString(selectedDate);
         const rrule = generateRRULE(recurringSettings);
 
+        // endDate가 없으면 자동으로 설정
+        let endDate = recurringSettings.endDate;
+        if (!endDate) {
+            const selectedDateObj = new Date(selectedDate);
+            if (recurringSettings.frequency === 'YEARLY') {
+                // 매년: 5년 후
+                selectedDateObj.setFullYear(selectedDateObj.getFullYear() + 5);
+            } else {
+                // 그 외: 1년 후
+                selectedDateObj.setFullYear(selectedDateObj.getFullYear() + 1);
+            }
+            endDate = getLocalDateString(selectedDateObj);
+        }
+
         const recurringData: CreateRecurringRuleDto = {
             rule: rrule,
             startDate,
-            endDate: recurringSettings.endDate,
+            endDate: endDate,
         };
 
         onApply(recurringData);
