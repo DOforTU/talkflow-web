@@ -8,6 +8,7 @@ interface DeleteEventModalProps {
     onClose: () => void;
     onDeleteSingle: () => void;
     onDeleteRecurring: () => void;
+    onDeleteFromThis: () => void;
     isRecurring: boolean;
     eventTitle: string;
 }
@@ -17,6 +18,7 @@ export default function DeleteEventModal({
     onClose,
     onDeleteSingle,
     onDeleteRecurring,
+    onDeleteFromThis,
     isRecurring,
     eventTitle,
 }: DeleteEventModalProps) {
@@ -37,6 +39,15 @@ export default function DeleteEventModal({
         setIsDeleting(true);
         try {
             await onDeleteRecurring();
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleDeleteFromThis = async () => {
+        setIsDeleting(true);
+        try {
+            await onDeleteFromThis();
         } finally {
             setIsDeleting(false);
         }
@@ -79,6 +90,22 @@ export default function DeleteEventModal({
                                     <div className="delete-option-text">
                                         <h3>이 일정만 삭제</h3>
                                         <p>선택한 날짜의 일정만 삭제합니다</p>
+                                    </div>
+                                </button>
+
+                                <button
+                                    className="delete-option-btn delete-from-this"
+                                    onClick={handleDeleteFromThis}
+                                    disabled={isDeleting}
+                                >
+                                    <div className="delete-option-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                        </svg>
+                                    </div>
+                                    <div className="delete-option-text">
+                                        <h3>이 일정 이후 모두 삭제</h3>
+                                        <p>선택한 일정부터 이후의 모든 반복 일정을 삭제합니다</p>
                                     </div>
                                 </button>
 

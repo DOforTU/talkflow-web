@@ -26,6 +26,10 @@ export const eventApi = {
         await apiClient.delete(`api/events/${eventId}/recurring/all`);
     },
 
+    deleteEventsFromThis: async (eventId: number): Promise<void> => {
+        await apiClient.delete(`api/events/${eventId}/recurring/from-this`);
+    },
+
     getRecurringEventById: async (recurringEventId: number): Promise<ResponseRecurringEventDto> => {
         const response = await apiClient.get(`api/recurring-event/${recurringEventId}`);
         return response.data;

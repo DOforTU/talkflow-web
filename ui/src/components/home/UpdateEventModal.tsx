@@ -279,6 +279,19 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         }
     };
 
+    const handleDeleteFromThis = async () => {
+        if (!event) return;
+
+        try {
+            await eventApi.deleteEventsFromThis(event.id);
+            onEventUpdated();
+            setShowDeleteModal(false);
+            handleClose();
+        } catch (error) {
+            console.error("Failed to delete events from this:", error);
+        }
+    };
+
     const handleClose = () => {
         const today = getLocalDateString(new Date());
         setFormData({
@@ -540,6 +553,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                 onClose={() => setShowDeleteModal(false)}
                 onDeleteSingle={handleDeleteSingle}
                 onDeleteRecurring={handleDeleteRecurring}
+                onDeleteFromThis={handleDeleteFromThis}
                 isRecurring={!!event?.recurringEventId}
                 eventTitle={event?.title || ""}
             />
