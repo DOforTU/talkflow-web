@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
 import { ResponseEventDto } from "@/lib/types/event.interface";
-import { getEventsForDate } from "@/lib/utils/eventUtils";
+import { getEventsForDateIncludingMultiDay, getMultiDayEventPosition, isMultiDayEvent } from "@/lib/utils/eventUtils";
 import { getDaysInMonth, getFirstDayOfMonth, formatMonth, isSelected, getDayNames } from "@/lib/utils/calendarUtils";
 import { isTodayInMonth } from "@/lib/utils/dateUtils";
 
@@ -113,7 +113,7 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
                 {/* 날짜 */}
                 {calendarDays.map((dateInfo, index) => {
                     const dayOfWeek = index % 7; // 0=일요일, 1=월요일, ...
-                    const dayEvents = getEventsForDate(events, dateInfo.date);
+                    const dayEvents = getEventsForDateIncludingMultiDay(events, dateInfo.date);
                     const hasEvents = dayEvents.length > 0;
 
                     return (
@@ -129,18 +129,39 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
                             <div className="calendar-day-number">{dateInfo.day}</div>
                             {hasEvents && (
                                 <div className="calendar-day-events">
-                                    {dayEvents.slice(0, 3).map((event, eventIndex) => (
-                                        <div
-                                            key={eventIndex}
-                                            className="calendar-event"
-                                            style={{ backgroundColor: event.colorCode }}
-                                            title={event.title}
-                                        >
-                                            {event.title.length > 10
-                                                ? event.title.substring(0, 10) + "..."
-                                                : event.title}
-                                        </div>
-                                    ))}
+                                    {dayEvents.slice(0, 3).map((event, eventIndex) => {
+                                        const position = getMultiDayEventPosition(event, dateInfo.date);
+                                        const isMultiDay = isMultiDayEvent(event.startTime, event.endTime);
+                                        
+                                        let eventTitle = event.title;
+                                        let eventClassName = "calendar-event";
+                                        
+                                        if (isMultiDay) {
+                                            if (position.isStart) {
+                                                eventClassName += " multi-day-start";
+                                                eventTitle = event.title.length > 8 ? event.title.substring(0, 8) + "..." : event.title;
+                                            } else if (position.isEnd) {
+                                                eventClassName += " multi-day-end";
+                                                eventTitle = "..." + (event.title.length > 6 ? event.title.substring(event.title.length - 6) : event.title);
+                                            } else if (position.isContinuation) {
+                                                eventClassName += " multi-day-continuation";
+                                                eventTitle = "...";
+                                            }
+                                        } else {
+                                            eventTitle = event.title.length > 10 ? event.title.substring(0, 10) + "..." : event.title;
+                                        }
+
+                                        return (
+                                            <div
+                                                key={eventIndex}
+                                                className={eventClassName}
+                                                style={{ backgroundColor: event.colorCode }}
+                                                title={event.title}
+                                            >
+                                                {eventTitle}
+                                            </div>
+                                        );
+                                    })}
                                     {dayEvents.length > 3 && (
                                         <div className="calendar-event-more">+{dayEvents.length - 3}</div>
                                     )}

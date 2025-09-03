@@ -18,6 +18,10 @@ export const eventApi = {
         return response.data.data;
     },
 
+    updateRecurringEvents: async (eventId: number, eventData: UpdateEventDto): Promise<void> => {
+        await apiClient.patch(`api/events/${eventId}/recurring/all`, eventData);
+    },
+
     deleteSingleEvent: async (eventId: number): Promise<void> => {
         await apiClient.delete(`api/events/${eventId}`);
     },
@@ -33,5 +37,16 @@ export const eventApi = {
     getRecurringEventById: async (recurringEventId: number): Promise<ResponseRecurringEventDto> => {
         const response = await apiClient.get(`api/recurring-event/${recurringEventId}`);
         return response.data.data;
+    },
+
+    smartUpdate: async (
+        eventId: number,
+        updateEventDto: UpdateEventDto,
+        updateType: 'single' | 'recurring' | 'from-this'
+    ): Promise<void> => {
+        await apiClient.patch(`api/events/${eventId}/smart-update`, {
+            updateEventDto,
+            updateType,
+        });
     },
 };

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
 import { eventApi } from "@/lib/api/event";
-import { getSelectedDateEvents, calculateDistance, formatDistance } from "@/lib/utils/eventUtils";
+import { getSelectedDateEvents, calculateDistance, formatDistance, getEventsForDateIncludingMultiDay, sortEventsByTime } from "@/lib/utils/eventUtils";
 import Calendar from "../../../components/home/Calendar";
 import MapModal from "../../../components/home/MapModal";
 import CreateEventModal from "../../../components/home/CreateEventModal";
@@ -26,7 +26,9 @@ export default function HomePage() {
 
     // 이벤트 데이터 로드
     useEffect(() => {
+        console.log("useEffect 실행됨");
         const loadEvents = async () => {
+            console.log("loadEvents 호출됨");
             try {
                 setIsLoading(true);
                 const fetchedEvents = await eventApi.getMyEvents();
@@ -41,8 +43,9 @@ export default function HomePage() {
         loadEvents();
     }, []);
 
-    // 선택된 날짜의 이벤트 가져기기
-    const selectedDateEvents = getSelectedDateEvents(events, selectedDate);
+    // 선택된 날짜의 이벤트 가져기기 (다중일 이벤트 포함)
+    const filteredEvents = getEventsForDateIncludingMultiDay(events, selectedDate);
+    const selectedDateEvents = sortEventsByTime(filteredEvents);
 
     // 날짜 선택 핸들러
     const handleDateSelect = (date: Date) => {

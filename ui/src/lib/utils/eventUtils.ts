@@ -63,3 +63,75 @@ export const formatDistance = (distance: number): string => {
         return `${Math.round(distance)}m`;
     }
 };
+
+/**
+ * 이벤트가 여러 날에 걸쳐있는지 확인
+ * @param startTime "YYYY-MM-DD HH:mm" 형식의 시작 시간
+ * @param endTime "YYYY-MM-DD HH:mm" 형식의 종료 시간
+ * @returns 여러 날에 걸쳐있으면 true
+ */
+export const isMultiDayEvent = (startTime: string, endTime: string): boolean => {
+    if (!endTime) return false;
+    const startDate = startTime.split(" ")[0];
+    const endDate = endTime.split(" ")[0];
+    return startDate !== endDate;
+};
+
+/**
+ * 이벤트가 특정 날짜에 속하는지 확인 (다중일 이벤트 포함)
+ * @param event 이벤트 객체
+ * @param targetDate 확인할 날짜
+ * @returns 해당 날짜에 이벤트가 있으면 true
+ */
+export const isEventOnDateIncludingMultiDay = (event: ResponseEventDto, targetDate: Date): boolean => {
+    // endTime이 없으면 기존 로직 사용
+    if (!event.endTime) {
+        return isEventOnDate(event.startTime, targetDate);
+    }
+    
+    const startDate = new Date(event.startTime.replace(" ", "T"));
+    const endDate = new Date(event.endTime.replace(" ", "T"));
+    const target = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    
+    const eventStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const eventEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    
+    return target >= eventStartDate && target <= eventEndDate;
+};
+
+/**
+ * 특정 날짜의 이벤트들을 필터링 (다중일 이벤트 포함)
+ */
+export const getEventsForDateIncludingMultiDay = (events: ResponseEventDto[], targetDate: Date): ResponseEventDto[] => {
+    return events.filter((event) => isEventOnDateIncludingMultiDay(event, targetDate));
+};
+
+/**
+ * 이벤트가 특정 날짜에서 시작하는지 확인
+ */
+export const isEventStartOnDate = (event: ResponseEventDto, targetDate: Date): boolean => {
+    return isEventOnDate(event.startTime, targetDate);
+};
+
+/**
+ * 이벤트가 특정 날짜에서 종료하는지 확인
+ */
+export const isEventEndOnDate = (event: ResponseEventDto, targetDate: Date): boolean => {
+    if (!event.endTime) return false;
+    return isEventOnDate(event.endTime, targetDate);
+};
+
+/**
+ * 다중일 이벤트의 표시 위치 정보 가져오기
+ */
+export const getMultiDayEventPosition = (event: ResponseEventDto, targetDate: Date): {
+    isStart: boolean;
+    isEnd: boolean;
+    isContinuation: boolean;
+} => {
+    const isStart = isEventStartOnDate(event, targetDate);
+    const isEnd = isEventEndOnDate(event, targetDate);
+    const isContinuation = !isStart && !isEnd && isEventOnDateIncludingMultiDay(event, targetDate);
+    
+    return { isStart, isEnd, isContinuation };
+};

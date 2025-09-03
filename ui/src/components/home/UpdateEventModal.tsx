@@ -16,6 +16,7 @@ import { COLOR_OPTIONS, formatRecurringRule } from "@/lib/utils/eventFormUtils";
 import RecurringScheduleModal from "./RecurringScheduleModal";
 import LocationSearchModal from "./LocationSearchModal";
 import DeleteEventModal from "./DeleteEventModal";
+import UpdateOptionsModal from "./UpdateOptionsModal";
 import "./UpdateEventModal.css";
 
 interface UpdateEventModalProps {
@@ -42,6 +43,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [showRecurringModal, setShowRecurringModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showUpdateOptionsModal, setShowUpdateOptionsModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -159,6 +161,67 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
 
         if (!formData.title.trim() || !event) return;
 
+        const wasRecurring = !!event.recurringEventId;
+        const willBeRecurring = !!recurring;
+
+        // Case 1: 단일 → 단일 - 바로 업데이트
+        if (!wasRecurring && !willBeRecurring) {
+            await performSmartUpdate("single");
+            return;
+        }
+
+        // Case 2: 단일 → 반복 - 바로 업데이트
+        if (!wasRecurring && willBeRecurring) {
+            await performSmartUpdate("single"); // 삭제 후 생성
+            return;
+        }
+
+        // Case 3: 반복 → 단일 - 바로 업데이트
+        if (wasRecurring && !willBeRecurring) {
+            await performSmartUpdate("single"); // 삭제 후 생성
+            return;
+        }
+
+        // Case 4,5: 반복 → 반복 - 조건에 따라 옵션 표시
+        if (wasRecurring && willBeRecurring) {
+            // 반복 rule이나 날짜가 변경된 경우: 2개 옵션만 ("관련 일정 모두", "이 일정 이후")
+            if (hasRecurringChanged()) {
+                setShowUpdateOptionsModal(true);
+                return;
+            }
+
+            // 반복 설정은 그대로이고 event 정보만 변경: 3개 옵션 모두 ("이 일정만", "관련 일정 모두", "이 일정 이후")
+            setShowUpdateOptionsModal(true);
+            return;
+        }
+    };
+
+    // recurring 데이터가 변경되었는지 확인
+    const hasRecurringChanged = () => {
+        if (!recurring && !recurringEventData) return false;
+        if (!recurring || !recurringEventData) return true;
+
+        return (
+            recurring.rule !== recurringEventData.rule ||
+            recurring.startDate !== recurringEventData.startDate ||
+            recurring.endDate !== (recurringEventData.endDate || undefined)
+        );
+    };
+
+    // "이 일정만 수정" 옵션을 보여줄지 결정
+    const getShowSingleOption = () => {
+        if (!event?.recurringEventId || !recurring) return false;
+
+        // 반복 → 반복이면서, 반복 설정이 변경되지 않은 경우에만 "이 일정만" 옵션 표시
+        const wasRecurring = !!event.recurringEventId;
+        const willBeRecurring = !!recurring;
+
+        return wasRecurring && willBeRecurring && !hasRecurringChanged();
+    };
+
+    const performUpdate = async (isRecurring: boolean) => {
+        if (!event) return;
+
         setIsSubmitting(true);
 
         try {
@@ -237,13 +300,114 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
 
             // 변경사항이 있을 때만 API 호출
             if (Object.keys(updateEventDto).length > 0) {
-                await eventApi.updateEvent(event.id, updateEventDto);
+                if (isRecurring) {
+                    await eventApi.updateRecurringEvents(event.id, updateEventDto);
+                } else {
+                    await eventApi.updateEvent(event.id, updateEventDto);
+                }
                 onEventUpdated();
             }
 
             handleClose();
         } catch (error) {
             console.error("Failed to update event:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleUpdateSingle = async () => {
+        setShowUpdateOptionsModal(false);
+        await performSmartUpdate("single");
+    };
+
+    const handleUpdateRecurring = async () => {
+        setShowUpdateOptionsModal(false);
+        await performSmartUpdate("recurring");
+    };
+
+    const handleUpdateFromThis = async () => {
+        setShowUpdateOptionsModal(false);
+        await performSmartUpdate("from-this");
+    };
+
+    const performSmartUpdate = async (updateType: "single" | "recurring" | "from-this") => {
+        if (!event) return;
+
+        setIsSubmitting(true);
+
+        try {
+            let startTime, endTime;
+            if (formData.isAllDay) {
+                startTime = `${formData.startDate} 00:00`;
+                endTime = `${formData.endDate} 23:59`;
+            } else {
+                startTime = `${formData.startDate} ${formData.startTime}`;
+                endTime = `${formData.endDate} ${formData.endTime}`;
+            }
+
+            // 변경된 필드만 포함하여 UpdateEventDto 생성
+            const updateEventDto: UpdateEventDto = {};
+
+            // 기본 필드 비교 및 추가
+            if (formData.title.trim() !== event.title) {
+                updateEventDto.title = formData.title.trim();
+            }
+
+            const newDescription = formData.description.trim() || undefined;
+            const oldDescription = event.description || undefined;
+            if (newDescription !== oldDescription) {
+                updateEventDto.description = newDescription;
+            }
+
+            if (startTime !== event.startTime) {
+                updateEventDto.startTime = startTime;
+            }
+
+            if (endTime !== event.endTime) {
+                updateEventDto.endTime = endTime;
+            }
+
+            if (formData.isAllDay !== event.isAllDay) {
+                updateEventDto.isAllDay = formData.isAllDay;
+            }
+
+            if (formData.colorCode !== event.colorCode) {
+                updateEventDto.colorCode = formData.colorCode;
+            }
+
+            // location 비교 (깊은 비교 필요)
+            const hasLocationChanged = () => {
+                if (!location && !event.location) return false;
+                if (!location || !event.location) return true;
+
+                return (
+                    location.nameEn !== (event.location.nameEn || undefined) ||
+                    location.nameKo !== (event.location.nameKo || undefined) ||
+                    location.address !== event.location.address ||
+                    location.latitude !== event.location.latitude ||
+                    location.longitude !== event.location.longitude
+                );
+            };
+
+            if (hasLocationChanged()) {
+                updateEventDto.location = location || undefined;
+            }
+
+            // recurring 비교
+            if (hasRecurringChanged()) {
+                updateEventDto.recurring = recurring || undefined;
+            }
+
+            // 변경사항이 있을 때만 API 호출
+            if (Object.keys(updateEventDto).length > 0) {
+                await eventApi.smartUpdate(event.id, updateEventDto, updateType);
+                onEventUpdated();
+            }
+
+            handleClose();
+        } catch (error) {
+            console.error("Failed to smart update event:", error);
         } finally {
             setIsSubmitting(false);
         }
@@ -310,6 +474,34 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
     };
 
     if (!isOpen || !event) return null;
+
+    /**
+     * 기존에 단일 일정이었고, 업데이트도 단일 일정인경우(기존 데이터 반복 일정 NULL, 업데이트 DTO 반복 undefined인 경우)
+     * - "이 일정만/관련 일정 모두/이 일정 이후" 보여주지 않고, 바로 updateSingleEvent 호출
+     *
+     * 기존에 단일 일정이었고, 업데이트는 반복 일정인 경우(기존 데이터 반복 일정 NULL, 업데이트 DTO 반복 존재하는 경우)
+     * - "이 일정만/관련 일정 모두/이 일정 이후" 보여주지 않고 바로 업데이트: 기존 일정 삭제 후, 업데이트 DTO -> CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성
+     *
+     * 기존에 반복 일정이었고, 업데이트는 단일 일정인 경우
+     * - "이 일정만/관련 일정 모두/이 일정 이후" 보여주지 않고 바로 업데이트: 기존 반복 일정 모두 삭제 후, 업데이트 DTO -> CreateEventDto 타입으로 변환 후 새로운 단일 일정 생성
+     *
+     * 기존에 반복 일정이었고, 업데이트도 반복 일정인 경우(기존 데이터 반복 일정 존재, 업데이트 DTO 반복 존재하는 경우)
+     * - 반복 이벤트를 아예 수정하지 않은 경우(= event 정보만 수정한 경우):
+     *      - "이 일정만/관련 일정 모두/이 일정 이후" 모두 보여줌
+     *          - 이 일정만 수정인 경우: updateSingleEvent 호출, recurringEventId => null로 변경(단일 이벤트 취급)
+     *          - 관련 일정 모두 수정인 경우: updateManyEventsByRecurringEventId 호출
+     *              - updateManyEventsByRecurringEventId: 파라미터로 받은 recurringEventId를 가진 모든 일정 수정
+     *                      반복 패턴은 수정이 아니므로 삭제후 생성보다 업데이트가 좋을듯...
+     *          - 이 일정 이후 수정인 경우: 이 일정 이후 삭제 후, CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성
+     * - 반복 rule을 수정한 경우:
+     *      - "관련 일정 모두/이 일정 이후" 2개만 보여줌
+     *          - 관련 일정 모두 수정인 경우: 관련 일정 모두 삭제 후, 업데이트 DTO -> CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성
+     *          - 이 일정 이후 수정인 경우: 이 일정 이후 삭제 후, CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성
+     * - 반복 rule은 수정하지 않았지만, startDate 또는 endDate를 수정한 경우:
+     *      - "관련 일정 모두/이 일정 이후" 2개만 보여줌
+     *          - 관련 일정 모두 수정인 경우: 관련 일정 모두 삭제 후, 업데이트 DTO -> CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성
+     *          - 이 일정 이후 수정인 경우: 이 일정 이후 삭제 후, CreateEventDto 타입으로 변환 후 새로운 반복 일정 생성 + 이 이전의 일정의 recurringEventId => null로 변경
+     */
 
     return (
         <div className="update-event-modal-overlay" onClick={handleClose}>
@@ -556,6 +748,17 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                 onDeleteFromThis={handleDeleteFromThis}
                 isRecurring={!!event?.recurringEventId}
                 eventTitle={event?.title || ""}
+            />
+
+            <UpdateOptionsModal
+                isOpen={showUpdateOptionsModal}
+                onClose={() => setShowUpdateOptionsModal(false)}
+                onUpdateSingle={handleUpdateSingle}
+                onUpdateRecurring={handleUpdateRecurring}
+                onUpdateFromThis={handleUpdateFromThis}
+                isRecurring={!!event?.recurringEventId}
+                eventTitle={event?.title || ""}
+                showSingleOption={getShowSingleOption()}
             />
         </div>
     );

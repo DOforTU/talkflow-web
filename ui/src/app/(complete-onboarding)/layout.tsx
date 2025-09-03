@@ -6,7 +6,6 @@ import { useAuthStore } from "@/store/authStore";
 import { useCurrentUser } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
-import SmartHeader from "@/components/headers/SmartHeader";
 
 export default function ProtectedLayout({
     children,
