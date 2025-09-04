@@ -38,15 +38,4 @@ export const eventApi = {
         const response = await apiClient.get(`api/recurring-event/${recurringEventId}`);
         return response.data.data;
     },
-
-    smartUpdate: async (
-        eventId: number,
-        updateEventDto: UpdateEventDto,
-        updateType: 'single' | 'recurring' | 'from-this'
-    ): Promise<void> => {
-        await apiClient.patch(`api/events/${eventId}/smart-update`, {
-            updateEventDto,
-            updateType,
-        });
-    },
 };

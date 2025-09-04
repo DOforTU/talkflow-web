@@ -1,3 +1,11 @@
+// ===== Component Props =====
+export interface UpdateEventModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onEventUpdated: () => void;
+    event: ResponseEventDto | null;
+}
+
 // ===== Create Event DTO =====
 export interface CreateEventDto {
     title: string;
@@ -98,6 +106,7 @@ export interface ResponseEventDto {
     userId: number;
     location: ResponseLocationDto | null;
     recurringEventId: number | null;
+    recurringEventData?: ResponseRecurringEventDto | null;
 }
 
 export interface ResponseRecurringEventDto {
