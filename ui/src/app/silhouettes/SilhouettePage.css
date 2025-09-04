@@ -1,13 +1,116 @@
 /* Silhouette Page - YouTube Shorts Style */
 
 .silhouette-page {
-    min-height: 100vh;
     max-width: 480px;
     margin: 0 auto;
     background-color: var(--bg-primary);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+
+/* Header with Search and Upload */
+.silhouette-header {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    margin-left: 120px;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: transparent;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.search-upload-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.search-section {
+    flex: 1;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-right: 3rem;
+    border: none;
+    border-radius: 25px;
+    border: 2px solid var(--text-3);
+    background-color: rgba(25, 25, 25, 0.2);
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+    color: var(--bg-secondary);
+}
+
+.search-input:focus {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.search-btn {
+    position: absolute;
+    right: 0.5rem;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.search-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+.upload-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 25px;
+    background: var(--text-1);
+    color: var(--bg-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.upload-btn:hover {
+    background: var(--primary-light);
+}
+
+.upload-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
 }
 
 .silhouette-page::-webkit-scrollbar {
@@ -17,6 +120,16 @@
 .silhouette-page {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Hide all scrollbars */
+* {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+    display: none;
 }
 
 .silhouette-container {
@@ -38,7 +151,7 @@
 /* Slides Container - Smooth vertical sliding */
 .slides-wrapper {
     position: relative;
-    width: 99%;
+    width: 100%;
     height: 94vh;
     will-change: transform;
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -49,7 +162,6 @@
     width: 100%;
     height: 94vh;
     border-radius: 20px;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
     margin: 0;
     flex-shrink: 0;
 }
@@ -63,7 +175,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 20px;
+    border-radius: 12px;
 }
 
 .silhouette-video,
@@ -73,6 +185,7 @@
     width: auto;
     height: auto;
     object-fit: contain;
+    border-radius: 12px;
 }
 
 .silhouette-video {
@@ -389,8 +502,8 @@
 .video-seek-bar {
     position: absolute;
     bottom: 0;
-    left: 16px;
-    right: 16px;
+    left: 1rem;
+    right: 1rem;
     z-index: 25;
     height: 4px;
     background: var(--text-3);
@@ -473,6 +586,55 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+    .silhouette-page-safe-area-top {
+        height: 44px;
+    }
+    .silhouette-page-safe-area-bottom {
+        height: 56px;
+    }
+    .silhouette-header {
+        left: 0;
+        transform: none;
+        max-width: 100%;
+        padding: 0.75rem;
+        margin-left: 0;
+    }
+
+    .search-upload-container {
+        gap: 0.75rem;
+    }
+
+    .search-input {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.85rem;
+        padding-right: 2.5rem;
+    }
+
+    .search-btn {
+        width: 28px;
+        height: 28px;
+        right: 0.4rem;
+    }
+
+    .search-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .upload-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .upload-btn span {
+        display: none; /* Hide text on mobile */
+    }
+
+    .upload-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
     .silhouette-container {
         height: 100vh;
         padding: 0;
@@ -484,11 +646,7 @@
     }
 
     .slide {
-        border-radius: 0;
-    }
-
-    .silhouette-video-container {
-        height: 100%;
+        height: calc(100vh - 80px);
         border-radius: 0;
     }
 
@@ -499,10 +657,15 @@
     }
 
     .silhouette-overlay {
-        bottom: 5rem;
         left: 1rem;
         right: 1rem;
         padding: 1rem;
+    }
+
+    .video-seek-bar {
+        bottom: 0.5rem;
+        left: 0rem;
+        right: 0rem;
     }
 
     .silhouette-loading,
@@ -522,14 +685,6 @@
 
     .user-nickname {
         font-size: 0.85rem;
-    }
-
-    .silhouette-title {
-        font-size: 0.9rem;
-    }
-
-    .silhouette-description {
-        font-size: 0.8rem;
     }
 
     .action-btn {
