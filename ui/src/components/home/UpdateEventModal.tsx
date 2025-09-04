@@ -169,6 +169,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                     onSubmit={handleSubmit}
                     onClose={onClose}
                     isSubmitting={isSubmitting}
+                    mode="update"
                 />
             </div>
 
