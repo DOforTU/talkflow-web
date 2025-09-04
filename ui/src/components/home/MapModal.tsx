@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Script from "next/script";
 import "./MapModal.css";
 import { ResponseEventDto } from "@/lib/types/event.interface";
 
@@ -17,8 +16,50 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
     const [searchValue, setSearchValue] = useState("");
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<google.maps.Map | null>(null);
-    const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+    const markersRef = useRef<google.maps.Marker[]>([]);
     const polylineRef = useRef<google.maps.Polyline | null>(null);
+
+    // Google Maps API가 이미 로드되었는지 확인
+    const checkGoogleMapsLoaded = () => {
+        return typeof window !== "undefined" && window.google && window.google.maps;
+    };
+
+    // Google Maps API 동적 로드 함수
+    const loadGoogleMapsAPI = (): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            // 이미 로드된 경우
+            if (checkGoogleMapsLoaded()) {
+                resolve();
+                return;
+            }
+
+            // 이미 로딩 중인 경우 (script 태그가 존재하는 경우)
+            const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+            if (existingScript) {
+                existingScript.addEventListener("load", () => resolve());
+                existingScript.addEventListener("error", reject);
+                return;
+            }
+
+            // 새로 로드
+            const script = document.createElement("script");
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
+            script.async = true;
+            script.defer = true;
+
+            script.onload = () => {
+                console.log("Google Maps API loaded successfully");
+                resolve();
+            };
+
+            script.onerror = (e) => {
+                console.error("Google Maps API failed to load", e);
+                reject(e);
+            };
+
+            document.head.appendChild(script);
+        });
+    };
 
     // 선택된 날짜의 이벤트 가져기기
     const getSelectedDateEvents = () => {
@@ -61,7 +102,6 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                 streetViewControl: false,
                 fullscreenControl: false,
                 zoomControl: false,
-                mapId: "DEMO_MAP_ID",
             });
             mapInstanceRef.current = map;
             console.log("Map initialized with default location");
@@ -78,7 +118,6 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
             streetViewControl: false,
             fullscreenControl: false,
             zoomControl: false,
-            mapId: "DEMO_MAP_ID",
         });
 
         mapInstanceRef.current = map;
@@ -90,7 +129,10 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
     const addMarkersAndRoute = (eventsWithLocation: ResponseEventDto[]) => {
         if (!mapInstanceRef.current) return;
 
-        markersRef.current.forEach((marker) => (marker.map = null));
+        // 기존 마커 제거
+        markersRef.current.forEach((marker) => {
+            marker.setMap(null);
+        });
         markersRef.current = [];
 
         if (polylineRef.current) {
@@ -99,34 +141,34 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
 
         const path: google.maps.LatLng[] = [];
 
+        console.log("Adding markers for events:", eventsWithLocation);
+
         eventsWithLocation.forEach((event, index) => {
             const location = event.location!;
             const position = { lat: location.latitude, lng: location.longitude };
 
+            console.log(`Creating marker ${index + 1} at position:`, position);
+
             path.push(new google.maps.LatLng(location.latitude, location.longitude));
 
-            const markerElement = document.createElement("div");
-            markerElement.style.cssText = `
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background-color: ${event.colorCode};
-                border: 3px solid white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            `;
-            markerElement.textContent = (index + 1).toString();
-
-            const marker = new google.maps.marker.AdvancedMarkerElement({
+            // 일반 Marker 사용 (더 호환성이 좋음)
+            const marker = new google.maps.Marker({
                 position: position,
                 map: mapInstanceRef.current,
                 title: event.title,
-                content: markerElement,
+                label: {
+                    text: (index + 1).toString(),
+                    color: "white",
+                    fontWeight: "bold",
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: event.colorCode || "#4F46E5",
+                    fillOpacity: 1,
+                    strokeColor: "white",
+                    strokeWeight: 3,
+                    scale: 20,
+                },
             });
 
             const infoWindow = new google.maps.InfoWindow({
@@ -148,10 +190,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
             });
 
             marker.addListener("click", () => {
-                infoWindow.open({
-                    anchor: marker,
-                    map: mapInstanceRef.current,
-                });
+                infoWindow.open(mapInstanceRef.current!, marker);
             });
 
             markersRef.current.push(marker);
@@ -192,28 +231,23 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                     mapInstanceRef.current?.setCenter(place.geometry.location);
                     mapInstanceRef.current?.setZoom(15);
 
-                    const searchMarkerElement = document.createElement("div");
-                    searchMarkerElement.style.cssText = `
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        background-color: #EF4444;
-                        border: 3px solid white;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-weight: bold;
-                        font-size: 16px;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                    `;
-                    searchMarkerElement.textContent = "🔍";
-
-                    const marker = new google.maps.marker.AdvancedMarkerElement({
+                    // 검색 마커도 일반 Marker 사용
+                    const marker = new google.maps.Marker({
                         position: place.geometry.location,
                         map: mapInstanceRef.current,
                         title: place.name,
-                        content: searchMarkerElement,
+                        label: {
+                            text: "🔍",
+                            color: "white",
+                        },
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillColor: "#EF4444",
+                            fillOpacity: 1,
+                            strokeColor: "white",
+                            strokeWeight: 3,
+                            scale: 25,
+                        },
                     });
 
                     const infoWindow = new google.maps.InfoWindow({
@@ -221,10 +255,7 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
                     });
 
                     marker.addListener("click", () => {
-                        infoWindow.open({
-                            anchor: marker,
-                            map: mapInstanceRef.current,
-                        });
+                        infoWindow.open(mapInstanceRef.current!, marker);
                     });
 
                     markersRef.current.push(marker);
@@ -246,6 +277,22 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
             return () => clearTimeout(timer);
         }
     }, [isGoogleMapsLoaded, isOpen, selectedDate]);
+
+    // 컴포넌트 마운트 시 Google Maps API 로드
+    useEffect(() => {
+        if (checkGoogleMapsLoaded()) {
+            console.log("Google Maps API already loaded");
+            setIsGoogleMapsLoaded(true);
+        } else {
+            loadGoogleMapsAPI()
+                .then(() => {
+                    setIsGoogleMapsLoaded(true);
+                })
+                .catch((error) => {
+                    console.error("Failed to load Google Maps API:", error);
+                });
+        }
+    }, []);
 
     // 모달이 열릴 때 지도 리사이즈
     useEffect(() => {
@@ -279,18 +326,6 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
 
     return (
         <div className="map-modal-container">
-            <Script
-                src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,marker`}
-                onLoad={() => {
-                    console.log("Google Maps API loaded successfully");
-                    setIsGoogleMapsLoaded(true);
-                }}
-                onError={(e) => {
-                    console.error("Google Maps API failed to load", e);
-                    console.log("API Key:", process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
-                }}
-                strategy="afterInteractive"
-            />
             <div className="map-modal-overlay" onClick={onClose}>
                 <div className="map-modal" onClick={(e) => e.stopPropagation()}>
                     {/* Close Button - Top Left */}
