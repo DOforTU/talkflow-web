@@ -12,6 +12,8 @@ interface UpdateOptionsModalProps {
     isRecurring: boolean;
     eventTitle: string;
     showSingleOption: boolean;
+    showRecurringOption?: boolean;
+    showFromThisOption?: boolean;
 }
 
 export default function UpdateOptionsModal({
@@ -23,6 +25,8 @@ export default function UpdateOptionsModal({
     isRecurring,
     eventTitle,
     showSingleOption,
+    showRecurringOption = true,
+    showFromThisOption = true,
 }: UpdateOptionsModalProps) {
     const [isUpdating, setIsUpdating] = useState(false);
 
@@ -96,38 +100,42 @@ export default function UpdateOptionsModal({
                                     </button>
                                 )}
 
-                                <button
-                                    className="update-option-btn update-from-this"
-                                    onClick={handleUpdateFromThis}
-                                    disabled={isUpdating}
-                                >
-                                    <div className="update-option-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                                        </svg>
-                                    </div>
-                                    <div className="update-option-text">
-                                        <h3>이 일정 이후 모두 수정</h3>
-                                        <p>선택한 일정부터 이후의 모든 반복 일정을 수정합니다</p>
-                                    </div>
-                                </button>
+                                {showFromThisOption && (
+                                    <button
+                                        className="update-option-btn update-from-this"
+                                        onClick={handleUpdateFromThis}
+                                        disabled={isUpdating}
+                                    >
+                                        <div className="update-option-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                            </svg>
+                                        </div>
+                                        <div className="update-option-text">
+                                            <h3>이 일정 이후 모두 수정</h3>
+                                            <p>선택한 일정부터 이후의 모든 반복 일정을 수정합니다</p>
+                                        </div>
+                                    </button>
+                                )}
 
-                                <button
-                                    className="update-option-btn update-all"
-                                    onClick={handleUpdateRecurring}
-                                    disabled={isUpdating}
-                                >
-                                    <div className="update-option-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path d="M4 12h8l-3-3m6 6h8l-3-3" />
-                                            <path d="M4 6h16M4 18h16" />
-                                        </svg>
-                                    </div>
-                                    <div className="update-option-text">
-                                        <h3>모든 반복 일정 수정</h3>
-                                        <p>관련된 모든 반복 일정을 수정합니다</p>
-                                    </div>
-                                </button>
+                                {showRecurringOption && (
+                                    <button
+                                        className="update-option-btn update-all"
+                                        onClick={handleUpdateRecurring}
+                                        disabled={isUpdating}
+                                    >
+                                        <div className="update-option-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path d="M4 12h8l-3-3m6 6h8l-3-3" />
+                                                <path d="M4 6h16M4 18h16" />
+                                            </svg>
+                                        </div>
+                                        <div className="update-option-text">
+                                            <h3>모든 반복 일정 수정</h3>
+                                            <p>관련된 모든 반복 일정을 수정합니다</p>
+                                        </div>
+                                    </button>
+                                )}
                             </div>
                         </>
                     ) : (

@@ -30,17 +30,37 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         hasRecurringChanged,
     } = useUpdateEventForm({ event, isOpen });
 
-    const { handleSubmit, handleUpdateSingle, handleUpdateRecurring, handleUpdateFromThis, isSubmitting } =
-        useEventUpdateLogic({
-            event,
-            formData,
-            location,
-            recurring,
-            onEventUpdated,
-            onClose,
-            setShowUpdateOptionsModal,
-            hasRecurringChanged,
-        });
+    const {
+        handleSubmit: handleSubmitLogic,
+        handleUpdateSingle,
+        handleUpdateRecurring,
+        handleUpdateFromThis,
+        isSubmitting,
+    } = useEventUpdateLogic({
+        event,
+        formData,
+        location,
+        recurring,
+        onEventUpdated,
+        onClose,
+        setShowUpdateOptionsModal,
+        hasRecurringChanged,
+    });
+
+    // 커스텀 handleSubmit: 옵션 모달을 보여줄지 결정
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const options = getUpdateOptions();
+
+        if (!options.shouldShowModal) {
+            // 모달 없이 직접 처리
+            await handleSubmitLogic(e);
+        } else {
+            // 옵션 모달 표시
+            setShowUpdateOptionsModal(true);
+        }
+    };
 
     const {
         handleDelete,
@@ -51,26 +71,56 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         setShowDeleteModal,
     } = useEventDeleteLogic({ event, onEventUpdated, onClose });
 
-    // Helper function to determine if "이 일정만" option should be shown
+    // Helper functions to determine update options
+    const getUpdateOptions = () => {
+        const wasRecurring = !!event?.recurringEventId;
+        const willBeRecurring = !!recurring && !!recurring.rule && !!recurring.startDate;
+
+        // Case 1: 단일 → 단일 (모달 안 보여줌)
+        if (!wasRecurring && !willBeRecurring) {
+            return { shouldShowModal: false };
+        }
+
+        // Case 2: 단일 → 반복 (모달 안 보여줌)
+        if (!wasRecurring && willBeRecurring) {
+            return { shouldShowModal: false };
+        }
+
+        // Case 3: 반복 → 단일 (모달 안 보여줌)
+        if (wasRecurring && !willBeRecurring) {
+            return { shouldShowModal: false };
+        }
+
+        // Case 4: 반복 → 반복
+        if (wasRecurring && willBeRecurring) {
+            const recurringChanged = hasRecurringChanged();
+
+            if (!recurringChanged) {
+                // 반복 설정 변경 안함: 모든 옵션 표시
+                return {
+                    shouldShowModal: true,
+                    showSingleOption: true,
+                    showRecurringOption: true,
+                    showFromThisOption: true,
+                };
+            } else {
+                // 반복 설정 변경됨: "관련 일정 모두", "이 일정 이후"만 표시
+                return {
+                    shouldShowModal: true,
+                    showSingleOption: false,
+                    showRecurringOption: true,
+                    showFromThisOption: true,
+                };
+            }
+        }
+
+        return { shouldShowModal: false };
+    };
+
+    // 기존 함수 유지 (하위 호환성)
     const getShowSingleOption = () => {
-        if (!event?.recurringEventId || !recurring) return false;
-
-        // 반복 설정이 변경되었는지 확인하는 로직
-        const hasRecurringChanged = () => {
-            if (!event.recurringEventData || !recurring) return true;
-
-            return (
-                event.recurringEventData.rule !== recurring.rule ||
-                event.recurringEventData.startDate !== recurring.startDate ||
-                event.recurringEventData.endDate !== recurring.endDate
-            );
-        };
-
-        // 반복 → 반복이면서, 반복 설정이 변경되지 않은 경우에만 "이 일정만" 옵션 표시
-        const wasRecurring = !!event.recurringEventId;
-        const willBeRecurring = !!recurring;
-
-        return wasRecurring && willBeRecurring && !hasRecurringChanged();
+        const options = getUpdateOptions();
+        return options.showSingleOption || false;
     };
 
     const handleUpdateSingleWithClose = () => {
@@ -163,7 +213,9 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                 onUpdateFromThis={handleUpdateFromThisWithClose}
                 isRecurring={!!event?.recurringEventId}
                 eventTitle={event?.title || ""}
-                showSingleOption={getShowSingleOption()}
+                showSingleOption={getUpdateOptions().showSingleOption || false}
+                showRecurringOption={getUpdateOptions().showRecurringOption || false}
+                showFromThisOption={getUpdateOptions().showFromThisOption || false}
             />
         </div>
     );

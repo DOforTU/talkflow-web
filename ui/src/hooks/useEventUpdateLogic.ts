@@ -137,9 +137,8 @@ export const useEventUpdateLogic = ({
             // Case 3: 반복 → 단일
             await deleteRecurringAndCreateSingleEvent();
         } else {
-            // Case 4,5: 반복 → 반복 (옵션 모달 표시)
-            setShowUpdateOptionsModal(true);
-            return; // Don't close modal, let user choose update type
+            // Case 4: 반복 → 반복 (기본 동작: 관련 일정 모두 수정)
+            await handleUpdateRecurring();
         }
     };
 
