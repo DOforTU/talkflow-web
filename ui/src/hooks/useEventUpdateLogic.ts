@@ -27,6 +27,7 @@ interface UseEventUpdateLogicProps {
     onEventUpdated: () => void;
     onClose: () => void;
     setShowUpdateOptionsModal: (show: boolean) => void;
+    hasRecurringChanged: () => boolean;
 }
 
 export const useEventUpdateLogic = ({
@@ -37,6 +38,7 @@ export const useEventUpdateLogic = ({
     onEventUpdated,
     onClose,
     setShowUpdateOptionsModal,
+    hasRecurringChanged,
 }: UseEventUpdateLogicProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -114,31 +116,6 @@ export const useEventUpdateLogic = ({
         }
 
         return createEventDto;
-    };
-
-    // Helper: 반복 설정이 변경되었는지 확인
-    const hasRecurringChanged = () => {
-        if (!recurring) return true;
-        // For now, assume recurring has changed if it exists
-        return true;
-    };
-
-    // Location handlers (these will be used from the form hook)
-    const handleLocationAdd = (newLocation: UpdateLocationDto) => {
-        // This will be handled by useUpdateEventForm
-    };
-
-    const handleLocationRemove = () => {
-        // This will be handled by useUpdateEventForm
-    };
-
-    // Recurring handlers (these will be used from the form hook)
-    const handleRecurringApply = (newRecurring: UpdateRecurringRuleDto) => {
-        // This will be handled by useUpdateEventForm
-    };
-
-    const handleRecurringRemove = () => {
-        // This will be handled by useUpdateEventForm
     };
 
     // Main submit handler
@@ -296,10 +273,6 @@ export const useEventUpdateLogic = ({
     };
 
     return {
-        handleLocationAdd,
-        handleLocationRemove,
-        handleRecurringApply,
-        handleRecurringRemove,
         handleSubmit,
         updateSingleEventDirectly,
         deleteAndCreateRecurringEvent,

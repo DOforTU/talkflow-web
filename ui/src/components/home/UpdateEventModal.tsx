@@ -17,27 +17,30 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
     const [showUpdateOptionsModal, setShowUpdateOptionsModal] = useState(false);
 
     // Custom hooks for state management and logic
-    const { formData, location, recurring, updateFormData, selectColor } = useUpdateEventForm({ event, isOpen });
-
     const {
+        formData,
+        location,
+        recurring,
+        updateFormData,
+        selectColor,
         handleLocationAdd,
         handleLocationRemove,
         handleRecurringApply,
         handleRecurringRemove,
-        handleSubmit,
-        handleUpdateSingle,
-        handleUpdateRecurring,
-        handleUpdateFromThis,
-        isSubmitting,
-    } = useEventUpdateLogic({
-        event,
-        formData,
-        location,
-        recurring,
-        onEventUpdated,
-        onClose,
-        setShowUpdateOptionsModal,
-    });
+        hasRecurringChanged,
+    } = useUpdateEventForm({ event, isOpen });
+
+    const { handleSubmit, handleUpdateSingle, handleUpdateRecurring, handleUpdateFromThis, isSubmitting } =
+        useEventUpdateLogic({
+            event,
+            formData,
+            location,
+            recurring,
+            onEventUpdated,
+            onClose,
+            setShowUpdateOptionsModal,
+            hasRecurringChanged,
+        });
 
     const {
         handleDelete,

@@ -152,7 +152,7 @@ export default function RecurringScheduleModal({
         let endDate = recurringSettings.endDate;
         if (!endDate) {
             const selectedDateObj = new Date(selectedDate);
-            if (recurringSettings.frequency === 'YEARLY') {
+            if (recurringSettings.frequency === "YEARLY") {
                 // 매년: 5년 후
                 selectedDateObj.setFullYear(selectedDateObj.getFullYear() + 5);
             } else {
@@ -169,6 +169,7 @@ export default function RecurringScheduleModal({
         };
 
         onApply(recurringData);
+        onClose(); // 모달 닫기 추가
     };
 
     if (!isOpen) return null;
@@ -250,18 +251,14 @@ export default function RecurringScheduleModal({
                         {!recurringSettings.endDate && (
                             <div className="end-date-info">
                                 <div className="info-text">
-                                    {recurringSettings.frequency === "YEARLY" && 
-                                        "⚠️ 종료일을 선택하지 않으면 5년간 총 5개의 일정이 생성됩니다."
-                                    }
-                                    {recurringSettings.frequency === "MONTHLY" && 
-                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 12개의 일정이 생성됩니다."
-                                    }
-                                    {recurringSettings.frequency === "WEEKLY" && 
-                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 52개의 일정이 생성됩니다."
-                                    }
-                                    {recurringSettings.frequency === "DAILY" && 
-                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 365개의 일정이 생성됩니다."
-                                    }
+                                    {recurringSettings.frequency === "YEARLY" &&
+                                        "⚠️ 종료일을 선택하지 않으면 5년간 총 5개의 일정이 생성됩니다."}
+                                    {recurringSettings.frequency === "MONTHLY" &&
+                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 12개의 일정이 생성됩니다."}
+                                    {recurringSettings.frequency === "WEEKLY" &&
+                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 52개의 일정이 생성됩니다."}
+                                    {recurringSettings.frequency === "DAILY" &&
+                                        "⚠️ 종료일을 선택하지 않으면 1년간 총 365개의 일정이 생성됩니다."}
                                 </div>
                             </div>
                         )}
