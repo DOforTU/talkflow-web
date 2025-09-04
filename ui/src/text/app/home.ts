@@ -1,4 +1,4 @@
-import { SupportedLanguage } from "@/lib/types/users.interface";
+import { SupportedLanguage } from "@/lib/types/user.interface";
 
 export interface HomeTexts {
     calendar: {
@@ -15,6 +15,8 @@ export interface HomeTexts {
     schedule: {
         title: string;
         noSchedule: string;
+        noScheduleForDate: string; // "{day}일에 일정이 없습니다." 형식 
+        allDay: string; // 하루종일 이벤트 시간 표시
         sampleSchedules: {
             teamMeeting: string;
             projectReview: string;
@@ -46,6 +48,8 @@ export const homeTexts: Record<SupportedLanguage, HomeTexts> = {
         schedule: {
             title: "Schedule",
             noSchedule: "No scheduled events for today",
+            noScheduleForDate: "No events on {day}",
+            allDay: "All Day",
             sampleSchedules: {
                 teamMeeting: "Team Meeting",
                 projectReview: "Project Review",
@@ -75,6 +79,8 @@ export const homeTexts: Record<SupportedLanguage, HomeTexts> = {
         schedule: {
             title: "일정",
             noSchedule: "오늘 등록된 일정이 없습니다",
+            noScheduleForDate: "{day}일에 일정이 없습니다",
+            allDay: "종일",
             sampleSchedules: {
                 teamMeeting: "팀 회의",
                 projectReview: "프로젝트 검토",

@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { SupportedLanguage } from "@/lib/types/users.interface";
+import { SupportedLanguage } from "@/lib/types/user.interface";
+import { useAuthStore } from "@/store/authStore";
 
 export type Language = "ENG" | "KOR";
 
@@ -51,12 +52,13 @@ export function useProfileLanguage() {
     };
 }
 
-// Auth와 Language를 통합한 편의 훅
-// 사용법: const { currentLanguage } = useAuthLanguage(currentProfile?.language);
-export function useAuthLanguage(profileLanguage?: SupportedLanguage) {
+// Auth와 Language를 통합한 편의 훅 (새로운 Auth Store 사용)
+// 사용법: const { currentLanguage } = useAuthLanguage();
+export function useAuthLanguage() {
+    const { profile } = useAuthStore();
     const { getProfileBasedLanguage } = useLanguage();
 
-    const currentLanguage = getProfileBasedLanguage(profileLanguage);
+    const currentLanguage = getProfileBasedLanguage(profile.language);
 
     return { currentLanguage };
 }

@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@/context/Auth";
+import { useAuthStore } from "@/store/authStore";
+import { useCurrentUser } from "@/hooks/useAuth";
 import { useLanguage } from "@/context/Language";
 import { completeOnboarding } from "@/lib/api/auth";
 import { onboardingTexts } from "@/text/onboarding";
@@ -12,7 +13,8 @@ import SmartHeader from "@/components/headers/SmartHeader";
 
 export default function AppStartPage() {
     const router = useRouter();
-    const { currentUser, currentProfile, isLoading } = useAuth();
+    const { user, profile } = useAuthStore();
+    const { isLoading } = useCurrentUser();
     const { currentLanguage } = useLanguage();
     const texts = onboardingTexts[currentLanguage];
 
@@ -28,13 +30,13 @@ export default function AppStartPage() {
     // 온보딩 완료 여부 체크
     // 온보딩 완료 여부 체크: firstName, lastName, language 모두 true일 때만 완료
     const isOnboardingComplete = useCallback(() => {
-        return currentProfile?.language && currentUser?.firstName && currentUser?.lastName;
-    }, [currentProfile?.language, currentUser?.firstName, currentUser?.lastName]);
+        return profile?.language && user?.firstName && user?.lastName;
+    }, [profile?.language, user?.firstName, user?.lastName]);
 
     // 로그인 상태 및 온보딩 완료 여부에 따라 리다이렉트
     useEffect(() => {
         if (!isLoading) {
-            if (!currentUser) {
+            if (!user) {
                 router.push("/");
                 return;
             }
@@ -45,16 +47,16 @@ export default function AppStartPage() {
             }
 
             // 온보딩이 필요한 경우 기존 데이터로 폼 초기화
-            if (currentUser && currentProfile) {
+            if (user && profile) {
                 setFormData({
-                    firstName: currentUser.firstName,
-                    lastName: currentUser.lastName,
-                    nickname: currentProfile.nickname,
-                    language: currentProfile.language || "",
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    nickname: profile.nickname,
+                    language: profile.language || "",
                 });
             }
         }
-    }, [currentUser, currentProfile, isLoading, router, isOnboardingComplete]);
+    }, [user, profile, isLoading, router, isOnboardingComplete]);
 
     // 폼 제출
     const handleSubmit = async (e: React.FormEvent) => {
@@ -94,7 +96,7 @@ export default function AppStartPage() {
     };
 
     // 로딩 중이거나 리다이렉트 대상인 경우
-    if (isLoading || !currentUser || isOnboardingComplete()) {
+    if (isLoading || !user || isOnboardingComplete()) {
         return (
             <div className="app-loading">
                 <div className="loading-spinner"></div>

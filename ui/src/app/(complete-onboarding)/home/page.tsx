@@ -1,191 +1,218 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/context/Auth";
+import { useState, useEffect } from "react";
 import { useAuthLanguage } from "@/context/Language";
 import { homeTexts } from "@/text/app/home";
-import { SupportedLanguage } from "@/lib/types/users.interface";
+import { eventApi } from "@/lib/api/event";
+import { getSelectedDateEvents, calculateDistance, formatDistance, getEventsForDateIncludingMultiDay, sortEventsByTime } from "@/lib/utils/eventUtils";
+import Calendar from "../../../components/home/Calendar";
+import MapModal from "../../../components/home/MapModal";
+import CreateEventModal from "../../../components/home/CreateEventModal";
+import UpdateEventModal from "../../../components/home/UpdateEventModal";
 import "./HomePage.css";
+import { ResponseEventDto } from "@/lib/types/event.interface";
 
 export default function HomePage() {
-    const { currentProfile } = useAuth();
-    const { currentLanguage } = useAuthLanguage(currentProfile?.language);
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const { currentLanguage } = useAuthLanguage();
+    const [events, setEvents] = useState<ResponseEventDto[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const [showMapModal, setShowMapModal] = useState(false);
+    const [showCreateEventModal, setShowCreateEventModal] = useState(false);
+    const [showUpdateEventModal, setShowUpdateEventModal] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState<ResponseEventDto | null>(null);
 
     const texts = homeTexts[currentLanguage];
 
-    // 캘린더 관련 함수들
-    const getDaysInMonth = (date: Date) => {
-        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    // 이벤트 데이터 로드
+    useEffect(() => {
+        console.log("useEffect 실행됨");
+        const loadEvents = async () => {
+            console.log("loadEvents 호출됨");
+            try {
+                setIsLoading(true);
+                const fetchedEvents = await eventApi.getMyEvents();
+                setEvents(fetchedEvents);
+            } catch (error) {
+                console.error("Failed to load events:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadEvents();
+    }, []);
+
+    // 선택된 날짜의 이벤트 가져기기 (다중일 이벤트 포함)
+    const filteredEvents = getEventsForDateIncludingMultiDay(events, selectedDate);
+    const selectedDateEvents = sortEventsByTime(filteredEvents);
+
+    // 날짜 선택 핸들러
+    const handleDateSelect = (date: Date) => {
+        setSelectedDate(date);
     };
 
-    const getFirstDayOfMonth = (date: Date) => {
-        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    };
-
-    const formatMonth = (date: Date) => {
-        // 언어에 따라 다른 locale 사용
-        const locale = currentLanguage === SupportedLanguage.EN ? "en-US" : "ko-KR";
-        return date.toLocaleDateString(locale, { year: "numeric", month: "long" });
-    };
-
-    const isToday = (day: number) => {
-        const today = new Date();
-        return (
-            today.getDate() === day &&
-            today.getMonth() === currentDate.getMonth() &&
-            today.getFullYear() === currentDate.getFullYear()
-        );
-    };
-
-    const goToPreviousMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
-    };
-
-    const goToNextMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
-    };
-
-    // 캘린더 날짜 배열 생성
-    const generateCalendarDays = () => {
-        const daysInMonth = getDaysInMonth(currentDate);
-        const firstDay = getFirstDayOfMonth(currentDate);
-        const days = [];
-
-        // 이전 달의 날짜들
-        const prevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1);
-        const daysInPrevMonth = getDaysInMonth(prevMonth);
-        for (let i = firstDay - 1; i >= 0; i--) {
-            days.push({
-                day: daysInPrevMonth - i,
-                isCurrentMonth: false,
-            });
+    // 이벤트 생성 후 목록 새로고침
+    const handleEventCreated = async () => {
+        try {
+            const fetchedEvents = await eventApi.getMyEvents();
+            setEvents(fetchedEvents);
+        } catch (error) {
+            console.error("Failed to reload events:", error);
         }
-
-        // 현재 달의 날짜들
-        for (let day = 1; day <= daysInMonth; day++) {
-            days.push({
-                day,
-                isCurrentMonth: true,
-            });
-        }
-
-        // 다음 달의 날짜들 (42개 채우기 위해)
-        const remainingDays = 42 - days.length;
-        for (let day = 1; day <= remainingDays; day++) {
-            days.push({
-                day,
-                isCurrentMonth: false,
-            });
-        }
-
-        return days;
     };
 
-    const calendarDays = generateCalendarDays();
-    const dayNames = [
-        texts.calendar.dayNames.sunday,
-        texts.calendar.dayNames.monday,
-        texts.calendar.dayNames.tuesday,
-        texts.calendar.dayNames.wednesday,
-        texts.calendar.dayNames.thursday,
-        texts.calendar.dayNames.friday,
-        texts.calendar.dayNames.saturday,
-    ];
+    // 이벤트 수정 후 목록 새로고침
+    const handleEventUpdated = async () => {
+        try {
+            const fetchedEvents = await eventApi.getMyEvents();
+            setEvents(fetchedEvents);
+        } catch (error) {
+            console.error("Failed to reload events:", error);
+        }
+    };
+
+    // 일정 아이템 클릭 핸들러
+    const handleEventClick = (event: ResponseEventDto) => {
+        setSelectedEvent(event);
+        setShowUpdateEventModal(true);
+    };
 
     return (
         <div className="home-page">
             {/* Main Content */}
             <main className="home-main">
                 {/* Calendar Section */}
-                <section className="calendar-section">
-                    <div className="calendar-header">
-                        <h2 className="calendar-title">{formatMonth(currentDate)}</h2>
-                        <div className="calendar-nav">
-                            <button className="calendar-nav-btn" onClick={goToPreviousMonth}>
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={3}
-                                        d="M15 19l-7-7 7-7"
-                                    />
+                <Calendar events={events} onDateSelect={handleDateSelect} />
+
+                {/* Selected Day Schedule */}
+                <section className="select-day-schedule">
+                    <div className="schedule-header">
+                        <h2 className="select-day-schedule-title">
+                            {selectedDate.toLocaleDateString(currentLanguage === "en" ? "en-US" : "ko-KR", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            })}
+                        </h2>
+                        <div className="schedule-header-buttons">
+                            <button
+                                className="create-event-btn"
+                                onClick={() => setShowCreateEventModal(true)}
+                                aria-label="일정 생성"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <line x1="5" y1="12" x2="19" y2="12" />
                                 </svg>
                             </button>
-                            <button className="calendar-nav-btn" onClick={goToNextMonth}>
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={3}
-                                        d="M9 5l7 7-7 7"
-                                    />
+                            <button
+                                className="map-view-btn"
+                                onClick={() => setShowMapModal(true)}
+                                aria-label="지도 보기"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                    <circle cx="12" cy="10" r="3" />
                                 </svg>
                             </button>
                         </div>
                     </div>
-
-                    <div className="calendar-grid">
-                        {/* 요일 헤더 */}
-                        {dayNames.map((day, index) => (
-                            <div key={day} className={`calendar-day-header ${index === 0 ? "sunday" : ""}`}>
-                                {day}
-                            </div>
-                        ))}
-
-                        {/* 날짜 */}
-                        {calendarDays.map((dateInfo, index) => {
-                            const dayOfWeek = index % 7; // 0=일요일, 1=월요일, ...
-                            return (
-                                <div
-                                    key={index}
-                                    className={`calendar-day ${!dateInfo.isCurrentMonth ? "other-month" : ""} ${
-                                        dateInfo.isCurrentMonth && isToday(dateInfo.day) ? "today" : ""
-                                    } ${dayOfWeek === 0 ? "sunday" : ""}`}
-                                    onClick={() => {
-                                        if (dateInfo.isCurrentMonth) {
-                                            const alertMessage =
-                                                currentLanguage === SupportedLanguage.EN
-                                                    ? texts.alerts.dateClick
-                                                          .replace("{year}", currentDate.getFullYear().toString())
-                                                          .replace("{month}", (currentDate.getMonth() + 1).toString())
-                                                          .replace("{day}", dateInfo.day.toString())
-                                                    : texts.alerts.dateClick
-                                                          .replace("{year}", currentDate.getFullYear().toString())
-                                                          .replace("{month}", (currentDate.getMonth() + 1).toString())
-                                                          .replace("{day}", dateInfo.day.toString());
-                                            alert(alertMessage);
-                                        }
-                                    }}
-                                >
-                                    {dateInfo.day}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </section>
-
-                {/* Today's Schedule */}
-                <section className="today-schedule">
-                    <h2 className="today-schedule-title">{texts.schedule.title}</h2>
                     <div className="schedule-list">
-                        {/* 임시 일정 데이터 */}
-                        <div className="schedule-item">
-                            <div className="schedule-time">09:00</div>
-                            <div className="schedule-content">{texts.schedule.sampleSchedules.teamMeeting}</div>
-                        </div>
-                        <div className="schedule-item">
-                            <div className="schedule-time">14:00</div>
-                            <div className="schedule-content">{texts.schedule.sampleSchedules.projectReview}</div>
-                        </div>
-                        <div className="schedule-item">
-                            <div className="schedule-time">16:30</div>
-                            <div className="schedule-content">{texts.schedule.sampleSchedules.clientMeeting}</div>
-                        </div>
-                        {/* 일정이 없을 때 */}
-                        {/* <div className="no-schedule">
-                            {texts.schedule.noSchedule}
-                        </div> */}
+                        {isLoading ? (
+                            <div className="schedule-loading">Loading...</div>
+                        ) : (
+                            <>
+                                {selectedDateEvents.length > 0 ? (
+                                    (() => {
+                                        let timedEventIndex = 0;
+
+                                        return selectedDateEvents.map((event, index) => {
+                                            // 현재 이벤트가 시간 이벤트인 경우에만 번호 증가
+                                            const currentEventNumber = event.isAllDay ? null : ++timedEventIndex;
+
+                                            // 이전 location이 있는 이벤트 찾기 (현재 이벤트에 location이 있을 때만)
+                                            let prevLocationEvent = null;
+                                            let distance = null;
+
+                                            if (event.location) {
+                                                // 현재 이벤트보다 이전 이벤트 중에서 location이 있는 것 찾기
+                                                for (let i = index - 1; i >= 0; i--) {
+                                                    if (selectedDateEvents[i].location) {
+                                                        prevLocationEvent = selectedDateEvents[i];
+                                                        distance = calculateDistance(
+                                                            prevLocationEvent.location!.latitude,
+                                                            prevLocationEvent.location!.longitude,
+                                                            event.location.latitude,
+                                                            event.location.longitude
+                                                        );
+                                                        break;
+                                                    }
+                                                }
+                                            }
+
+                                            return (
+                                                <div key={event.id}>
+                                                    {/* 거리 표시 - 현재 이벤트 위에 표시 */}
+                                                    {distance && (
+                                                        <div className="schedule-distance">
+                                                            <div className="distance-line"></div>
+                                                            <div className="distance-text">
+                                                                {formatDistance(distance)}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    <div
+                                                        className="schedule-item"
+                                                        onClick={() => handleEventClick(event)}
+                                                        style={{ cursor: "pointer" }}
+                                                    >
+                                                        <div
+                                                            className="schedule-color-dot"
+                                                            style={{ backgroundColor: event.colorCode }}
+                                                        >
+                                                            {currentEventNumber || ""}
+                                                        </div>
+                                                        <div className="schedule-time">
+                                                            {event.isAllDay ? (
+                                                                texts.schedule.allDay
+                                                            ) : (
+                                                                <>
+                                                                    <div>{event.startTime.split(" ")[1]}</div>
+                                                                    <div>{event.endTime.split(" ")[1]}</div>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                        <div className="schedule-content">
+                                                            <div className="schedule-title">{event.title}</div>
+                                                            {event.description && (
+                                                                <div className="schedule-description">
+                                                                    {event.description}
+                                                                </div>
+                                                            )}
+                                                            {event.location && (
+                                                                <div className="schedule-location">
+                                                                    📍 {event.location.nameKo || event.location.nameEn}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        });
+                                    })()
+                                ) : (
+                                    <div className="no-schedule">
+                                        {selectedDate.toDateString() === new Date().toDateString()
+                                            ? texts.schedule.noSchedule
+                                            : texts.schedule.noScheduleForDate.replace(
+                                                  "{day}",
+                                                  selectedDate.getDate().toString()
+                                              )}
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 </section>
                 {/* Voice Recording Button */}
@@ -202,6 +229,27 @@ export default function HomePage() {
                     </svg>
                 </button>
             </main>
+
+            <MapModal
+                isOpen={showMapModal}
+                onClose={() => setShowMapModal(false)}
+                events={events}
+                selectedDate={selectedDate}
+            />
+
+            <CreateEventModal
+                isOpen={showCreateEventModal}
+                onClose={() => setShowCreateEventModal(false)}
+                onEventCreated={handleEventCreated}
+                selectedDate={selectedDate}
+            />
+
+            <UpdateEventModal
+                isOpen={showUpdateEventModal}
+                onClose={() => setShowUpdateEventModal(false)}
+                onEventUpdated={handleEventUpdated}
+                event={selectedEvent}
+            />
         </div>
     );
 }

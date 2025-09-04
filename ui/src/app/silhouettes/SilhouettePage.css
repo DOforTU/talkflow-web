@@ -1,0 +1,555 @@
+/* Silhouette Page - YouTube Shorts Style */
+
+.silhouette-page {
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    background-color: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.silhouette-page::-webkit-scrollbar {
+    display: none;
+}
+
+.silhouette-page {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.silhouette-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* Slides Container - Smooth vertical sliding */
+.slides-wrapper {
+    position: relative;
+    width: 99%;
+    height: 94vh;
+    will-change: transform;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.slide {
+    position: relative;
+    width: 100%;
+    height: 94vh;
+    border-radius: 20px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* Video/Image Container */
+.silhouette-video-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.silhouette-video,
+.silhouette-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.silhouette-video {
+    outline: none;
+}
+
+/* Overlay for user info and actions */
+.silhouette-overlay {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    border-radius: 12px;
+    padding: 1rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.silhouette-overlay > * {
+    pointer-events: all;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.user-nickname {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 auto;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    color: var(--bg-primary);
+}
+
+.silhouette-title {
+    font-size: 0.85rem;
+    font-weight: 400;
+    margin: 0.25rem 0 0 0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    color: var(--bg-primary);
+    opacity: 0.9;
+}
+
+.silhouette-description {
+    font-size: 0.85rem;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+    opacity: 0.9;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.silhouette-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    font-size: 0.8rem;
+    color: white;
+    opacity: 0.8;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.action-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+.action-count {
+    position: absolute;
+    bottom: -18px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.like-btn:hover {
+    background: rgba(255, 59, 92, 0.3);
+}
+
+.view-btn:hover {
+    background: rgba(29, 161, 242, 0.3);
+}
+
+.share-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Progress Indicator - Updated for vertical layout */
+.progress-indicator {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 60%;
+    overflow-y: auto;
+    padding: 0.5rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.progress-indicator::-webkit-scrollbar {
+    display: none;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.progress-dot:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.2);
+}
+
+.progress-dot.active {
+    background: white;
+    transform: scale(1.3);
+}
+
+/* Loading and Empty States */
+.silhouette-loading,
+.silhouette-empty {
+    min-height: 100vh;
+    max-width: 768px;
+    margin: 0 auto;
+    background-color: var(--bg-primary);
+    color: var(--text-1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding-top: 92px;
+    padding-bottom: 120px;
+}
+
+.silhouette-loading .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--border);
+    border-top: 2px solid var(--border);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.silhouette-loading p,
+.silhouette-empty p {
+    color: var(--text-1);
+    font-size: 1rem;
+    margin: 0;
+    text-align: center;
+}
+
+/* Empty State Styling */
+.silhouette-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+.silhouette-empty .empty-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    color: var(--text-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.silhouette-empty .empty-icon svg {
+    width: 40px;
+    height: 40px;
+    stroke: var(--text-2);
+    stroke-width: 1.5;
+}
+
+.silhouette-empty h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-2);
+    margin: 0;
+    text-align: center;
+}
+
+.silhouette-empty p {
+    font-size: 1rem;
+    color: var(--text-2);
+    margin: 0;
+    text-align: center;
+    line-height: 1.5;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Play/Pause Overlay */
+.play-pause-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.play-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.play-icon svg {
+    width: 32px;
+    height: 32px;
+    margin-left: 4px; /* Slight offset to center play triangle */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Custom Video Seek Bar */
+.video-seek-bar {
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    z-index: 25;
+    height: 4px;
+    background: var(--text-3);
+    border-radius: 2px;
+}
+
+.seek-slider {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    outline: none;
+    border-radius: 2px;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.seek-slider::-webkit-slider-track {
+    height: 4px;
+    background: transparent;
+    border-radius: 2px;
+}
+
+.seek-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.seek-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.3);
+}
+
+.seek-slider::-moz-range-track {
+    height: 4px;
+    background: transparent;
+    border-radius: 2px;
+    border: none;
+}
+
+.seek-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: all 0.2s ease;
+    -moz-appearance: none;
+}
+
+.seek-slider::-moz-range-thumb:hover {
+    transform: scale(1.3);
+}
+
+/* Progress Bar Visual Enhancement */
+.seek-slider::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+    width: var(--progress, 0%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .silhouette-container {
+        height: 100vh;
+        padding: 0;
+    }
+
+    .slide-container {
+        height: 100vh;
+        border-radius: 0;
+    }
+
+    .slide {
+        border-radius: 0;
+    }
+
+    .silhouette-video-container {
+        height: 100%;
+        border-radius: 0;
+    }
+
+    .progress-indicator {
+        top: 50%;
+        right: 0.5rem;
+        transform: translateY(-50%);
+    }
+
+    .silhouette-overlay {
+        bottom: 5rem;
+        left: 1rem;
+        right: 1rem;
+        padding: 1rem;
+    }
+
+    .silhouette-loading,
+    .silhouette-empty {
+        padding-top: 44px;
+        padding-bottom: 80px;
+    }
+
+    .user-profile {
+        gap: 0.5rem;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .user-nickname {
+        font-size: 0.85rem;
+    }
+
+    .silhouette-title {
+        font-size: 0.9rem;
+    }
+
+    .silhouette-description {
+        font-size: 0.8rem;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .action-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* Touch gestures for mobile */
+@media (pointer: coarse) {
+    .silhouette-container {
+        touch-action: pan-y;
+    }
+
+    .progress-indicator {
+        opacity: 0.6;
+    }
+}
