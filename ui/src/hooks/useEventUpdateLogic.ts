@@ -148,6 +148,7 @@ export const useEventUpdateLogic = ({
 
         setIsSubmitting(true);
         try {
+            // 단일 이벤트 업데이트하고 끝냄
             const updateEventDto = buildUpdateEventDto();
             await eventApi.updateSingleEvent(event.id, updateEventDto);
             onEventUpdated();
