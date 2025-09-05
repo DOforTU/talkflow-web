@@ -117,7 +117,7 @@ export const useEventUpdateLogic = ({
     // Helper: 반복 설정이 변경되었는지 확인
     const hasRecurringChanged = () => {
         if (!event?.recurringEventData || !recurring) return true;
-        
+
         return (
             event.recurringEventData.rule !== recurring.rule ||
             event.recurringEventData.startDate !== recurring.startDate ||
@@ -146,7 +146,7 @@ export const useEventUpdateLogic = ({
     // Main submit handler
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!event) return;
 
         const wasRecurring = !!event.recurringEventId;
@@ -175,7 +175,7 @@ export const useEventUpdateLogic = ({
         setIsSubmitting(true);
         try {
             const updateEventDto = buildUpdateEventDto();
-            await eventApi.updateEvent(event.id, updateEventDto);
+            await eventApi.updateSingleEvent(event.id, updateEventDto);
             onEventUpdated();
             onClose();
         } catch (error) {
@@ -238,7 +238,7 @@ export const useEventUpdateLogic = ({
         try {
             const updateEventDto = buildUpdateEventDto();
             // 이 일정만 단일 이벤트로 변경 (recurringEventId를 null로 설정)
-            await eventApi.updateEvent(event.id, updateEventDto);
+            await eventApi.updateSingleEvent(event.id, updateEventDto);
             onEventUpdated();
             onClose();
         } catch (error) {
@@ -311,5 +311,4 @@ export const useEventUpdateLogic = ({
         handleUpdateFromThis,
         isSubmitting,
     };
-};
 };

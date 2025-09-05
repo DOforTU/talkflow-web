@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import "./MapModal.css";
 import { ResponseEventDto } from "@/lib/types/event.interface";
+import { getEventsForDateIncludingMultiDay, sortEventsByTime } from "@/lib/utils/eventUtils";
 
 interface MapModalProps {
     isOpen: boolean;
@@ -63,18 +64,8 @@ export default function MapModal({ isOpen, onClose, events, selectedDate }: MapM
 
     // 선택된 날짜의 이벤트 가져기기
     const getSelectedDateEvents = () => {
-        const selectedDateStr = selectedDate.toISOString().split("T")[0];
-
-        const filteredEvents = events.filter((event) => {
-            const eventDateStr = event.startTime.split(" ")[0];
-            return eventDateStr === selectedDateStr;
-        });
-
-        return filteredEvents.sort((a, b) => {
-            if (a.isAllDay && !b.isAllDay) return -1;
-            if (!a.isAllDay && b.isAllDay) return 1;
-            return a.startTime.localeCompare(b.startTime);
-        });
+        const filteredEvents = getEventsForDateIncludingMultiDay(events, selectedDate);
+        return sortEventsByTime(filteredEvents);
     };
 
     // 구글맵 초기화

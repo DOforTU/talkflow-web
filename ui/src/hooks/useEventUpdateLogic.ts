@@ -149,7 +149,7 @@ export const useEventUpdateLogic = ({
         setIsSubmitting(true);
         try {
             const updateEventDto = buildUpdateEventDto();
-            await eventApi.updateEvent(event.id, updateEventDto);
+            await eventApi.updateSingleEvent(event.id, updateEventDto);
             onEventUpdated();
             onClose();
         } catch (error) {
@@ -212,7 +212,7 @@ export const useEventUpdateLogic = ({
         try {
             const updateEventDto = buildUpdateEventDto();
             // 이 일정만 단일 이벤트로 변경 (recurringEventId를 null로 설정)
-            await eventApi.updateEvent(event.id, updateEventDto);
+            await eventApi.updateSingleEvent(event.id, updateEventDto);
             onEventUpdated();
             onClose();
         } catch (error) {

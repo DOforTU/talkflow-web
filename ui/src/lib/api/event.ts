@@ -13,7 +13,7 @@ export const eventApi = {
         return response.data.data;
     },
 
-    updateEvent: async (eventId: number, eventData: UpdateEventDto): Promise<ResponseEventDto> => {
+    updateSingleEvent: async (eventId: number, eventData: UpdateEventDto): Promise<ResponseEventDto> => {
         const response = await apiClient.patch(`api/events/${eventId}`, eventData);
         return response.data.data;
     },
