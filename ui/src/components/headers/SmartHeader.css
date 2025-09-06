@@ -84,9 +84,3 @@
         font-size: var(--font-size-sm);
     }
 }
-
-@media (min-width: 769px) {
-    .smart-header {
-        margin-left: 240px;
-    }
-}
