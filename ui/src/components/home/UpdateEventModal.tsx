@@ -26,6 +26,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         handleLocationAdd,
         handleLocationRemove,
         handleRecurringApply,
+        handleRecurringFromThisApply,
         handleRecurringRemove,
         hasRecurringChanged,
     } = useUpdateEventForm({ event, isOpen });
@@ -45,6 +46,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         onClose,
         setShowUpdateOptionsModal,
         hasRecurringChanged,
+        handleRecurringFromThisApply,
     });
 
     // 커스텀 handleSubmit: 옵션 모달을 보여줄지 결정

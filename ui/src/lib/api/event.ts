@@ -18,9 +18,9 @@ export const eventApi = {
         return response.data.data;
     },
 
-    updateRecurringEvents: async (eventId: number, eventData: UpdateEventDto): Promise<void> => {
-        await apiClient.patch(`api/events/${eventId}/recurring/all`, eventData);
-    },
+    // updateRecurringEvents: async (eventId: number, eventData: UpdateEventDto): Promise<void> => {
+    //     await apiClient.patch(`api/events/${eventId}/recurring/all`, eventData);
+    // },
 
     deleteSingleEvent: async (eventId: number): Promise<void> => {
         await apiClient.delete(`api/events/${eventId}`);

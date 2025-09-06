@@ -101,6 +101,7 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
         }
     }, [event]); // isOpen 제거
 
+    /* 폼 데이터 업데이트: 시작/종료 시간 유효성 검사 및 자동 조정 포함 */
     const updateFormData = (field: string, value: string | boolean) => {
         setFormData((prev) => {
             const newData = { ...prev, [field]: value };
@@ -121,10 +122,12 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
         });
     };
 
+    /* 일정 색상 선택: 선택된 색상을 formData에 적용 */
     const selectColor = (color: string) => {
         updateFormData("colorCode", color);
     };
 
+    /* 위치 추가: CreateLocationDto를 UpdateLocationDto로 변환하여 저장 */
     const handleLocationAdd = (locationData: CreateLocationDto) => {
         // CreateLocationDto를 UpdateLocationDto로 변환
         const updateLocationData: UpdateLocationDto = {
@@ -138,12 +141,32 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
         setShowLocationModal(false);
     };
 
+    /* 위치 제거: 일정에서 위치 정보 삭제 */
     const handleLocationRemove = () => {
         setLocation(null);
     };
 
+    /* 반복 일정 적용: "관련 일정 모두 수정" 옵션에서 사용
+     * 기존 recurring.startDate가 recurringData.startDate보다 이전일 경우에만 기존 startDate 유지하여 전체 반복 범위 보존 */
     const handleRecurringApply = (recurringData: CreateRecurringRuleDto) => {
-        // CreateRecurringRuleDto를 UpdateRecurringRuleDto로 변환
+        // 기존 recurring.startDate가 recurringData.startDate보다 이전일 경우에만 기존 startDate 사용
+        let startDate = recurringData.startDate;
+        if (recurring && recurring.startDate && new Date(recurring.startDate) < new Date(recurringData.startDate)) {
+            startDate = recurring.startDate;
+        }
+
+        const updateRecurringData: UpdateRecurringRuleDto = {
+            rule: recurringData.rule,
+            startDate: startDate,
+            endDate: recurringData.endDate,
+        };
+        setRecurring(updateRecurringData);
+        setShowRecurringModal(false);
+    };
+
+    /* 반복 일정 "이 일정 이후 수정" 적용: "이 일정 이후 수정" 옵션에서 사용
+     * recurringData.startDate를 그대로 사용하여 현재 선택된 날짜부터 새로운 반복 일정 시작 */
+    const handleRecurringFromThisApply = (recurringData: CreateRecurringRuleDto) => {
         const updateRecurringData: UpdateRecurringRuleDto = {
             rule: recurringData.rule,
             startDate: recurringData.startDate,
@@ -153,11 +176,12 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
         setShowRecurringModal(false);
     };
 
+    /* 반복 일정 제거: 반복 설정을 null로 설정하여 단일 일정으로 변환 */
     const handleRecurringRemove = () => {
         setRecurring(null);
     };
 
-    // recurring 데이터가 변경되었는지 확인
+    /* 반복 설정 변경 여부 확인: 기존 반복 데이터와 현재 설정 비교 */
     const hasRecurringChanged = () => {
         if (!recurring && !recurringEventData) return false;
         if (!recurring || !recurringEventData) return true;
@@ -169,6 +193,7 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
         );
     };
 
+    /* 폼 재설정: 모든 입력 값을 초기값으로 되돌림 */
     const resetForm = () => {
         const today = new Date().toISOString().split("T")[0];
         setFormData({
@@ -200,6 +225,7 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
         handleLocationAdd,
         handleLocationRemove,
         handleRecurringApply,
+        handleRecurringFromThisApply,
         handleRecurringRemove,
         hasRecurringChanged,
         resetForm,
