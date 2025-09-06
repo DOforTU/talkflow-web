@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CreateEventDto, CreateLocationDto, CreateRecurringRuleDto } from "@/lib/types/event.interface";
-import { eventApi } from "@/lib/api/event";
+import { CreateLocationDto, CreateRecurringRuleDto } from "@/lib/types/event.interface";
+import { useEventCreateLogic } from "@/hooks/event/useEventCreateLogic";
 import { getLocalDateString } from "@/lib/utils/dateUtils";
 import {
     COLOR_OPTIONS,
@@ -37,7 +37,22 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
     const [recurring, setRecurring] = useState<CreateRecurringRuleDto | null>(null);
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [showRecurringModal, setShowRecurringModal] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleClose = () => {
+        const dateStr = getLocalDateString(selectedDate);
+        setFormData(createDefaultFormData(dateStr));
+        setLocation(null);
+        setRecurring(null);
+        onClose();
+    };
+
+    const { handleSubmit, isSubmitting } = useEventCreateLogic({
+        formData,
+        location,
+        recurring,
+        onEventCreated,
+        onClose: handleClose,
+    });
 
     // selectedDate가 변경될 때 날짜 필드 업데이트
     useEffect(() => {
@@ -91,53 +106,6 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
 
     const handleRecurringRemove = () => {
         setRecurring(null);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!formData.title.trim()) return;
-
-        setIsSubmitting(true);
-
-        try {
-            let startTime, endTime;
-            if (formData.isAllDay) {
-                // 하루 종일
-                startTime = `${formData.startDate} 00:00`;
-                endTime = `${formData.endDate} 23:59`;
-            } else {
-                startTime = `${formData.startDate} ${formData.startTime}`;
-                endTime = `${formData.endDate} ${formData.endTime}`;
-            }
-
-            const createEventDto: CreateEventDto = {
-                title: formData.title.trim(),
-                description: formData.description.trim() || undefined,
-                startTime,
-                endTime,
-                isAllDay: formData.isAllDay,
-                colorCode: formData.colorCode,
-                location: location || undefined,
-                recurring: recurring || undefined,
-            };
-
-            await eventApi.createEvent(createEventDto);
-            onEventCreated();
-            handleClose();
-        } catch (error) {
-            console.error("Failed to create event:", error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleClose = () => {
-        const dateStr = getLocalDateString(selectedDate);
-        setFormData(createDefaultFormData(dateStr));
-        setLocation(null);
-        setRecurring(null);
-        onClose();
     };
 
     if (!isOpen) return null;
