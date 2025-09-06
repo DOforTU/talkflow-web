@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-    CreateLocationDto,
-    CreateRecurringRuleDto,
-    CreateEventDto,
-} from "@/lib/types/event.interface";
+import { CreateLocationDto, CreateRecurringRuleDto, CreateEventDto } from "@/lib/types/event.interface";
 import { eventApi } from "@/lib/api/event";
 
 interface FormData {
@@ -60,16 +56,9 @@ export const useEventCreateLogic = ({
 
         // recurring 추가
         if (recurring && recurring.rule && recurring.startDate) {
-            let startDate = recurring.startDate;
-
-            // formData.startDate가 이전일 경우에 formData.startDate 사용
-            if (new Date(formData.startDate) < new Date(recurring.startDate)) {
-                startDate = formData.startDate;
-            }
-
             createEventDto.recurring = {
                 rule: recurring.rule,
-                startDate: startDate,
+                startDate: formData.startDate,
                 endDate: recurring.endDate,
             };
         }
