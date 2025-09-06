@@ -28,6 +28,7 @@ interface UseEventUpdateLogicProps {
     onClose: () => void;
     setShowUpdateOptionsModal: (show: boolean) => void;
     hasRecurringChanged: () => boolean;
+    // TODO: 삭제 예정 - 미사용 파라미터
     handleRecurringFromThisApply?: (recurringData: any) => void;
 }
 
@@ -40,6 +41,7 @@ export const useEventUpdateLogic = ({
     onClose,
     setShowUpdateOptionsModal,
     hasRecurringChanged,
+    // TODO: 삭제 예정 - 미사용 파라미터
     handleRecurringFromThisApply,
 }: UseEventUpdateLogicProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -282,6 +284,7 @@ export const useEventUpdateLogic = ({
 
     return {
         handleSubmit,
+        // TODO: 삭제 예정 - 미사용 함수들 (내부에서만 사용됨)
         updateSingleEventDirectly,
         deleteAndCreateRecurringEvent,
         deleteRecurringAndCreateSingleEvent,

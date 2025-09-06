@@ -42,7 +42,8 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
     const [recurring, setRecurring] = useState<UpdateRecurringRuleDto | null>(null);
     const [recurringEventData, setRecurringEventData] = useState<ResponseRecurringEventDto | null>(null);
 
-    // 모달 상태들
+    // 모달 상태들 - 사용 안함: UpdateEventModal에서 직접 상태 관리
+    // TODO: 삭제 예정 - 미사용
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [showRecurringModal, setShowRecurringModal] = useState(false);
 
@@ -194,6 +195,7 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
     };
 
     /* 폼 재설정: 모든 입력 값을 초기값으로 되돌림 */
+    // TODO: 삭제 예정 - 미사용 함수
     const resetForm = () => {
         const today = new Date().toISOString().split("T")[0];
         setFormData({
@@ -216,6 +218,7 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
         location,
         recurring,
         recurringEventData,
+        // TODO: 삭제 예정 - 미사용 상태들
         showLocationModal,
         showRecurringModal,
         setShowLocationModal,
@@ -228,6 +231,7 @@ export const useUpdateEventForm = ({ event, isOpen }: UseUpdateEventFormProps) =
         handleRecurringFromThisApply,
         handleRecurringRemove,
         hasRecurringChanged,
+        // TODO: 삭제 예정 - 미사용 함수
         resetForm,
     };
 };
