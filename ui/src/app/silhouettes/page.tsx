@@ -31,6 +31,9 @@ export default function SilhouettePage() {
     const lastWheelTime = useRef<number>(0);
     const slideHeight = useRef<number>(0);
     const loadingRef = useRef<boolean>(false);
+    const silhouettesRef = useRef<ResponseSilhouetteDto[]>([]);
+    const offsetRef = useRef<number>(0);
+    const hasMoreRef = useRef<boolean>(true);
 
     // 초기 실루엣 로드
     useEffect(() => {
@@ -41,10 +44,19 @@ export default function SilhouettePage() {
                 setSilhouettes(fetchedSilhouettes);
                 setOffset(LIMIT);
                 setHasMore(fetchedSilhouettes.length === LIMIT);
+
+                // ref 업데이트
+                silhouettesRef.current = fetchedSilhouettes;
+                offsetRef.current = LIMIT;
+                hasMoreRef.current = fetchedSilhouettes.length === LIMIT;
             } catch (error) {
                 console.error("Failed to load silhouettes:", error);
                 setSilhouettes([]);
                 setHasMore(false);
+
+                // ref 업데이트
+                silhouettesRef.current = [];
+                hasMoreRef.current = false;
             } finally {
                 setIsLoading(false);
             }
@@ -53,43 +65,59 @@ export default function SilhouettePage() {
         loadInitialSilhouettes();
     }, []);
 
-    // 추가 실루엣 로드 함수
+    // 추가 실루엣 로드 함수 - ref 사용으로 안정적인 useCallback
     const loadMoreSilhouettes = useCallback(async () => {
-        if (isLoadingMore || !hasMore || loadingRef.current) return;
+        if (loadingRef.current || !hasMoreRef.current) return;
 
         try {
             loadingRef.current = true;
             setIsLoadingMore(true);
-            console.log("API Request:", `limit=${LIMIT}, offset=${offset}`);
 
-            const newSilhouettes = await silhouetteApi.getAllSilhouettes(LIMIT, offset);
+            const currentOffset = silhouettesRef.current.length;
+            console.log("API Request:", `limit=${LIMIT}, offset=${currentOffset}`);
+
+            const newSilhouettes = await silhouetteApi.getAllSilhouettes(LIMIT, currentOffset);
 
             if (newSilhouettes.length > 0) {
-                setSilhouettes((prev) => [...prev, ...newSilhouettes]);
-                setOffset((prev) => prev + LIMIT);
-                setHasMore(newSilhouettes.length === LIMIT);
+                setSilhouettes((prev) => {
+                    const updated = [...prev, ...newSilhouettes];
+                    silhouettesRef.current = updated; // ref 업데이트
+                    return updated;
+                });
+                setOffset((prev) => {
+                    const updated = prev + LIMIT;
+                    offsetRef.current = updated; // ref 업데이트
+                    return updated;
+                });
+                const hasMoreUpdated = newSilhouettes.length === LIMIT;
+                setHasMore(hasMoreUpdated);
+                hasMoreRef.current = hasMoreUpdated; // ref 업데이트
             } else {
                 setHasMore(false);
+                hasMoreRef.current = false; // ref 업데이트
             }
         } catch (error) {
             console.error("Failed to load more silhouettes:", error);
             setHasMore(false);
+            hasMoreRef.current = false; // ref 업데이트
         } finally {
             setIsLoadingMore(false);
             loadingRef.current = false;
         }
-    }, [isLoadingMore, hasMore, offset]);
+    }, []); // 빈 의존성 배열 - ref만 사용하므로 재생성되지 않음
 
     // 현재 인덱스가 끝에 가까워지면 더 로드
     useEffect(() => {
         const shouldLoadMore =
-            currentIndex >= silhouettes.length - 3 && hasMore && !isLoadingMore && silhouettes.length > 0;
+            currentIndex >= silhouettesRef.current.length - 3 &&
+            hasMoreRef.current &&
+            !loadingRef.current &&
+            silhouettesRef.current.length > 0;
 
         if (shouldLoadMore) {
-            console.log("Loading more silhouettes...", { currentIndex, length: silhouettes.length, offset });
             loadMoreSilhouettes();
         }
-    }, [currentIndex, silhouettes.length, hasMore, isLoadingMore, loadMoreSilhouettes]);
+    }, [currentIndex, loadMoreSilhouettes]); // 안정적인 의존성 배열
 
     // Initialize slide height and handle resize
     useEffect(() => {

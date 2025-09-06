@@ -49,6 +49,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     // Cleanup preview URLs when modal closes
     useEffect(() => {
         if (!isOpen) {
+            // 현재 uploadFiles 상태를 사용해서 cleanup
             uploadFiles.forEach((file) => URL.revokeObjectURL(file.preview));
             setUploadFiles([]);
             setCurrentIndex(0);
@@ -56,7 +57,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
             setIsPublic(true);
             setShowSettings(false);
         }
-    }, [isOpen, uploadFiles]);
+    }, [isOpen]); // uploadFiles 의존성 제거
 
     // 비디오 러닝타임을 가져오는 함수
     const getVideoDuration = (file: File): Promise<number> => {
