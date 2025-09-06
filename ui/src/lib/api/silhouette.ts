@@ -4,13 +4,13 @@ import apiClient from "./client";
 export const silhouetteApi = {
     // Get all silhouettes
     getAllSilhouettes: async (): Promise<ResponseSilhouetteDto[]> => {
-        const response = await apiClient.get(`api/silhouette`);
+        const response = await apiClient.get(`api/silhouettes`);
         return response.data.data;
     },
 
     // Get my silhouettes
     getMySilhouettes: async (): Promise<ResponseSilhouetteDto[]> => {
-        const response = await apiClient.get(`api/silhouette/my`);
+        const response = await apiClient.get(`api/silhouettes/my`);
         return response.data.data;
     },
 

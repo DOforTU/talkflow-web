@@ -51,6 +51,7 @@
         flex-direction: column;
         gap: 0.5rem;
         border-right: 1px solid var(--border-color);
+        z-index: 100; /* Lower z-index for desktop sidebar */
     }
 }
 

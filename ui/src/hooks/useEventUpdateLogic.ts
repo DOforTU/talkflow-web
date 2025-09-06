@@ -28,6 +28,7 @@ interface UseEventUpdateLogicProps {
     onClose: () => void;
     setShowUpdateOptionsModal: (show: boolean) => void;
     hasRecurringChanged: () => boolean;
+    handleRecurringFromThisApply?: (recurringData: any) => void;
 }
 
 export const useEventUpdateLogic = ({
@@ -39,10 +40,11 @@ export const useEventUpdateLogic = ({
     onClose,
     setShowUpdateOptionsModal,
     hasRecurringChanged,
+    handleRecurringFromThisApply,
 }: UseEventUpdateLogicProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Helper: UpdateEventDto 생성
+    /* 기본 일정 수정을 위한 UpdateEventDto 생성 (단일 → 단일 업데이트에 사용) */
     const buildUpdateEventDto = (): UpdateEventDto => {
         let startTime, endTime;
         if (formData.isAllDay) {
@@ -75,8 +77,8 @@ export const useEventUpdateLogic = ({
         return updateEventDto;
     };
 
-    // Helper: CreateEventDto 생성
-    const buildCreateEventDto = (): CreateEventDto => {
+    /* 새로운 일정 생성을 위한 CreateEventDto 생성 (단일 → 반복, 반복 → 단일, 반복 → 반복에 사용) */
+    const buildCreateEventDto = (forceRecurringStartDate?: string): CreateEventDto => {
         let startTime, endTime;
         if (formData.isAllDay) {
             startTime = `${formData.startDate} 00:00`;
@@ -105,12 +107,22 @@ export const useEventUpdateLogic = ({
                 longitude: location.longitude || 0,
             };
         }
-
         // recurring 추가
         if (recurring && recurring.rule && recurring.startDate) {
+            let startDate = recurring.startDate;
+
+            // forceRecurringStartDate가 있으면 무조건 그 값을 사용 ("이 일정 이후 수정"용)
+            if (forceRecurringStartDate) {
+                startDate = forceRecurringStartDate;
+            }
+            // formData.startDate가 이전일 경우에 formData.startDate 사용
+            else if (new Date(formData.startDate) < new Date(recurring.startDate)) {
+                startDate = formData.startDate;
+            }
+
             createEventDto.recurring = {
                 rule: recurring.rule,
-                startDate: recurring.startDate,
+                startDate: startDate,
                 endDate: recurring.endDate,
             };
         }
@@ -118,7 +130,7 @@ export const useEventUpdateLogic = ({
         return createEventDto;
     };
 
-    // Main submit handler
+    /* 메인 제출 핸들러: 이벤트 상태에 따라 적절한 업데이트 방식을 결정 */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -142,14 +154,15 @@ export const useEventUpdateLogic = ({
         }
     };
 
-    // Case 1: 단일 → 단일
+    /* Case 1: 단일 일정 → 단일 일정 업데이트 (기존 단일 일정의 내용만 수정) */
     const updateSingleEventDirectly = async () => {
         if (!event) return;
 
         setIsSubmitting(true);
         try {
+            // 단일 이벤트 업데이트하고 끝냄
             const updateEventDto = buildUpdateEventDto();
-            await eventApi.updateEvent(event.id, updateEventDto);
+            await eventApi.updateSingleEvent(event.id, updateEventDto);
             onEventUpdated();
             onClose();
         } catch (error) {
@@ -159,7 +172,7 @@ export const useEventUpdateLogic = ({
         }
     };
 
-    // Case 2: 단일 → 반복
+    /* Case 2: 단일 일정 → 반복 일정 변환 (기존 단일 일정 삭제 후 반복 일정 생성) */
     const deleteAndCreateRecurringEvent = async () => {
         if (!event) return;
 
@@ -181,7 +194,7 @@ export const useEventUpdateLogic = ({
         }
     };
 
-    // Case 3: 반복 → 단일
+    /* Case 3: 반복 일정 → 단일 일정 변환 (모든 반복 일정 삭제 후 단일 일정 생성) */
     const deleteRecurringAndCreateSingleEvent = async () => {
         if (!event) return;
 
@@ -203,16 +216,16 @@ export const useEventUpdateLogic = ({
         }
     };
 
-    // Case 4,5: 반복 → 반복 업데이트 옵션별 처리
+    /** Case 4: 반복 -> 반복 */
+    /* "이 일정만 수정" 옵션: 선택된 반복 일정 하나만 단일 일정으로 변환하여 수정 */
     const handleUpdateSingle = async () => {
-        // "이 일정만 수정": updateSingleEvent 호출, recurringEventId => null로 변경
         if (!event) return;
 
         setIsSubmitting(true);
         try {
             const updateEventDto = buildUpdateEventDto();
             // 이 일정만 단일 이벤트로 변경 (recurringEventId를 null로 설정)
-            await eventApi.updateEvent(event.id, updateEventDto);
+            await eventApi.updateSingleEvent(event.id, updateEventDto);
             onEventUpdated();
             onClose();
         } catch (error) {
@@ -222,23 +235,16 @@ export const useEventUpdateLogic = ({
         }
     };
 
+    /* "관련 일정 모두 수정" 옵션: 모든 반복 일정을 삭제하고 새로운 설정으로 반복 일정 재생성 */
     const handleUpdateRecurring = async () => {
-        // "관련 일정 모두 수정"
         if (!event) return;
 
         setIsSubmitting(true);
         try {
-            const updateEventDto = buildUpdateEventDto();
-
-            if (hasRecurringChanged()) {
-                // 반복 패턴이 변경된 경우: 모두 삭제 후 새로 생성
-                await eventApi.deleteRecurringEvents(event.id);
-                const createEventDto = buildCreateEventDto();
-                await eventApi.createEvent(createEventDto);
-            } else {
-                // 반복 패턴 변경 없음: 모든 관련 일정 업데이트
-                await eventApi.updateRecurringEvents(event.id, updateEventDto);
-            }
+            // 관련 일정 모두 삭제 후 새로 생성
+            await eventApi.deleteRecurringEvents(event.id);
+            const createEventDto = buildCreateEventDto();
+            await eventApi.createEvent(createEventDto);
 
             onEventUpdated();
             onClose();
@@ -249,17 +255,20 @@ export const useEventUpdateLogic = ({
         }
     };
 
+    /* "이 일정 이후 수정" 옵션: 선택된 일정 이후의 모든 반복 일정을 삭제하고 새로운 설정으로 재생성 */
     const handleUpdateFromThis = async () => {
-        // "이 일정 이후 수정": 이 일정 이후 삭제 후 새로운 반복 일정 생성
-        if (!event) return;
+        if (!event || !recurring) return;
 
         setIsSubmitting(true);
         try {
             // 이 일정 이후의 모든 반복 일정 삭제
             await eventApi.deleteEventsFromThis(event.id);
 
-            // 새로운 반복 일정 생성
-            const createEventDto = buildCreateEventDto();
+            // 현재 이벤트 날짜를 추출하여 직접 전달
+            const [startDateStr] = event.startTime.split(" ");
+
+            // 새로운 반복 일정 생성 (현재 이벤트 날짜를 시작 날짜로 강제 적용)
+            const createEventDto = buildCreateEventDto(startDateStr);
             await eventApi.createEvent(createEventDto);
 
             onEventUpdated();

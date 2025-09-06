@@ -26,6 +26,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         handleLocationAdd,
         handleLocationRemove,
         handleRecurringApply,
+        handleRecurringFromThisApply,
         handleRecurringRemove,
         hasRecurringChanged,
     } = useUpdateEventForm({ event, isOpen });
@@ -45,6 +46,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         onClose,
         setShowUpdateOptionsModal,
         hasRecurringChanged,
+        handleRecurringFromThisApply,
     });
 
     // 커스텀 handleSubmit: 옵션 모달을 보여줄지 결정
@@ -107,7 +109,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                 // 반복 설정 변경됨: "관련 일정 모두", "이 일정 이후"만 표시
                 return {
                     shouldShowModal: true,
-                    showSingleOption: false,
+                    showSingleOption: false, // "이 일정만 변경" 보여주지 않음
                     showRecurringOption: true,
                     showFromThisOption: true,
                 };
@@ -115,12 +117,6 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
         }
 
         return { shouldShowModal: false };
-    };
-
-    // 기존 함수 유지 (하위 호환성)
-    const getShowSingleOption = () => {
-        const options = getUpdateOptions();
-        return options.showSingleOption || false;
     };
 
     const handleUpdateSingleWithClose = () => {
@@ -169,6 +165,7 @@ export default function UpdateEventModal({ isOpen, onClose, onEventUpdated, even
                     onSubmit={handleSubmit}
                     onClose={onClose}
                     isSubmitting={isSubmitting}
+                    mode="update"
                 />
             </div>
 

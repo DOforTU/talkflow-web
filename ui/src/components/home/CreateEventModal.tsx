@@ -12,6 +12,7 @@ import {
 } from "@/lib/utils/eventFormUtils";
 import RecurringScheduleModal from "./RecurringScheduleModal";
 import LocationSearchModal from "./LocationSearchModal";
+import EventFormSection from "./EventFormSection";
 import "./CreateEventModal.css";
 
 interface CreateEventModalProps {
@@ -154,200 +155,23 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated, sele
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="event-form">
-                    <div className="form-group">
-                        <label htmlFor="title">제목 *</label>
-                        <input
-                            id="title"
-                            type="text"
-                            value={formData.title}
-                            onChange={(e) => updateFormData("title", e.target.value)}
-                            placeholder="일정 제목을 입력하세요"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="description">설명</label>
-                        <textarea
-                            id="description"
-                            value={formData.description}
-                            onChange={(e) => updateFormData("description", e.target.value)}
-                            placeholder="일정 설명을 입력하세요 (선택사항)"
-                            rows={3}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="checkbox-label">
-                            <input
-                                type="checkbox"
-                                checked={formData.isAllDay}
-                                onChange={(e) => updateFormData("isAllDay", e.target.checked)}
-                            />
-                            <span className="checkbox-text">하루종일</span>
-                        </label>
-                    </div>
-
-                    <div className="form-group datetime-group">
-                        <div className="datetime-row">
-                            <div className="datetime-input-group">
-                                <label htmlFor="startDate">시작 날짜</label>
-                                <input
-                                    id="startDate"
-                                    type="date"
-                                    value={formData.startDate}
-                                    onChange={(e) => updateFormData("startDate", e.target.value)}
-                                    required
-                                />
-                            </div>
-                            {!formData.isAllDay && (
-                                <div className="datetime-input-group">
-                                    <label htmlFor="startTime">시작 시간</label>
-                                    <input
-                                        id="startTime"
-                                        type="time"
-                                        value={formData.startTime}
-                                        onChange={(e) => updateFormData("startTime", e.target.value)}
-                                        required={!formData.isAllDay}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                        <div className="datetime-row">
-                            <div className="datetime-input-group">
-                                <label htmlFor="endDate">종료 날짜</label>
-                                <input
-                                    id="endDate"
-                                    type="date"
-                                    value={formData.endDate}
-                                    onChange={(e) => updateFormData("endDate", e.target.value)}
-                                    required
-                                />
-                            </div>
-                            {!formData.isAllDay && (
-                                <div className="datetime-input-group">
-                                    <label htmlFor="endTime">종료 시간</label>
-                                    <input
-                                        id="endTime"
-                                        type="time"
-                                        value={formData.endTime}
-                                        onChange={(e) => updateFormData("endTime", e.target.value)}
-                                        required={!formData.isAllDay}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>색상</label>
-                        <div className="color-picker">
-                            {COLOR_OPTIONS.map((color) => (
-                                <button
-                                    key={color}
-                                    type="button"
-                                    className={`color-option ${formData.colorCode === color ? "selected" : ""}`}
-                                    style={{ backgroundColor: color }}
-                                    onClick={() => selectColor(color)}
-                                    aria-label={`색상 ${color} 선택`}
-                                >
-                                    {formData.colorCode === color && (
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="white">
-                                            <polyline points="20,6 9,17 4,12" />
-                                        </svg>
-                                    )}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>위치</label>
-                        {location ? (
-                            <div className="location-display" onClick={() => setShowLocationModal(true)}>
-                                <div className="location-info">
-                                    <span className="location-name">{location.nameKo || location.nameEn}</span>
-                                    <span className="location-address">{location.address}</span>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="location-remove-btn"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleLocationRemove();
-                                    }}
-                                >
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <line x1="18" y1="6" x2="6" y2="18" />
-                                        <line x1="6" y1="6" x2="18" y2="18" />
-                                    </svg>
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                type="button"
-                                className="location-add-btn"
-                                onClick={() => setShowLocationModal(true)}
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                                    <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                <span>위치 추가</span>
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label>반복</label>
-                        {recurring ? (
-                            <div
-                                className="recurring-display"
-                                onClick={() => setShowRecurringModal(true)}
-                                style={{ cursor: "pointer" }}
-                            >
-                                <div className="recurring-info">
-                                    <span className="recurring-rule">{formatRecurringRule(recurring.rule)}</span>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="recurring-remove-btn"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleRecurringRemove();
-                                    }}
-                                >
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <line x1="18" y1="6" x2="6" y2="18" />
-                                        <line x1="6" y1="6" x2="18" y2="18" />
-                                    </svg>
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                type="button"
-                                className="recurring-add-btn"
-                                onClick={() => setShowRecurringModal(true)}
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M16 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
-                                    <polyline points="16,2 16,6 20,6" />
-                                </svg>
-                                <span>반복 설정</span>
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="form-buttons">
-                        <button type="button" className="cancel-btn" onClick={handleClose}>
-                            취소
-                        </button>
-                        <button type="submit" className="submit-btn" disabled={isSubmitting || !formData.title.trim()}>
-                            {isSubmitting ? "생성 중..." : "생성"}
-                        </button>
-                    </div>
-                </form>
+                <EventFormSection
+                    formData={formData}
+                    location={location}
+                    recurring={recurring}
+                    updateFormData={updateFormData}
+                    selectColor={selectColor}
+                    handleLocationAdd={handleLocationAdd}
+                    handleLocationRemove={handleLocationRemove}
+                    handleRecurringApply={handleRecurringApply}
+                    handleRecurringRemove={handleRecurringRemove}
+                    setShowLocationModal={setShowLocationModal}
+                    setShowRecurringModal={setShowRecurringModal}
+                    onSubmit={handleSubmit}
+                    onClose={handleClose}
+                    isSubmitting={isSubmitting}
+                    mode="create"
+                />
             </div>
 
             <LocationSearchModal

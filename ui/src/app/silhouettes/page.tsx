@@ -14,6 +14,8 @@ export default function SilhouettePage() {
     const [isPlaying, setIsPlaying] = useState(true);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [showSearchUpload, setShowSearchUpload] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
     const startY = useRef<number>(0);
@@ -42,8 +44,11 @@ export default function SilhouettePage() {
     // Initialize slide height and handle resize
     useEffect(() => {
         const updateSlideHeight = () => {
-            // Use viewport height calculation for consistent sizing
-            const vh = window.innerHeight * 0.94; // 94vh for slide height
+            // Use different height calculation for mobile vs desktop
+            const isMobile = window.innerWidth <= 768;
+            const vh = isMobile
+                ? window.innerHeight - 80 // Mobile: match CSS height
+                : window.innerHeight * 0.94; // Desktop: 94vh
 
             slideHeight.current = vh;
             // Initial translateY calculation
@@ -231,6 +236,16 @@ export default function SilhouettePage() {
         };
     }, [silhouettes.length, isTransitioning, currentIndex]);
 
+    const handleUpload = () => {
+        // TODO: Implement upload functionality
+        console.log("Upload silhouette");
+    };
+
+    const handleSearch = () => {
+        // TODO: Implement search functionality
+        console.log("Search:", searchQuery);
+    };
+
     if (isLoading) {
         return (
             <div className="silhouette-loading">
@@ -258,6 +273,39 @@ export default function SilhouettePage() {
 
     return (
         <div className="silhouette-page">
+            {/* Search and Upload Header */}
+            <div className="silhouette-header">
+                <div className="search-upload-container">
+                    <div className="search-section">
+                        <div className="search-input-wrapper">
+                            <input
+                                type="text"
+                                placeholder="실루엣 검색..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                                className="search-input"
+                            />
+                            <button onClick={handleSearch} className="search-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="m21 21-4.35-4.35" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button onClick={handleUpload} className="upload-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                            <polyline points="14,2 14,8 20,8" />
+                            <line x1="12" y1="18" x2="12" y2="12" />
+                            <line x1="9" y1="15" x2="15" y2="15" />
+                        </svg>
+                        <span>업로드</span>
+                    </button>
+                </div>
+            </div>
+
             <div
                 className="silhouette-container"
                 ref={containerRef}

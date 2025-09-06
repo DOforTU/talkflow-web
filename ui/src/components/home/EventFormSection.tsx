@@ -20,8 +20,8 @@ interface FormData {
 
 interface EventFormSectionProps {
     formData: FormData;
-    location: UpdateLocationDto | null;
-    recurring: UpdateRecurringRuleDto | null;
+    location: UpdateLocationDto | CreateLocationDto | null;
+    recurring: UpdateRecurringRuleDto | CreateRecurringRuleDto | null;
     updateFormData: (field: string, value: string | boolean) => void;
     selectColor: (color: string) => void;
     handleLocationAdd: (location: CreateLocationDto) => void;
@@ -30,10 +30,11 @@ interface EventFormSectionProps {
     handleRecurringRemove: () => void;
     setShowLocationModal: (show: boolean) => void;
     setShowRecurringModal: (show: boolean) => void;
-    onDelete: () => void;
+    onDelete?: () => void; // Optional for create modal
     onSubmit: (e: React.FormEvent) => void;
     onClose: () => void;
     isSubmitting: boolean;
+    mode: 'create' | 'update'; // To determine button text and functionality
 }
 
 export default function EventFormSection({
@@ -52,6 +53,7 @@ export default function EventFormSection({
     onSubmit,
     onClose,
     isSubmitting,
+    mode,
 }: EventFormSectionProps) {
     return (
         <form onSubmit={onSubmit} className="event-form">
@@ -94,53 +96,55 @@ export default function EventFormSection({
 
             {/* 날짜 시간 입력 */}
             <div className="form-group datetime-group">
-                <div className="datetime-row">
-                    <div className="datetime-input-group">
-                        <label htmlFor="startDate">시작 날짜</label>
-                        <input
-                            id="startDate"
-                            type="date"
-                            value={formData.startDate}
-                            onChange={(e) => updateFormData("startDate", e.target.value)}
-                            required
-                        />
-                    </div>
-                    {!formData.isAllDay && (
+                <div className="datetime-columns">
+                    <div className="datetime-column">
                         <div className="datetime-input-group">
-                            <label htmlFor="startTime">시작 시간</label>
+                            <label htmlFor="startDate">시작 날짜</label>
                             <input
-                                id="startTime"
-                                type="time"
-                                value={formData.startTime}
-                                onChange={(e) => updateFormData("startTime", e.target.value)}
-                                required={!formData.isAllDay}
+                                id="startDate"
+                                type="date"
+                                value={formData.startDate}
+                                onChange={(e) => updateFormData("startDate", e.target.value)}
+                                required
                             />
                         </div>
-                    )}
-                </div>
-                <div className="datetime-row">
-                    <div className="datetime-input-group">
-                        <label htmlFor="endDate">종료 날짜</label>
-                        <input
-                            id="endDate"
-                            type="date"
-                            value={formData.endDate}
-                            onChange={(e) => updateFormData("endDate", e.target.value)}
-                            required
-                        />
+                        {!formData.isAllDay && (
+                            <div className="datetime-input-group">
+                                <label htmlFor="startTime">시작 시간</label>
+                                <input
+                                    id="startTime"
+                                    type="time"
+                                    value={formData.startTime}
+                                    onChange={(e) => updateFormData("startTime", e.target.value)}
+                                    required={!formData.isAllDay}
+                                />
+                            </div>
+                        )}
                     </div>
-                    {!formData.isAllDay && (
+                    <div className="datetime-column">
                         <div className="datetime-input-group">
-                            <label htmlFor="endTime">종료 시간</label>
+                            <label htmlFor="endDate">종료 날짜</label>
                             <input
-                                id="endTime"
-                                type="time"
-                                value={formData.endTime}
-                                onChange={(e) => updateFormData("endTime", e.target.value)}
-                                required={!formData.isAllDay}
+                                id="endDate"
+                                type="date"
+                                value={formData.endDate}
+                                onChange={(e) => updateFormData("endDate", e.target.value)}
+                                required
                             />
                         </div>
-                    )}
+                        {!formData.isAllDay && (
+                            <div className="datetime-input-group">
+                                <label htmlFor="endTime">종료 시간</label>
+                                <input
+                                    id="endTime"
+                                    type="time"
+                                    value={formData.endTime}
+                                    onChange={(e) => updateFormData("endTime", e.target.value)}
+                                    required={!formData.isAllDay}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -248,14 +252,19 @@ export default function EventFormSection({
 
             {/* 버튼 */}
             <div className="form-buttons">
-                <button type="button" onClick={onDelete} className="delete-btn" disabled={isSubmitting}>
-                    삭제
-                </button>
+                {mode === 'update' && onDelete && (
+                    <button type="button" onClick={onDelete} className="delete-btn" disabled={isSubmitting}>
+                        삭제
+                    </button>
+                )}
                 <button type="button" onClick={onClose} className="cancel-btn">
                     취소
                 </button>
                 <button type="submit" className="submit-btn" disabled={isSubmitting || !formData.title.trim()}>
-                    {isSubmitting ? "수정 중..." : "수정"}
+                    {isSubmitting ? 
+                        (mode === 'create' ? "생성 중..." : "수정 중...") : 
+                        (mode === 'create' ? "생성" : "수정")
+                    }
                 </button>
             </div>
         </form>
