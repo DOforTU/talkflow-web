@@ -76,3 +76,13 @@
 .header-notification:hover svg {
     stroke: var(--primary);
 }
+
+.login-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    background-color: var(--primary);
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+}

@@ -1,0 +1,115 @@
+.user-profile-page {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+.profile-page-image-container {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.profile-page-image {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-page-image-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #666;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-nickname {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.profile-bio {
+    margin: 0 0 1rem 0;
+    color: #666;
+    line-height: 1.4;
+}
+
+.follow-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.profile-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.profile-settings-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.follow-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.follow-btn.following {
+    border: 1px solid #d0d0d0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.follow-btn.not-following {
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+}
+
+.loading-container {
+    padding: 2rem;
+    text-align: center;
+}
+
+.error-container {
+    padding: 2rem;
+    text-align: center;
+}
+
+.content-area {
+    padding: 2rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #fff;
+    text-align: center;
+    color: #666;
+}

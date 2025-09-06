@@ -106,6 +106,7 @@ export default function EventFormSection({
                                 value={formData.startDate}
                                 onChange={(e) => updateFormData("startDate", e.target.value)}
                                 required
+                                readOnly // 시작 날짜는 수정 불가(에러 방지)
                             />
                         </div>
                         {!formData.isAllDay && (

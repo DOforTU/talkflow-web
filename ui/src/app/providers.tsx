@@ -28,6 +28,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, ReactNode, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useCurrentUser, useAutoTokenRefresh } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
 
@@ -56,6 +57,13 @@ function AuthInitializer({ children }: { children: ReactNode }) {
 }
 
 export default function Providers({ children }: ProvidersProps) {
+    const pathname = usePathname();
+    
+    // about 페이지는 provider 없이 렌더링
+    if (pathname.startsWith('/about')) {
+        return <>{children}</>;
+    }
+    
     // 🔧 QueryClient 인스턴스를 useState로 생성 (컴포넌트 리렌더링 시 재생성 방지)
     const [queryClient] = useState(
         () =>
