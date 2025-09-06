@@ -22,7 +22,7 @@ export enum SilhouetteType {
 
 export interface ResponseSilhouetteDto {
     id: number;
-    title: string;
+    title: string | null;
     contentUrl: string;
     type: SilhouetteType;
     createdAt: string;

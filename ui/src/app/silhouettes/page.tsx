@@ -6,10 +6,10 @@ import { SilhouetteType } from "@/lib/types/silhouette.interface";
 import SearchModal from "@/components/silhouettes/SearchModal";
 import UploadModal from "@/components/silhouettes/UploadModal";
 import BottomNav from "@/components/navigation/BottomNav";
-import { useSilhouetteData } from "@/hooks/useSilhouetteData";
-import { useSlideNavigation } from "@/hooks/useSlideNavigation";
-import { useVideoControl } from "@/hooks/useVideoControl";
-import { useTouchNavigation } from "@/hooks/useTouchNavigation";
+import { useSilhouetteData } from "@/hooks/silhouette/useSilhouetteData";
+import { useSlideNavigation } from "@/hooks/silhouette/useSlideNavigation";
+import { useVideoControl } from "@/hooks/silhouette/useVideoControl";
+import { useTouchNavigation } from "@/hooks/silhouette/useTouchNavigation";
 
 export default function SilhouettePage() {
     // ==================== MODAL STATE ====================
@@ -261,7 +261,7 @@ export default function SilhouettePage() {
                                     ) : (
                                         <img
                                             src={silhouette.contentUrl}
-                                            alt={silhouette.title}
+                                            alt={silhouette.title || "Silhouette Image"}
                                             className="silhouette-image"
                                         />
                                     )}
@@ -291,7 +291,7 @@ export default function SilhouettePage() {
                                             />
                                             <div className="user-details">
                                                 <p className="user-nickname">@{silhouette.profile.nickname}</p>
-                                                <p className="silhouette-title">{silhouette.title}</p>
+                                                <p className="silhouette-title">{silhouette.title || "제목 없음"}</p>
                                             </div>
                                         </div>
                                         <div className="action-buttons">

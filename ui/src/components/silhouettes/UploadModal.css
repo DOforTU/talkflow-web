@@ -123,7 +123,7 @@
 }
 
 .upload-submit-btn.disabled {
-    background: var(--text-4);
+    background: var(--text-3);
     cursor: not-allowed;
     opacity: 0.6;
 }
