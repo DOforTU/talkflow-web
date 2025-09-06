@@ -1,0 +1,619 @@
+/* Upload Modal Styles - Inspired by Silhouette Slide Design */
+.upload-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.upload-modal {
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    max-width: 480px;
+    height: 100vh;
+}
+
+/* Mobile styles (default) - Full screen on mobile */
+@media (max-width: 768px) {
+    .upload-modal-overlay {
+        align-items: stretch;
+    }
+
+    .upload-modal {
+        width: 100vw;
+        height: 100vh;
+        max-width: 480px; /* Same as slide max-width */
+        margin: 0 auto;
+        border-radius: 0;
+        border: none;
+        position: relative; /* 추가 - 자식 요소들의 절대 위치 기준점 */
+        /* Account for bottom navigation height */
+    }
+}
+
+/* Desktop styles - Modal dialog */
+@media (min-width: 769px) {
+    .upload-modal-overlay {
+        align-items: flex-start;
+        /* Account for left sidebar width (240px from BottomNav.css) */
+        padding-left: 240px;
+    }
+
+    .upload-modal {
+        width: 100%;
+        max-width: 480px;
+        height: 100vh;
+        margin-top: 0;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+}
+
+/* Modal Header */
+.upload-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: transparent;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 30;
+}
+
+.upload-modal-header h2 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-1);
+    margin: 0;
+}
+
+.close-btn,
+.delete-btn {
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.close-btn:hover,
+.delete-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+.close-btn svg,
+.delete-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.upload-submit-btn {
+    background: var(--primary);
+    border: none;
+    color: var(--bg-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.upload-submit-btn.disabled {
+    background: var(--text-3);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Modal Content */
+.upload-modal-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    background-color: var(--bg-primary);
+}
+
+/* Upload Dropzone */
+.upload-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    margin: 2rem;
+    margin-top: 4rem;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--bg-primary);
+    min-height: 300px;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.drag-over {
+    border-color: var(--border);
+    background: var(--bg-secondary);
+}
+
+.upload-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-icon svg {
+    width: 48px;
+    height: 48px;
+}
+
+.upload-dropzone h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-1);
+    margin: 0 0 0.5rem 0;
+}
+
+.upload-dropzone p {
+    font-size: var(--font-size-sm);
+    color: var(--text-2);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.5;
+}
+
+.select-files-btn {
+    background: var(--primary);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Preview Section - Inspired by Slide Design */
+.upload-preview {
+    padding: 0;
+    position: relative;
+}
+
+.preview-slide {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: calc(100vh - 56px);
+    margin: 0 auto;
+    border-radius: 0;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+.preview-media {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-image,
+.preview-video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+.remove-file-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.remove-file-btn:hover {
+    background: rgba(255, 59, 92, 0.9);
+    color: white;
+    transform: scale(1.1);
+}
+
+.remove-file-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Thumbnail Navigation - Similar to Progress Indicator */
+.thumbnail-nav {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.thumbnail-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.thumbnail {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--bg-secondary);
+    padding: 0;
+}
+
+.thumbnail:hover {
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.thumbnail.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+.thumbnail img,
+.thumbnail video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.add-more-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: var(--font-size-sm);
+    margin-bottom: 1.5rem;
+}
+
+.add-more-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+    color: var(--text-1);
+}
+
+.add-more-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Form Section */
+.upload-form {
+    border-top: 1px solid var(--border-color);
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 0.5rem;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-1);
+    font-size: var(--font-size-sm);
+    transition: all 0.2s ease;
+    resize: none;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: var(--text-3);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .upload-modal-header {
+        padding: 1rem;
+        padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+    }
+
+    .upload-dropzone {
+        margin: 1rem;
+        padding: 2rem 1rem;
+        min-height: 250px;
+        margin-top: 4rem;
+    }
+
+    .upload-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .upload-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .upload-dropzone h3 {
+        font-size: var(--font-size-md);
+    }
+
+    .preview-slide {
+        height: calc(100vh - 56px);
+        border-radius: 0;
+    }
+
+    .thumbnail {
+        width: 50px;
+        height: 50px;
+    }
+
+    .upload-form {
+        padding: 1rem;
+    }
+
+    .form-input,
+    .form-textarea {
+        padding: 0.75rem;
+    }
+
+    .settings-toggle-btn {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+        max-width: calc(480px - 2rem); /* 모달 max-width에서 좌우 마진 제외 */
+        margin: 0 auto;
+    }
+}
+
+/* Loading State */
+.upload-submit-btn:disabled {
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-submit-btn:disabled::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Scrollbar styling */
+.upload-modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.upload-modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.upload-modal-content::-webkit-scrollbar-thumb {
+    background: var(--text-4);
+    border-radius: 3px;
+}
+
+.upload-modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--text-3);
+}
+
+/* Radio Button Styling */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--text-1);
+}
+
+.radio-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.radio-text {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.radio-option:hover .radio-text {
+    color: var(--primary);
+}
+
+/* Settings Toggle Button */
+.settings-toggle-btn {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--text-1);
+    backdrop-filter: blur(8px);
+    border: none;
+    border-radius: 1rem;
+    color: var(--bg-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 15;
+}
+
+.settings-toggle-btn:hover {
+    opacity: 0.9;
+}
+
+.settings-toggle-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Settings Slide Up Panel */
+.settings-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.3);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 20;
+    max-height: 70vh;
+    max-width: 480px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.settings-panel.show {
+    transform: translateY(0);
+}
+
+.settings-panel-content {
+    padding: 1.5rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-header h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-1);
+    margin: 0;
+}
+
+.close-settings-btn {
+    background: none;
+    border: none;
+    color: var(--text-2);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-settings-btn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-1);
+}
+
+.close-settings-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}

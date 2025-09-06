@@ -2,250 +2,152 @@
 
 import { useState, useEffect, useRef } from "react";
 import "./SilhouettePage.css";
-import { silhouetteApi } from "@/lib/api/silhouette";
-import { ResponseSilhouetteDto, SilhouetteType } from "@/lib/types/silhouette.interface";
+import { SilhouetteType } from "@/lib/types/silhouette.interface";
+import SearchModal from "@/components/silhouettes/SearchModal";
+import UploadModal from "@/components/silhouettes/UploadModal";
+import BottomNav from "@/components/navigation/BottomNav";
+import { useSilhouetteData } from "@/hooks/silhouette/useSilhouetteData";
+import { useSlideNavigation } from "@/hooks/silhouette/useSlideNavigation";
+import { useVideoControl } from "@/hooks/silhouette/useVideoControl";
+import { useTouchNavigation } from "@/hooks/silhouette/useTouchNavigation";
 
 export default function SilhouettePage() {
-    const [silhouettes, setSilhouettes] = useState<ResponseSilhouetteDto[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [translateY, setTranslateY] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(true);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [showSearchUpload, setShowSearchUpload] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
+    // ==================== MODAL STATE ====================
+    const [modalState, setModalState] = useState({
+        showSearchModal: false,
+        showUploadModal: false,
+    });
+
+    // ==================== CUSTOM HOOKS ====================
+    const { silhouettes, isLoading, isLoadingMore, hasMore, offset, loadInitialSilhouettes, loadMoreSilhouettes } =
+        useSilhouetteData();
+
+    const {
+        currentIndex,
+        isTransitioning,
+        translateY,
+        goToSlide,
+        handleNext,
+        handlePrev,
+        updateSlideHeight,
+        updateTranslateY,
+        resetToFirst,
+    } = useSlideNavigation(silhouettes.length);
+
+    const {
+        isPlaying,
+        currentTime,
+        duration,
+        videoRefs,
+        handleVideoClick: videoHandleClick,
+        handleVideoTimeUpdate,
+        handleSeekBarChange,
+    } = useVideoControl();
+
+    const { handleTouchStart, handleTouchMove, handleTouchEnd, handleKeyDown, handleWheel } = useTouchNavigation(
+        isTransitioning,
+        handleNext,
+        handlePrev
+    );
+
+    // ==================== REFS ====================
     const containerRef = useRef<HTMLDivElement>(null);
-    const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
-    const startY = useRef<number>(0);
-    const currentY = useRef<number>(0);
-    const isDragging = useRef<boolean>(false);
-    const lastWheelTime = useRef<number>(0);
-    const slideHeight = useRef<number>(0);
 
-    useEffect(() => {
-        const loadSilhouettes = async () => {
-            try {
-                setIsLoading(true);
-                const fetchedSilhouettes = await silhouetteApi.getAllSilhouettes();
-                setSilhouettes(fetchedSilhouettes);
-            } catch (error) {
-                console.error("Failed to load silhouettes:", error);
-                setSilhouettes([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    // ==================== MODAL HANDLERS ====================
+    const openUploadModal = () => setModalState((prev) => ({ ...prev, showUploadModal: true }));
 
-        loadSilhouettes();
-    }, []);
+    const openSearchModal = () => setModalState((prev) => ({ ...prev, showSearchModal: true }));
 
-    // Initialize slide height and handle resize
-    useEffect(() => {
-        const updateSlideHeight = () => {
-            // Use different height calculation for mobile vs desktop
-            const isMobile = window.innerWidth <= 768;
-            const vh = isMobile
-                ? window.innerHeight - 80 // Mobile: match CSS height
-                : window.innerHeight * 0.94; // Desktop: 94vh
+    const closeSearchModal = () => setModalState((prev) => ({ ...prev, showSearchModal: false }));
 
-            slideHeight.current = vh;
-            // Initial translateY calculation
-            setTranslateY(-currentIndex * vh);
-        };
-
-        updateSlideHeight();
-        window.addEventListener("resize", updateSlideHeight);
-
-        return () => {
-            window.removeEventListener("resize", updateSlideHeight);
-        };
-    }, [currentIndex]);
-
-    // Update translateY when currentIndex changes
-    useEffect(() => {
-        if (slideHeight.current > 0) {
-            const newTranslateY = -currentIndex * slideHeight.current;
-            setTranslateY(newTranslateY);
+    const closeUploadModal = async (uploaded?: boolean) => {
+        setModalState((prev) => ({ ...prev, showUploadModal: false }));
+        if (uploaded) {
+            await loadInitialSilhouettes();
+            resetToFirst();
         }
-    }, [currentIndex]);
+    };
 
-    // Handle video playback when currentIndex changes
-    useEffect(() => {
-        if (silhouettes.length === 0) return;
-
+    // ==================== VIDEO HANDLERS ====================
+    const clickVideo = () => {
         const currentSilhouette = silhouettes[currentIndex];
-
-        // Pause all videos first
-        Object.values(videoRefs.current).forEach((video) => {
-            if (video) {
-                video.pause();
-            }
-        });
-
-        // If current slide is a video, play it and reset states
-        if (currentSilhouette?.type === SilhouetteType.VIDEO) {
-            const currentVideoElement = videoRefs.current[currentSilhouette.id];
-            if (currentVideoElement) {
-                setIsPlaying(true);
-                setCurrentTime(0);
-                currentVideoElement.currentTime = 0;
-                currentVideoElement.play().catch(console.error);
-            }
-        }
-    }, [currentIndex, silhouettes]);
-
-    const goToSlide = (newIndex: number) => {
-        if (isTransitioning || newIndex === currentIndex || newIndex < 0 || newIndex >= silhouettes.length) {
-            return;
-        }
-
-        setIsTransitioning(true);
-        setCurrentIndex(newIndex);
-
-        setTimeout(() => {
-            setIsTransitioning(false);
-        }, 500);
-    };
-
-    const handleNext = () => {
-        const nextIndex = (currentIndex + 1) % silhouettes.length;
-        goToSlide(nextIndex);
-    };
-
-    const handlePrev = () => {
-        const prevIndex = (currentIndex - 1 + silhouettes.length) % silhouettes.length;
-        goToSlide(prevIndex);
-    };
-
-    const handleVideoClick = () => {
-        const currentSilhouette = silhouettes[currentIndex];
-        if (currentSilhouette?.type === SilhouetteType.VIDEO) {
-            const videoElement = videoRefs.current[currentSilhouette.id];
-            if (videoElement) {
-                if (isPlaying) {
-                    videoElement.pause();
-                    setIsPlaying(false);
-                } else {
-                    videoElement.play();
-                    setIsPlaying(true);
-                }
-            }
+        if (currentSilhouette) {
+            videoHandleClick(currentSilhouette);
         }
     };
 
-    const handleVideoTimeUpdate = (videoElement: HTMLVideoElement) => {
-        setCurrentTime(videoElement.currentTime);
-        setDuration(videoElement.duration || 0);
-    };
-
-    const handleSeekBarChange = (newTime: number) => {
+    const handleSeekChange = (newTime: number) => {
         const currentSilhouette = silhouettes[currentIndex];
         if (currentSilhouette?.type === SilhouetteType.VIDEO) {
             const videoElement = videoRefs.current[currentSilhouette.id];
             if (videoElement) {
                 videoElement.currentTime = newTime;
-                setCurrentTime(newTime);
             }
         }
+        handleSeekBarChange(newTime);
     };
 
-    // Touch/Mouse event handlers for vertical swipe
-    const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-        if (isTransitioning) return;
-
-        isDragging.current = true;
-        const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-        startY.current = clientY;
-        currentY.current = clientY;
-    };
-
-    const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
-        if (!isDragging.current || isTransitioning) return;
-
-        e.preventDefault();
-        const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-        currentY.current = clientY;
-    };
-
-    const handleTouchEnd = () => {
-        if (!isDragging.current || isTransitioning) {
-            isDragging.current = false;
-            return;
-        }
-
-        const deltaY = currentY.current - startY.current;
-        const threshold = 50; // Minimum swipe distance
-
-        if (Math.abs(deltaY) > threshold) {
-            if (deltaY > 0) {
-                // Swipe down - go to previous (scroll up)
-                handlePrev();
-            } else {
-                // Swipe up - go to next (scroll down)
-                handleNext();
-            }
-        }
-
-        isDragging.current = false;
-    };
-
-    // Keyboard and wheel navigation
+    // ==================== EFFECTS ====================
+    // 초기 로드
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "ArrowUp") {
-                e.preventDefault();
-                handlePrev();
-            } else if (e.key === "ArrowDown") {
-                e.preventDefault();
-                handleNext();
-            }
-        };
+        loadInitialSilhouettes();
+    }, [loadInitialSilhouettes]);
 
-        const handleWheel = (e: WheelEvent) => {
-            e.preventDefault();
+    // 무한 스크롤: 현재 인덱스가 끝에 가까워지면 더 로드
+    useEffect(() => {
+        const shouldLoadMore = currentIndex >= silhouettes.length - 3 && hasMore && !isLoading && !isLoadingMore;
+        if (shouldLoadMore) {
+            loadMoreSilhouettes();
+        }
+    }, [currentIndex, silhouettes.length, hasMore, isLoading, isLoadingMore, loadMoreSilhouettes]);
 
-            // Block all scrolls during transition
-            if (isTransitioning) return;
+    // 슬라이드 높이 초기화 및 리사이즈 핸들러
+    useEffect(() => {
+        updateSlideHeight();
+        window.addEventListener("resize", updateSlideHeight);
+        return () => window.removeEventListener("resize", updateSlideHeight);
+    }, [updateSlideHeight]);
 
-            const now = Date.now();
-            // Debounce to prevent multiple slides
-            if (now - lastWheelTime.current < 800) return;
+    // translateY 업데이트
+    useEffect(() => {
+        updateTranslateY();
+    }, [currentIndex, updateTranslateY]);
 
-            lastWheelTime.current = now;
-
-            // Scroll threshold
-            if (Math.abs(e.deltaY) > 10) {
-                if (e.deltaY > 0) {
-                    // Scroll down - go to next slide
-                    handleNext();
-                } else {
-                    // Scroll up - go to previous slide
-                    handlePrev();
-                }
-            }
-        };
-
+    // 키보드 이벤트 리스너
+    useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
-        window.addEventListener("wheel", handleWheel, { passive: false });
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [handleKeyDown]);
 
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-            window.removeEventListener("wheel", handleWheel);
-        };
-    }, [silhouettes.length, isTransitioning, currentIndex]);
+    // 휠 이벤트 리스너
+    useEffect(() => {
+        const handleWheelEvent = (e: WheelEvent) => handleWheel(e);
+        window.addEventListener("wheel", handleWheelEvent, { passive: false });
+        return () => window.removeEventListener("wheel", handleWheelEvent);
+    }, [handleWheel]);
 
-    const handleUpload = () => {
-        // TODO: Implement upload functionality
-        console.log("Upload silhouette");
-    };
+    // 비디오 재생 관리: 현재 인덱스 변경시 비디오 처리
+    useEffect(() => {
+        if (silhouettes.length === 0) return;
 
-    const handleSearch = () => {
-        // TODO: Implement search functionality
-        console.log("Search:", searchQuery);
-    };
+        const currentSilhouette = silhouettes[currentIndex];
 
+        // 모든 비디오 일시정지
+        Object.values(videoRefs.current).forEach((video) => {
+            if (video) video.pause();
+        });
+
+        // 현재 슬라이드가 비디오면 재생
+        if (currentSilhouette?.type === SilhouetteType.VIDEO) {
+            const currentVideoElement = videoRefs.current[currentSilhouette.id];
+            if (currentVideoElement) {
+                currentVideoElement.currentTime = 0;
+                currentVideoElement.play().catch(console.error);
+            }
+        }
+    }, [currentIndex, silhouettes, videoRefs]);
+
+    // ==================== RENDER CONDITIONS ====================
     if (isLoading) {
         return (
             <div className="silhouette-loading">
@@ -276,32 +178,19 @@ export default function SilhouettePage() {
             {/* Search and Upload Header */}
             <div className="silhouette-header">
                 <div className="search-upload-container">
-                    <div className="search-section">
-                        <div className="search-input-wrapper">
-                            <input
-                                type="text"
-                                placeholder="실루엣 검색..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                                className="search-input"
-                            />
-                            <button onClick={handleSearch} className="search-btn">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <circle cx="11" cy="11" r="8" />
-                                    <path d="m21 21-4.35-4.35" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <button onClick={handleUpload} className="upload-btn">
+                    <button onClick={openSearchModal} className="search-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                        </svg>
+                    </button>
+                    <button onClick={openUploadModal} className="upload-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                             <polyline points="14,2 14,8 20,8" />
                             <line x1="12" y1="18" x2="12" y2="12" />
                             <line x1="9" y1="15" x2="15" y2="15" />
                         </svg>
-                        <span>업로드</span>
                     </button>
                 </div>
             </div>
@@ -331,7 +220,7 @@ export default function SilhouettePage() {
                         if (!isVisible) {
                             return (
                                 <div
-                                    key={silhouette.id}
+                                    key={`${silhouette.id}-${index}`}
                                     className="slide"
                                     style={{ opacity: 0, pointerEvents: "none" }}
                                 ></div>
@@ -340,7 +229,7 @@ export default function SilhouettePage() {
 
                         return (
                             <div
-                                key={silhouette.id}
+                                key={`${silhouette.id}-${index}`}
                                 className="slide"
                                 style={{
                                     opacity: index === currentIndex ? 1 : 0,
@@ -349,7 +238,7 @@ export default function SilhouettePage() {
                             >
                                 <div
                                     className="silhouette-video-container"
-                                    onClick={silhouette.type === SilhouetteType.VIDEO ? handleVideoClick : undefined}
+                                    onClick={silhouette.type === SilhouetteType.VIDEO ? clickVideo : undefined}
                                 >
                                     {silhouette.type === SilhouetteType.VIDEO ? (
                                         <video
@@ -362,18 +251,17 @@ export default function SilhouettePage() {
                                             className="silhouette-video"
                                             loop
                                             muted
-                                            autoPlay={currentIndex === index && isPlaying}
                                             onTimeUpdate={(e) =>
                                                 currentIndex === index && handleVideoTimeUpdate(e.currentTarget)
                                             }
                                             onLoadedMetadata={(e) =>
-                                                currentIndex === index && setDuration(e.currentTarget.duration)
+                                                currentIndex === index && (e.currentTarget.duration || 0)
                                             }
                                         />
                                     ) : (
                                         <img
                                             src={silhouette.contentUrl}
-                                            alt={silhouette.title}
+                                            alt={silhouette.title || "Silhouette Image"}
                                             className="silhouette-image"
                                         />
                                     )}
@@ -403,7 +291,7 @@ export default function SilhouettePage() {
                                             />
                                             <div className="user-details">
                                                 <p className="user-nickname">@{silhouette.profile.nickname}</p>
-                                                <p className="silhouette-title">{silhouette.title}</p>
+                                                <p className="silhouette-title">{silhouette.title || "제목 없음"}</p>
                                             </div>
                                         </div>
                                         <div className="action-buttons">
@@ -425,6 +313,7 @@ export default function SilhouettePage() {
                                         </div>
                                     </div>
                                 </div>
+
                                 {/* Custom Video Seek Bar - Only show for video content */}
                                 {silhouettes[currentIndex]?.type === SilhouetteType.VIDEO && (
                                     <div className="video-seek-bar">
@@ -433,7 +322,7 @@ export default function SilhouettePage() {
                                             min="0"
                                             max={duration || 0}
                                             value={currentTime}
-                                            onChange={(e) => handleSeekBarChange(parseFloat(e.target.value))}
+                                            onChange={(e) => handleSeekChange(parseFloat(e.target.value))}
                                             className="seek-slider"
                                             style={
                                                 {
@@ -450,6 +339,15 @@ export default function SilhouettePage() {
                     })}
                 </div>
             </div>
+
+            {/* Search Modal */}
+            <SearchModal isOpen={modalState.showSearchModal} onClose={closeSearchModal} />
+
+            {/* Upload Modal */}
+            <UploadModal isOpen={modalState.showUploadModal} onClose={closeUploadModal} />
+
+            {/* Bottom Navigation */}
+            <BottomNav />
         </div>
     );
 }

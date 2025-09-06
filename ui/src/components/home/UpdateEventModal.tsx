@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { UpdateEventModalProps } from "@/lib/types/event.interface";
-import { useUpdateEventForm } from "../../hooks/useUpdateEventForm";
-import { useEventUpdateLogic } from "../../hooks/useEventUpdateLogic";
-import { useEventDeleteLogic } from "../../hooks/useEventDeleteLogic";
+import { useUpdateEventForm } from "../../hooks/event/useUpdateEventForm";
+import { useEventUpdateLogic } from "../../hooks/event/useEventUpdateLogic";
+import { useEventDeleteLogic } from "../../hooks/event/useEventDeleteLogic";
 import EventFormSection from "./EventFormSection";
 import LocationSearchModal from "./LocationSearchModal";
 import RecurringScheduleModal from "./RecurringScheduleModal";

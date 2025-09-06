@@ -34,7 +34,7 @@ interface EventFormSectionProps {
     onSubmit: (e: React.FormEvent) => void;
     onClose: () => void;
     isSubmitting: boolean;
-    mode: 'create' | 'update'; // To determine button text and functionality
+    mode: "create" | "update"; // To determine button text and functionality
 }
 
 export default function EventFormSection({
@@ -252,7 +252,7 @@ export default function EventFormSection({
 
             {/* 버튼 */}
             <div className="form-buttons">
-                {mode === 'update' && onDelete && (
+                {mode === "update" && onDelete && (
                     <button type="button" onClick={onDelete} className="delete-btn" disabled={isSubmitting}>
                         삭제
                     </button>
@@ -261,10 +261,13 @@ export default function EventFormSection({
                     취소
                 </button>
                 <button type="submit" className="submit-btn" disabled={isSubmitting || !formData.title.trim()}>
-                    {isSubmitting ? 
-                        (mode === 'create' ? "생성 중..." : "수정 중...") : 
-                        (mode === 'create' ? "생성" : "수정")
-                    }
+                    {isSubmitting
+                        ? mode === "create"
+                            ? "생성 중..."
+                            : "수정 중..."
+                        : mode === "create"
+                        ? "생성"
+                        : "수정"}
                 </button>
             </div>
         </form>

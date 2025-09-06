@@ -1,22 +1,10 @@
-import { create } from "zustand";
 // ===== Create Silhouette DTO =====
 export interface CreateSilhouetteDto {
-    title: string;
-    description?: string;
     contentUrl: string;
-    thumbnailUrl?: string;
-    duration?: number;
-    tags?: string[];
-}
-
-// ===== Update Silhouette DTO =====
-export interface UpdateSilhouetteDto {
     title?: string;
-    description?: string;
-    contentUrl?: string;
-    thumbnailUrl?: string;
-    duration?: number;
-    tags?: string[];
+    isPublic: boolean;
+    runningTime?: number;
+    type: "image" | "video";
 }
 
 // ===== User Profile DTO =====
@@ -34,7 +22,7 @@ export enum SilhouetteType {
 
 export interface ResponseSilhouetteDto {
     id: number;
-    title: string;
+    title: string | null;
     contentUrl: string;
     type: SilhouetteType;
     createdAt: string;

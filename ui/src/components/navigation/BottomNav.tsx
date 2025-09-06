@@ -3,14 +3,48 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import "./BottomNav.css";
+import { use } from "react";
+import { useAuthStore } from "@/store/authStore";
 
 export default function BottomNav() {
     const pathname = usePathname();
+    const { user, profile, isAuthenticated } = useAuthStore();
 
     const isActive = (path: string) => {
         return pathname === path;
     };
 
+    // 로그인하지 않은 상태의 네비게이션
+    if (!isAuthenticated) {
+        return (
+            <nav className="bottom-nav">
+                <Link href="/" className={`nav-item ${isActive("/") ? "active" : ""}`}>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                        />
+                    </svg>
+                    <span>로그인 하기</span>
+                </Link>
+                <Link href="/about" className={`nav-item ${isActive("/about") ? "active" : ""}`}>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                    <span>Learn more</span>
+                </Link>
+            </nav>
+        );
+    }
+
+    // 로그인한 상태의 기존 네비게이션
     return (
         <nav className="bottom-nav">
             <Link href="/home" className={`nav-item ${isActive("/home") ? "active" : ""}`}>
