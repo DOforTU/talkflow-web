@@ -106,6 +106,7 @@ export default function EventFormSection({
                                 value={formData.startDate}
                                 onChange={(e) => updateFormData("startDate", e.target.value)}
                                 required
+                                readOnly
                             />
                         </div>
                         {!formData.isAllDay && (
