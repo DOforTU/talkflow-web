@@ -1,10 +1,10 @@
-import { CreateSilhouetteDto, ResponseSilhouetteDto, UpdateSilhouetteDto } from "../types/silhouette.interface";
+import { CreateSilhouetteDto, ResponseSilhouetteDto } from "../types/silhouette.interface";
 import apiClient from "./client";
 
 export const silhouetteApi = {
-    // Get all silhouettes
-    getAllSilhouettes: async (): Promise<ResponseSilhouetteDto[]> => {
-        const response = await apiClient.get(`api/silhouettes`);
+    // Get all silhouettes with pagination
+    getAllSilhouettes: async (limit: number = 10, offset: number = 0): Promise<ResponseSilhouetteDto[]> => {
+        const response = await apiClient.get(`api/silhouettes?limit=${limit}&offset=${offset}`);
         return response.data.data;
     },
 
@@ -22,16 +22,7 @@ export const silhouetteApi = {
 
     // Create silhouette
     createSilhouette: async (silhouetteData: CreateSilhouetteDto): Promise<ResponseSilhouetteDto> => {
-        const response = await apiClient.post(`api/silhouettes`, silhouetteData);
-        return response.data.data;
-    },
-
-    // Update silhouette
-    updateSilhouette: async (
-        silhouetteId: number,
-        silhouetteData: UpdateSilhouetteDto
-    ): Promise<ResponseSilhouetteDto> => {
-        const response = await apiClient.patch(`api/silhouettes/${silhouetteId}`, silhouetteData);
+        const response = await apiClient.post(`api/silhouettes/create`, silhouetteData);
         return response.data.data;
     },
 

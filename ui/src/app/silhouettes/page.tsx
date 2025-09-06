@@ -1,21 +1,28 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import "./SilhouettePage.css";
 import { silhouetteApi } from "@/lib/api/silhouette";
 import { ResponseSilhouetteDto, SilhouetteType } from "@/lib/types/silhouette.interface";
+import SearchModal from "@/components/silhouettes/SearchModal";
+import UploadModal from "@/components/silhouettes/UploadModal";
+
+const LIMIT = 10;
 
 export default function SilhouettePage() {
     const [silhouettes, setSilhouettes] = useState<ResponseSilhouetteDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [offset, setOffset] = useState(0);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [translateY, setTranslateY] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [showSearchUpload, setShowSearchUpload] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [showSearchModal, setShowSearchModal] = useState(false);
+    const [showUploadModal, setShowUploadModal] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
     const startY = useRef<number>(0);
@@ -23,23 +30,66 @@ export default function SilhouettePage() {
     const isDragging = useRef<boolean>(false);
     const lastWheelTime = useRef<number>(0);
     const slideHeight = useRef<number>(0);
+    const loadingRef = useRef<boolean>(false);
 
+    // 초기 실루엣 로드
     useEffect(() => {
-        const loadSilhouettes = async () => {
+        const loadInitialSilhouettes = async () => {
             try {
                 setIsLoading(true);
-                const fetchedSilhouettes = await silhouetteApi.getAllSilhouettes();
+                const fetchedSilhouettes = await silhouetteApi.getAllSilhouettes(LIMIT, 0);
                 setSilhouettes(fetchedSilhouettes);
+                setOffset(LIMIT);
+                setHasMore(fetchedSilhouettes.length === LIMIT);
             } catch (error) {
                 console.error("Failed to load silhouettes:", error);
                 setSilhouettes([]);
+                setHasMore(false);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        loadSilhouettes();
+        loadInitialSilhouettes();
     }, []);
+
+    // 추가 실루엣 로드 함수
+    const loadMoreSilhouettes = useCallback(async () => {
+        if (isLoadingMore || !hasMore || loadingRef.current) return;
+
+        try {
+            loadingRef.current = true;
+            setIsLoadingMore(true);
+            console.log("API Request:", `limit=${LIMIT}, offset=${offset}`);
+
+            const newSilhouettes = await silhouetteApi.getAllSilhouettes(LIMIT, offset);
+
+            if (newSilhouettes.length > 0) {
+                setSilhouettes((prev) => [...prev, ...newSilhouettes]);
+                setOffset((prev) => prev + LIMIT);
+                setHasMore(newSilhouettes.length === LIMIT);
+            } else {
+                setHasMore(false);
+            }
+        } catch (error) {
+            console.error("Failed to load more silhouettes:", error);
+            setHasMore(false);
+        } finally {
+            setIsLoadingMore(false);
+            loadingRef.current = false;
+        }
+    }, [isLoadingMore, hasMore, offset]);
+
+    // 현재 인덱스가 끝에 가까워지면 더 로드
+    useEffect(() => {
+        const shouldLoadMore =
+            currentIndex >= silhouettes.length - 3 && hasMore && !isLoadingMore && silhouettes.length > 0;
+
+        if (shouldLoadMore) {
+            console.log("Loading more silhouettes...", { currentIndex, length: silhouettes.length, offset });
+            loadMoreSilhouettes();
+        }
+    }, [currentIndex, silhouettes.length, hasMore, isLoadingMore, loadMoreSilhouettes]);
 
     // Initialize slide height and handle resize
     useEffect(() => {
@@ -237,13 +287,35 @@ export default function SilhouettePage() {
     }, [silhouettes.length, isTransitioning, currentIndex]);
 
     const handleUpload = () => {
-        // TODO: Implement upload functionality
-        console.log("Upload silhouette");
+        setShowUploadModal(true);
     };
 
-    const handleSearch = () => {
-        // TODO: Implement search functionality
-        console.log("Search:", searchQuery);
+    const handleSearchClick = () => {
+        setShowSearchModal(true);
+    };
+
+    const handleSearchModalClose = () => {
+        setShowSearchModal(false);
+    };
+
+    const handleUploadModalClose = async (uploaded?: boolean) => {
+        setShowUploadModal(false);
+
+        // 업로드가 성공했다면 실루엣 목록을 새로고침
+        if (uploaded) {
+            try {
+                setIsLoading(true);
+                const fetchedSilhouettes = await silhouetteApi.getAllSilhouettes(LIMIT, 0);
+                setSilhouettes(fetchedSilhouettes);
+                setOffset(LIMIT);
+                setHasMore(fetchedSilhouettes.length === LIMIT);
+                setCurrentIndex(0); // 처음 슬라이드로 이동
+            } catch (error) {
+                console.error("Failed to reload silhouettes:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
     };
 
     if (isLoading) {
@@ -276,24 +348,12 @@ export default function SilhouettePage() {
             {/* Search and Upload Header */}
             <div className="silhouette-header">
                 <div className="search-upload-container">
-                    <div className="search-section">
-                        <div className="search-input-wrapper">
-                            <input
-                                type="text"
-                                placeholder="실루엣 검색..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                                className="search-input"
-                            />
-                            <button onClick={handleSearch} className="search-btn">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <circle cx="11" cy="11" r="8" />
-                                    <path d="m21 21-4.35-4.35" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+                    <button onClick={handleSearchClick} className="search-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                        </svg>
+                    </button>
                     <button onClick={handleUpload} className="upload-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
@@ -301,7 +361,6 @@ export default function SilhouettePage() {
                             <line x1="12" y1="18" x2="12" y2="12" />
                             <line x1="9" y1="15" x2="15" y2="15" />
                         </svg>
-                        <span>업로드</span>
                     </button>
                 </div>
             </div>
@@ -331,7 +390,7 @@ export default function SilhouettePage() {
                         if (!isVisible) {
                             return (
                                 <div
-                                    key={silhouette.id}
+                                    key={`${silhouette.id}-${index}`}
                                     className="slide"
                                     style={{ opacity: 0, pointerEvents: "none" }}
                                 ></div>
@@ -340,7 +399,7 @@ export default function SilhouettePage() {
 
                         return (
                             <div
-                                key={silhouette.id}
+                                key={`${silhouette.id}-${index}`}
                                 className="slide"
                                 style={{
                                     opacity: index === currentIndex ? 1 : 0,
@@ -450,6 +509,12 @@ export default function SilhouettePage() {
                     })}
                 </div>
             </div>
+
+            {/* Search Modal */}
+            <SearchModal isOpen={showSearchModal} onClose={handleSearchModalClose} />
+
+            {/* Upload Modal */}
+            <UploadModal isOpen={showUploadModal} onClose={handleUploadModalClose} />
         </div>
     );
 }
