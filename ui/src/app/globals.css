@@ -82,6 +82,7 @@
     :root {
         --bg-primary: var(--background) !important;
         --bg-secondary: var(--accent) !important;
+        --bg-third: var(--dark-card) !important;
         --text-1: var(--text-primary) !important;
         --text-2: var(--text-secondary) !important;
         --text-3: var(--text-muted) !important;
