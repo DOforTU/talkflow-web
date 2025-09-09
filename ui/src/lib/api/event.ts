@@ -18,6 +18,11 @@ export const eventApi = {
         return response.data.data;
     },
 
+    updateEventIsDone: async (eventId: number, isDone: boolean): Promise<ResponseEventDto> => {
+        const response = await apiClient.patch(`api/events/${eventId}/done`, { isDone });
+        return response.data.data;
+    },
+
     // updateRecurringEvents: async (eventId: number, eventData: UpdateEventDto): Promise<void> => {
     //     await apiClient.patch(`api/events/${eventId}/recurring/all`, eventData);
     // },

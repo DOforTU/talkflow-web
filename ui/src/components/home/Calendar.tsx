@@ -154,8 +154,12 @@ export default function Calendar({ events, onDateSelect }: CalendarProps) {
                                         return (
                                             <div
                                                 key={eventIndex}
-                                                className={eventClassName}
-                                                style={{ backgroundColor: event.colorCode }}
+                                                className={`${eventClassName}${event.isDone ? ' is-done' : ''}`}
+                                                style={{ 
+                                                    backgroundColor: event.colorCode,
+                                                    opacity: event.isDone ? 0.75 : 1,
+                                                    textDecoration: event.isDone ? 'line-through' : 'none'
+                                                }}
                                                 title={event.title}
                                             >
                                                 {eventTitle}

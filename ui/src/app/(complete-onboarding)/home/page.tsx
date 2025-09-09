@@ -82,6 +82,19 @@ export default function HomePage() {
         setShowUpdateEventModal(true);
     };
 
+    // isDone 상태 토글 핸들러
+    const handleToggleIsDone = async (event: ResponseEventDto, e: React.MouseEvent) => {
+        e.stopPropagation(); // 부모의 클릭 이벤트 방지
+        try {
+            await eventApi.updateEventIsDone(event.id, !event.isDone);
+            // 이벤트 목록 새로고침
+            const fetchedEvents = await eventApi.getMyEvents();
+            setEvents(fetchedEvents);
+        } catch (error) {
+            console.error("Failed to toggle isDone:", error);
+        }
+    };
+
     return (
         <div className="home-page">
             {/* Main Content */}
@@ -166,17 +179,28 @@ export default function HomePage() {
                                                             </div>
                                                         </div>
                                                     )}
-                                                    <div
-                                                        className="schedule-item"
-                                                        onClick={() => handleEventClick(event)}
-                                                        style={{ cursor: "pointer" }}
-                                                    >
+                                                    <div className="schedule-wrapper">
                                                         <div
                                                             className="schedule-color-dot"
                                                             style={{ backgroundColor: event.colorCode }}
                                                         >
                                                             {currentEventNumber || ""}
                                                         </div>
+                                                        <div
+                                                            className={`schedule-item${event.isDone ? ' is-done' : ''}`}
+                                                            onClick={() => handleEventClick(event)}
+                                                            style={{ 
+                                                                cursor: "pointer",
+                                                                opacity: event.isDone ? 0.75 : 1
+                                                            }}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={event.isDone}
+                                                                onChange={(e) => handleToggleIsDone(event, e as any)}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="schedule-checkbox"
+                                                            />
                                                         <div className="schedule-time">
                                                             {event.isAllDay ? (
                                                                 texts.schedule.allDay
@@ -188,7 +212,14 @@ export default function HomePage() {
                                                             )}
                                                         </div>
                                                         <div className="schedule-content">
-                                                            <div className="schedule-title">{event.title}</div>
+                                                            <div 
+                                                                className="schedule-title"
+                                                                style={{
+                                                                    textDecoration: event.isDone ? 'line-through' : 'none'
+                                                                }}
+                                                            >
+                                                                {event.title}
+                                                            </div>
                                                             {event.description && (
                                                                 <div className="schedule-description">
                                                                     {event.description}
@@ -199,6 +230,7 @@ export default function HomePage() {
                                                                     📍 {event.location.nameKo || event.location.nameEn}
                                                                 </div>
                                                             )}
+                                                        </div>
                                                         </div>
                                                     </div>
                                                 </div>

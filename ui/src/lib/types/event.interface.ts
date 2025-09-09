@@ -95,6 +95,7 @@ export interface ResponseEventDto {
     endTime: string;
     isAllDay: boolean;
     colorCode: string;
+    isDone: boolean;
     version: number;
 
     // time columns: Date는 JSON으로 전송시 string으로 변환됨
